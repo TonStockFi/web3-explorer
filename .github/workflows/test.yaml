@@ -1,0 +1,19 @@
+name: Web3ExplorerWs CD
+on:
+    push:
+        branches:
+          main
+env:
+    node-version: 20.11.1
+
+permissions:
+  contents: write  # Grant write access to contents for release creation
+
+jobs:
+  release:
+    name: Release pushed tag
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout to git repository
+        uses: actions/checkout@v4
+
