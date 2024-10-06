@@ -46,6 +46,7 @@ jobs:
       DEBUG: electron*
       GITHUB_REPOSITORY: ${{ github.repository }}
       MAKE_OUT_DIR: ${{ github.workspace }}/apps/desktop/out/make
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout to git repository
         uses: actions/checkout@v4
