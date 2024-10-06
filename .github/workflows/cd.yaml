@@ -10,25 +10,6 @@ permissions:
   contents: write  # Grant write access to contents for release creation
 
 jobs:
-  release:
-    name: Release pushed tag
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          if gh release view "$tag" --repo="$GITHUB_REPOSITORY" &> /dev/null; then
-            echo "Release $tag already exists."
-          else
-            gh release create "$tag" \
-                --repo="$GITHUB_REPOSITORY" \
-                --title="${tag}" \
-                --draft \
-                --generate-notes
-            echo "Release $tag created."
-          fi
   desktop-build:
     name: desktop-build
     needs: release
@@ -124,4 +105,22 @@ jobs:
         if: always() && runner.os == 'macOS'
         run: |
           rm ${{ github.workspace }}/AuthKey.p8
-
+  release:
+    name: Release pushed tag
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+        run: |
+          if gh release view "$tag" --repo="$GITHUB_REPOSITORY" &> /dev/null; then
+            echo "Release $tag already exists."
+          else
+            gh release create "$tag" \
+                --repo="$GITHUB_REPOSITORY" \
+                --title="${tag}" \
+                --draft \
+                --generate-notes
+            echo "Release $tag created."
+          fi
