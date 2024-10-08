@@ -20,7 +20,7 @@ export const Localization = () => {
             action: () => mutateAsync(localizationFrom(language))
         }));
     }, [i18n.language, mutateAsync]);
-
+    console.log(i18n.languages)
     return (
         <>
             <SubHeader title={t('Localization')} />

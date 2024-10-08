@@ -1,9 +1,14 @@
 import styled from 'styled-components';
 import { hexToRGBA } from '../../libs/css';
 
-export const AsideMenuItem = styled.button<{ isSelected: boolean }>`
+/**
+ * Need to be a 'div' instead of 'button' to provide correct dnd behavior
+ */
+export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundContent)};
     border-radius: ${p => p.theme.corner2xSmall};
+    box-sizing: border-box;
+    cursor: pointer;
 
     padding: 6px 10px;
     width: 100%;
@@ -31,7 +36,7 @@ export const AsideMenuIconItem = styled.button<{ disabled: boolean }>`
     border-radius: ${p => p.theme.corner2xSmall};
     width: 24px;
     height: 24px;
-    cursor: ${p => p.disabled ? "unset":"pointer"};
+    cursor: ${p => (p.disabled ? 'not-allowed' : 'pointer')};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -42,8 +47,7 @@ export const AsideMenuIconItem = styled.button<{ disabled: boolean }>`
     }
     transition: background-color 0.15s ease-in-out;
     &:hover {
-        background: ${p => p.disabled ? undefined : hexToRGBA(p.theme.backgroundContentTint, 0.56)};
+        background: ${p =>
+            p.disabled ? undefined : hexToRGBA(p.theme.backgroundContentTint, 0.56)};
     }
 `;
-
-

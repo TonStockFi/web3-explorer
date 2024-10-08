@@ -1,0 +1,8 @@
+
+button{
+    text-transform: none!important;
+}
+
+#react-portal-modal-container > div {
+    z-index: 10001 !important;
+}

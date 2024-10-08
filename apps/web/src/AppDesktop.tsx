@@ -1,21 +1,28 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
+import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
+import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
+import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
 import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
-import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
 import { DesktopWalletHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopWalletHeader';
+import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
+import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
+import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
+import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
-import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
+import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
+import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
 import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
@@ -25,62 +32,43 @@ import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/Deskto
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { any, AppProRoute, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import Initialize from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
+import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from 'react';
+import { useLocalStorageState } from '@web3-explorer/uikit-mui';
+import { View } from '@web3-explorer/uikit-view';
+import { Buffer } from 'buffer';
+import React, { FC, Suspense, useMemo } from 'react';
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
-import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
+import styled, { createGlobalStyle, ThemeProvider, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
-import {
-  DesktopManageMultisigsPage
-} from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
-import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
+import { DeviceAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/DeviceAsideMenu';
+import { DesktopDeviceHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopDeviceHeader';
+import { AsideAccountsMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideAccountsMenu';
+import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
+import DeviceView from '@web3-explorer/uikit-desk/dist/view/DeskMonitor/DeviceView';
+import { MAIN_NAV_TYPE } from '@web3-explorer/web3-app/dist/types';
+import { TgSiteView, Web3App } from '@web3-explorer/web3-app';
+import { createTheme } from '@mui/material/styles';
 
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
-);
-const SendActionNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
-);
-const ReceiveNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/home/ReceiveNotification')
-);
-const NftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/nft/NftNotification')
-);
-const SendNftNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification')
-);
-
-const PairSignerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
-);
-const PairKeystoneNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
-);
-
-const ConnectLedgerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
-);
+window.Buffer = Buffer;
 
 const GlobalStyle = createGlobalStyle`
-    ${GlobalStyleCss};
-    
+    ${GlobalStyleCss}
+
+    ;
+
     body {
         font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
+        background-color: #10161F;
     }
-    
+
     html, body, #root {
         height: 100%;
         overflow: hidden;
-    }
-
-    html.scroll,
-    html.scroll body,
-    html.scroll #root {
-        overflow: auto;
     }
 
     html.is-locked {
@@ -88,13 +76,13 @@ const GlobalStyle = createGlobalStyle`
     }
 
     button, input[type="submit"], input[type="reset"] {
-      background: none;
-      color: inherit;
-      border: none;
-      padding: 0;
-      font: inherit;
-      cursor: pointer;
-      outline: inherit;
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
     }
 `;
 
@@ -130,6 +118,12 @@ const WalletLayout = styled.div`
     height: 100%;
 `;
 
+const DeviceLayoutBody = styled.div`
+    flex: 1;
+    display: flex;
+    max-height: calc(100%);
+`;
+
 const WalletLayoutBody = styled.div`
     flex: 1;
     display: flex;
@@ -143,7 +137,7 @@ const WalletRoutingWrapper = styled.div`
 `;
 
 const PreferencesLayout = styled.div`
-    height: calc(100% - ${desktopHeaderContainerHeight});
+    height: calc(100%);
     display: flex;
     overflow: auto;
 `;
@@ -154,87 +148,67 @@ const PreferencesRoutingWrapper = styled.div`
     position: relative;
 `;
 
-const DesktopView: FC<{
-    activeAccount?: Account | null;
-    lock: boolean;
-}> = ({ activeAccount, lock }) => {
-    const theme = useTheme();
-    useWindowsScroll();
-    useAppWidth(false);
-    useRecommendations();
-    useTrackLocation();
-    useDebuggingTools();
+const FullSizeWrapperBounded = styled(FullSizeWrapper)`
+    max-height: 100%;
+    overflow: auto;
 
-    const updated = useMemo(() => {
-        theme.displayType = 'full-width';
-        return theme;
-    }, [theme]);
-
-    return (
-        <ThemeProvider theme={updated}>
-            <GlobalStyle />
-            <DesktopContent activeAccount={activeAccount} lock={lock} />
-        </ThemeProvider>
-    );
-};
-
-const InitializeContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    min-height: var(--app-height);
-    padding: 1rem 1rem;
-    box-sizing: border-box;
-    position: relative;
     justify-content: center;
 `;
 
-const FullScreen: FC<PropsWithChildren> = ({ children }) => {
-    useLayoutEffect(() => {
-        document.documentElement.classList.add('scroll');
-        return () => {
-            document.documentElement.classList.remove('scroll');
-        };
-    }, []);
-    return <FullSizeWrapper>{children}</FullSizeWrapper>;
+const usePrefetch = () => {
+    useRecommendations();
+    useCanPromptTouchId();
 };
+
 export const DesktopContent: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = ({ activeAccount, lock }) => {
     const location = useLocation();
+    useWindowsScroll();
+    useTrackLocation();
+    usePrefetch();
+    useDebuggingTools();
 
     if (lock) {
         return (
-            <FullScreen>
+            <FullSizeWrapper>
                 <Unlock />
-            </FullScreen>
+            </FullSizeWrapper>
         );
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
         return (
-            <FullScreen>
-                <InitializeContainer>
-                   <Initialize />
+            <FullSizeWrapperBounded className="full-size-wrapper">
+                <InitializeContainer fullHeight={false}>
+                    <Routes>
+                        <Route path={any(AppRoute.import)} element={<ImportRouter />} />
+                        <Route path="*" element={<Initialize />} />
+                    </Routes>
                 </InitializeContainer>
-            </FullScreen>
+            </FullSizeWrapperBounded>
         );
     }
 
     return (
-        <WideLayout>
-            <AsideMenu />
-            <WideContent>
-                <Routes>
-                    <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
-                    <Route path={AppRoute.browser} element={<DesktopBrowser />} />
-                    <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
-                    <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
-                    <Route path="*" element={<WalletContent />} />
-                </Routes>
-            </WideContent>
+        <View empty>
+            <AppWrapper>
+                <WideLayout>
+                    <AsideMenu />
+                    <WideContent>
+                        <Routes>
+                            <Route
+                                path={any(AppProRoute.multiSend)}
+                                element={<DesktopMultiSendPage />}
+                            />
+                            <Route path="*" element={<WalletContent />} />
+                        </Routes>
+                    </WideContent>
+                </WideLayout>
+            </AppWrapper>
             <BackgroundElements />
-        </WideLayout>
+        </View>
     );
 };
 
@@ -242,7 +216,6 @@ const WalletContent = () => {
     return (
         <WalletLayout>
             <DesktopWalletHeader />
-
             <WalletLayoutBody>
                 <WalletAsideMenu />
                 <WalletRoutingWrapper className="hide-scrollbar">
@@ -258,12 +231,12 @@ const WalletContent = () => {
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
                             <Route
-                              path={AppRoute.multisigWallets}
-                              element={<DesktopManageMultisigsPage />}
+                                path={AppRoute.multisigWallets}
+                                element={<DesktopManageMultisigsPage />}
                             />
                             <Route
-                              path={AppRoute.multisigOrders}
-                              element={<DesktopMultisigOrdersPage />}
+                                path={AppRoute.multisigOrders}
+                                element={<DesktopMultisigOrdersPage />}
                             />
                             <Route
                                 path={any(AppRoute.walletSettings)}
@@ -275,6 +248,26 @@ const WalletContent = () => {
                     </Routes>
                 </WalletRoutingWrapper>
             </WalletLayoutBody>
+        </WalletLayout>
+    );
+};
+
+const DeviceContent = () => {
+    return (
+        <WalletLayout>
+            <DesktopDeviceHeader />
+            <DeviceLayoutBody>
+                <DeviceAsideMenu />
+                <WalletRoutingWrapper className="hide-scrollbar">
+                    <Routes>
+                        <Route element={<OldAppRouting />}>
+                            <Route path={AppRoute.device} element={<DeviceView />} />
+                            <Route path={AppRoute.tgSite} element={<TgSiteView />} />
+                            <Route path="*" element={<TgSiteView />} />
+                        </Route>
+                    </Routes>
+                </WalletRoutingWrapper>
+            </DeviceLayoutBody>
         </WalletLayout>
     );
 };
@@ -307,7 +300,6 @@ const BackgroundElements = () => {
         <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
-            <TonConnectSubscription />
             <NftNotification />
             <SendNftNotification />
             <AddFavoriteNotification />
@@ -316,6 +308,105 @@ const BackgroundElements = () => {
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
         </Suspense>
+    );
+};
+
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        background: {
+            default: 'rgb(16, 22, 31)',
+            paper: 'rgb(16,24,40)'
+        }
+    }
+});
+
+const DesktopView: FC<{
+    activeAccount?: Account | null;
+    lock: boolean;
+}> = ({ activeAccount, lock }) => {
+    const theme = useTheme();
+    useWindowsScroll();
+    useAppWidth(false);
+    useRecommendations();
+    useTrackLocation();
+    useDebuggingTools();
+
+    const updated = useMemo(() => {
+        theme.displayType = 'full-width';
+        return theme;
+    }, [theme]);
+
+    return (
+        <ThemeProvider theme={updated}>
+            <GlobalStyle />
+            <DesktopContent activeAccount={activeAccount} lock={lock} />
+        </ThemeProvider>
+    );
+};
+
+const AppWrapper = ({ children }: { children: React.ReactNode }) => {
+    const [mainNavType, setMainNavType] = useLocalStorageState(
+        'MAIN_NAV_TYPE_3',
+        MAIN_NAV_TYPE.GAME_FI
+    );
+    return (
+        <ThemeProvider theme={darkTheme}>
+            <>
+                <Web3App
+                    {...{
+                        mainNavType,
+                        setMainNavType: (v: MAIN_NAV_TYPE) => {
+                            setMainNavType(v);
+                        }
+                    }}
+                />
+                <View
+                    hide={mainNavType !== MAIN_NAV_TYPE.DISCOVERY}
+                    absolute
+                    x={64}
+                    y={0}
+                    right={0}
+                    bottom={0}
+                >
+                    <DesktopBrowser />
+                </View>
+                <View
+                    absFull
+                    displayNone={mainNavType !== MAIN_NAV_TYPE.MOBILE_MONITORS}
+                    x={64}
+                    y={0}
+                    right={0}
+                    bottom={0}
+                >
+                    <WideLayout>
+                        <AsideAccountsMenu />
+                        <WideContent>
+                            <Routes>
+                                <Route path="*" element={<DeviceContent />} />
+                            </Routes>
+                        </WideContent>
+                    </WideLayout>
+                </View>
+
+                <View
+                    hide={mainNavType !== MAIN_NAV_TYPE.SETTING}
+                    absolute
+                    x={64}
+                    y={0}
+                    right={0}
+                    bottom={0}
+                >
+                    <Routes>
+                        <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
+                        <Route path="*" element={<PreferencesContent />} />
+                    </Routes>
+                </View>
+                <View absFull x={64} hide={mainNavType !== MAIN_NAV_TYPE.WALLET}>
+                    {children}
+                </View>
+            </>
+        </ThemeProvider>
     );
 };
 

@@ -1,10 +1,5 @@
-import { FC, forwardRef, Fragment, ReactNode } from 'react';
-import {
-    DragDropContext,
-    Draggable,
-    DraggableProvidedDragHandleProps,
-    Droppable
-} from 'react-beautiful-dnd';
+import { FC, forwardRef, Fragment, ReactNode, useState } from 'react';
+import { Draggable, DraggableProvidedDragHandleProps, Droppable } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
 import { DropDownContent, DropDownItem } from '../../components/DropDown';
 import {
@@ -17,11 +12,16 @@ import {
     ReorderIcon,
     TrashBinIcon
 } from '../../components/Icon';
-import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
+import { ListBlockDesktopAdaptive } from '../../components/List';
 import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveTonNetwork } from '../../state/wallet';
+import {
+    useAccountsState,
+    useActiveTonNetwork,
+    useCreateMAMAccountDerivation,
+    useMutateActiveTonWallet
+} from '../../state/wallet';
 import {
     Account,
     AccountKeystone,
@@ -32,7 +32,6 @@ import {
     AccountTonOnly,
     AccountTonWatchOnly
 } from '@tonkeeper/core/dist/entries/account';
-import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
@@ -54,15 +53,12 @@ import { SelectDropDown } from '../../components/fields/Select';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import { Button } from '../../components/fields/Button';
 import { useManageFolderNotification } from '../../components/modals/ManageFolderNotificationControlled';
-import {
-    AccountsFolder,
-    useAccountsDNDDrop,
-    useDeleteFolder,
-    useSideBarItems
-} from '../../state/folders';
+import { AccountsFolder, useDeleteFolder } from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { View } from '@web3-explorer/uikit-view';
+import { MAMIndexesPageContent } from '../../pages/settings/MamIndexes';
+import { AccountsPager } from '../../components/desktop/aside/AsideAccountsMenu';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -110,27 +106,6 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
         `}
 `;
 
-const ListItemStyled = styled(ListItem)<{ $isDragging: boolean }>`
-    flex-direction: column;
-    ${p =>
-        p.$isDragging &&
-        css`
-            border-radius: unset !important;
-            background-color: ${p.theme.backgroundContent};
-            div {
-                border: none !important;
-            }
-        `}
-
-    &:last-child {
-        border-bottom: 1px solid ${p => p.theme.separatorCommon};
-    }
-`;
-
-const BottomButtonContainer = styled.div`
-    padding: 1rem;
-`;
-
 const NewFolderButton = styled.button`
     border: none;
     background-color: transparent;
@@ -147,71 +122,63 @@ const NewFolderButton = styled.button`
 
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
-    const { onOpen: addWallet } = useAddWalletNotification();
-    const { onOpen: manageFolders } = useManageFolderNotification();
+    const accounts = useAccountsState();
+
+    const accountMAM = accounts[0] as AccountMAM;
+
     const { t } = useTranslation();
 
-    const items = useSideBarItems();
-    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const { mutateAsync: createDerivation } = useCreateMAMAccountDerivation();
+    const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
+
+    const { derivations } = accountMAM;
+    const total = derivations.length;
+    const limit = 10;
+    const [page, setPage] = useState(0);
+
+    const onClickWallet = (walletId: WalletId) => setActiveWallet(walletId);
+    const onCreateDerivation = async () => {
+        const d = await createDerivation({
+            accountId: accountMAM.id,
+            count: 2
+        });
+        if (d) {
+            await onClickWallet(d.activeTonWalletId);
+            setPage(Math.floor(total / limit));
+        }
+    };
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('Manage_wallets')}</Label2>
-                <NewFolderButton onClick={() => manageFolders()}>
-                    {t('accounts_new_folder')}
-                </NewFolderButton>
+                <View w100p row aCenter jSpaceBetween>
+                    <Label2>{t('Manage_wallets')}</Label2>
+                    <View row aCenter jEnd>
+                        <View mr12 w={150}>
+                            <AccountsPager
+                                total={total}
+                                limit={limit}
+                                page={page}
+                                setPage={(p: number) => setPage(p)}
+                            />
+                        </View>
+                        <NewFolderButton onClick={() => onCreateDerivation()}>
+                            <View mr12>
+                                <PlusIcon />
+                            </View>
+                            {t('add_wallet')}
+                        </NewFolderButton>
+                    </View>
+                </View>
             </DesktopViewHeader>
-            <DragDropContext onDragEnd={handleDrop}>
-                <Droppable droppableId="settings_wallets" type="all_items">
-                    {provided => (
-                        <ListBlockDesktopAdaptive
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            margin={false}
-                        >
-                            {itemsOptimistic.map((item, index) => (
-                                <Draggable key={item.id} draggableId={item.id} index={index}>
-                                    {(p, snapshot) => {
-                                        const transform = p.draggableProps.style?.transform;
-                                        if (transform) {
-                                            try {
-                                                const tr = transform.split(',')[1];
-                                                p.draggableProps.style!.transform =
-                                                    'translate(0px,' + tr;
-                                            } catch (_) {
-                                                //
-                                            }
-                                        }
-
-                                        return (
-                                            <ListItemStyled
-                                                hover={false}
-                                                ref={p.innerRef}
-                                                {...p.draggableProps}
-                                                $isDragging={snapshot.isDragging}
-                                            >
-                                                <ItemRow
-                                                    dragHandleProps={p.dragHandleProps}
-                                                    item={item}
-                                                />
-                                            </ListItemStyled>
-                                        );
-                                    }}
-                                </Draggable>
-                            ))}
-                            {provided.placeholder}
-                        </ListBlockDesktopAdaptive>
-                    )}
-                </Droppable>
-            </DragDropContext>
-
-            <BottomButtonContainer>
-                <Button secondary fullWidth onClick={() => addWallet()}>
-                    <PlusIcon />
-                    {t('add_wallet')}
-                </Button>
-            </BottomButtonContainer>
+            <ListBlockDesktopAdaptive margin={false}>
+                <MAMIndexesPageContent
+                    limit={limit}
+                    page={page}
+                    afterWalletOpened={() => {}}
+                    account={accountMAM}
+                />
+            </ListBlockDesktopAdaptive>
         </DesktopViewPageLayoutStyled>
     );
 };

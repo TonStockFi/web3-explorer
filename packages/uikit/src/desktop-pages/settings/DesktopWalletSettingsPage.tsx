@@ -91,7 +91,7 @@ export const DesktopWalletSettingsPage = () => {
     const { mutateAsync: hideDerivation } = useHideMAMAccountDerivation();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
-    const isMultisig = useIsActiveAccountMultisig();
+    // const isMultisig = useIsActiveAccountMultisig();
 
     const canChangeVersion = isAccountVersionEditable(account);
     const canChangeDerivations = account.type === 'mam';
@@ -117,13 +117,13 @@ export const DesktopWalletSettingsPage = () => {
                 <Label2>{t('settings_title')}</Label2>
             </DesktopViewHeader>
             <SettingsListBlock>
-                <SettingsListItem onClick={() => rename({ accountId: account.id })}>
-                    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={account.emoji} />
-                    <SettingsListText>
-                        <Label2>{account.name || t('wallet_title')}</Label2>
-                        <Body3>{t('customize')}</Body3>
-                    </SettingsListText>
-                </SettingsListItem>
+                {/*<SettingsListItem onClick={() => rename({ accountId: account.id })}>*/}
+                {/*    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={account.emoji} />*/}
+                {/*    <SettingsListText>*/}
+                {/*        <Label2>{account.name || t('wallet_title')}</Label2>*/}
+                {/*        <Body3>{t('customize')}</Body3>*/}
+                {/*    </SettingsListText>*/}
+                {/*</SettingsListItem>*/}
                 {activeDerivation && (
                     <SettingsListItem
                         onClick={() =>
@@ -155,13 +155,13 @@ export const DesktopWalletSettingsPage = () => {
                 )}
                 {account.type === 'mam' && (
                     <>
-                        <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
-                            <KeyIcon />
-                            <SettingsListText>
-                                <Label2>{t('settings_backup_account')}</Label2>
-                                <Body3>{t('settings_backup_account_mam_description')}</Body3>
-                            </SettingsListText>
-                        </SettingsListItem>
+                        {/*<SettingsListItem onClick={() => recovery({ accountId: account.id })}>*/}
+                        {/*    <KeyIcon />*/}
+                        {/*    <SettingsListText>*/}
+                        {/*        <Label2>{t('settings_backup_account')}</Label2>*/}
+                        {/*        <Body3>{t('settings_backup_account_mam_description')}</Body3>*/}
+                        {/*    </SettingsListText>*/}
+                        {/*</SettingsListItem>*/}
                         <SettingsListItem
                             onClick={() =>
                                 recovery({ accountId: account.id, walletId: activeWallet.id })
@@ -172,46 +172,46 @@ export const DesktopWalletSettingsPage = () => {
                         </SettingsListItem>
                     </>
                 )}
-                {canChangeVersion && (
-                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
-                        <SettingsListItem>
-                            <SwitchIcon />
-                            <SettingsListText>
-                                <Label2>{t('settings_wallet_version')}</Label2>
-                                <Body3>
-                                    {walletVersionText((activeWallet as TonWalletStandard).version)}
-                                </Body3>
-                            </SettingsListText>
-                        </SettingsListItem>
-                    </LinkStyled>
-                )}
-                {canChangeLedgerIndex && (
-                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.ledgerIndexes}>
-                        <SettingsListItem>
-                            <SwitchIcon />
-                            <SettingsListText>
-                                <Label2>{t('settings_ledger_indexes')}</Label2>
-                                <Body3># {account.activeDerivationIndex + 1}</Body3>
-                            </SettingsListText>
-                        </SettingsListItem>
-                    </LinkStyled>
-                )}
-                {canChangeDerivations && (
-                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.derivations}>
-                        <SettingsListItem>
-                            <SwitchIcon />
-                            <SettingsListText>
-                                <Label2>{t('settings_mam_indexes')}</Label2>
-                                <Body3>
-                                    {t('settings_mam_number_wallets').replace(
-                                        '%{number}',
-                                        account.derivations.length.toString()
-                                    )}
-                                </Body3>
-                            </SettingsListText>
-                        </SettingsListItem>
-                    </LinkStyled>
-                )}
+                {/*{canChangeVersion && (*/}
+                {/*    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>*/}
+                {/*        <SettingsListItem>*/}
+                {/*            <SwitchIcon />*/}
+                {/*            <SettingsListText>*/}
+                {/*                <Label2>{t('settings_wallet_version')}</Label2>*/}
+                {/*                <Body3>*/}
+                {/*                    {walletVersionText((activeWallet as TonWalletStandard).version)}*/}
+                {/*                </Body3>*/}
+                {/*            </SettingsListText>*/}
+                {/*        </SettingsListItem>*/}
+                {/*    </LinkStyled>*/}
+                {/*)}*/}
+                {/*{canChangeLedgerIndex && (*/}
+                {/*    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.ledgerIndexes}>*/}
+                {/*        <SettingsListItem>*/}
+                {/*            <SwitchIcon />*/}
+                {/*            <SettingsListText>*/}
+                {/*                <Label2>{t('settings_ledger_indexes')}</Label2>*/}
+                {/*                <Body3># {account.activeDerivationIndex + 1}</Body3>*/}
+                {/*            </SettingsListText>*/}
+                {/*        </SettingsListItem>*/}
+                {/*    </LinkStyled>*/}
+                {/*)}*/}
+                {/*{canChangeDerivations && (*/}
+                {/*    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.derivations}>*/}
+                {/*        <SettingsListItem>*/}
+                {/*            <SwitchIcon />*/}
+                {/*            <SettingsListText>*/}
+                {/*                <Label2>{t('settings_mam_indexes')}</Label2>*/}
+                {/*                <Body3>*/}
+                {/*                    {t('settings_mam_number_wallets').replace(*/}
+                {/*                        '%{number}',*/}
+                {/*                        account.derivations.length.toString()*/}
+                {/*                    )}*/}
+                {/*                </Body3>*/}
+                {/*            </SettingsListText>*/}
+                {/*        </SettingsListItem>*/}
+                {/*    </LinkStyled>*/}
+                {/*)}*/}
                 <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.jettons}>
                     <SettingsListItem>
                         <CoinsIcon />

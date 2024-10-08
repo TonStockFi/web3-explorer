@@ -41,7 +41,7 @@ import {
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 
-const useProcessMnemonic = () => {
+export const useProcessMnemonic = () => {
     const { mutateAsync: createAccountMam } = useCreateAccountMAM();
 
     const context = useAppContext();
@@ -58,8 +58,6 @@ const useProcessMnemonic = () => {
         string[]
     >(async mnemonic => {
         let isLegacyMAM = false;
-        debugger
-
         const mightBeLegacyMAM = await TonKeychainRoot.isValidMnemonicLegacy(mnemonic);
         const isValidForUsualWallet = await validateMnemonicStandardOrBip39Ton(mnemonic);
         if (mightBeLegacyMAM && isValidForUsualWallet) {

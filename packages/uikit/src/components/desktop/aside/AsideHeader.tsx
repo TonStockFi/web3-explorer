@@ -12,23 +12,15 @@ import { fallbackRenderOver } from '../../Error';
 export const AsideHeaderContent: FC<{ width: number }> = ({ width }) => {
     const route = useAsideActiveRoute();
 
-    if (!route) {
-        return <AsideHeaderWallet width={width} />;
-    }
 
     if (route === AppProRoute.dashboard) {
         return <AsideHeaderDashboard width={width} />;
     }
 
-    if (route === AppRoute.settings) {
-        return <AsideHeaderPreferences width={width} />;
-    }
-
     if (route === AppRoute.browser) {
         return <AsideHeaderDiscover width={width} />;
     }
-
-    return <AsideHeaderContainer width={width} />;
+    return <AsideHeaderWallet width={width} />;
 };
 
 export const AsideHeader: FC<{ width: number }> = ({ width }) => {

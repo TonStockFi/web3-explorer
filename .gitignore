@@ -3,6 +3,7 @@
 # compiled output
 dist
 tmp
+apps/desktop/out/
 /out-tsc
 
 # dependencies

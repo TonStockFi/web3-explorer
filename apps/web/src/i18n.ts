@@ -1,4 +1,4 @@
-import resources from '@tonkeeper/locales/dist/i18n/default.json';
+import resources from '@tonkeeper/locales/dist/i18n/resources.json';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend';

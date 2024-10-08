@@ -6,11 +6,11 @@ import { Legal } from '../../pages/settings/Legal';
 import { UserTheme } from '../../pages/settings/Theme';
 import { DevSettings } from '../../pages/settings/Dev';
 import { FiatCurrency } from '../../pages/settings/FiatCurrency';
-import { Account } from '../../pages/settings/Account';
 import { Notifications } from '../../pages/settings/Notification';
 import { CountrySettings } from '../../pages/settings/Country';
 import styled from 'styled-components';
 import { SecuritySettings } from '../../pages/settings/Security';
+import { DesktopManageAccountsPage } from '../settings/DesktopManageWalletsSettings';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
@@ -33,7 +33,6 @@ export const DesktopPreferencesRouting = () => {
     return (
         <Routes>
             <Route element={<OldSettingsLayout />}>
-                <Route path={SettingsRoute.account} element={<Account />} />
                 <Route path={SettingsRoute.localization} element={<Localization />} />
                 <Route path={SettingsRoute.legal} element={<Legal />} />
                 <Route path={SettingsRoute.theme} element={<UserTheme />} />
@@ -58,6 +57,7 @@ export const DesktopPreferencesRouting = () => {
                 <Route path={SettingsRoute.pro} element={<ProSettings />} />
                 <Route path="*" element={<Navigate to={'.' + SettingsRoute.account} replace />} />
             </Route>
+            <Route path={SettingsRoute.account} element={<DesktopManageAccountsPage />} />
         </Routes>
     );
 };

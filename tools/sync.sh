@@ -52,8 +52,7 @@ get_cur_dir
 PROJECT_DIR=$(dirname "${CUR_DIR}")
 
 sync_projects() {
-    rsync -avh --delete --exclude-from=".gitignore" --exclude="yarn.lock" --exclude="apps/twa/" --exclude="apps/extension/" --exclude="apps/web/" --exclude="apps/desktop/.webpack" --exclude=".git" $PROJECT_DIR/ /Volumes/projects/web3-explorer-v1
-    rsync -avh --delete  $PROJECT_DIR/packages/locales/dist/ /Volumes/projects/web3-explorer-v1/packages/locales/dist
+    rsync -avh --delete --exclude-from=".gitignore" --exclude="yarn.lock" --exclude="apps/desktop/.webpack" --exclude="apps/desktop/out" --exclude=".git" $PROJECT_DIR/ /Volumes/projects/web3-explorer-v1
 }
 
 if [ "$1" == "once" ]; then

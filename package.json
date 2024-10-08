@@ -9,7 +9,7 @@
         "build": "npx turbo build",
         "build:desktop": "npx turbo build:desktop",
         "build:pkg": "npx turbo build:pkg",
-        "runAll": "yarn workspace @web3-explorer/uikit-view start & yarn workspace @web3-explorer/web3-app start & yarn workspace @web3-explorer/uikit-desk start & yarn workspace @web3-explorer/uikit-mui start & yarn workspace @tonkeeper/core start & yarn workspace @tonkeeper/uikit start"
+        "runAll": "yarn workspace @web3-explorer/lib-crypto start & yarn workspace @web3-explorer/uikit-view start & yarn workspace @web3-explorer/web3-app start & yarn workspace @web3-explorer/uikit-desk start & yarn workspace @web3-explorer/uikit-mui start & yarn workspace @tonkeeper/core start & yarn workspace @tonkeeper/uikit start"
     },
     "private": true,
     "devDependencies": {

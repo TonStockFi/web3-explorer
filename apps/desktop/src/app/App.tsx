@@ -108,6 +108,7 @@ import { MAIN_NAV_TYPE } from '@web3-explorer/web3-app/dist/types';
 import { Web3App,TgSiteView } from '@web3-explorer/web3-app';
 
 window.Buffer = Buffer;
+declare const IS_DEV: string;
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -151,7 +152,8 @@ const GlobalStyle = createGlobalStyle`
 const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
 
-const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
+// const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
+const langs = 'en,zh_TW,zh_CN';
 
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
@@ -543,7 +545,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     return (
         <ThemeView>
             <>
-                <Web3App {...{ mainNavType, setMainNavType:(v:MAIN_NAV_TYPE)=>{setMainNavType(v)} }} />
+                <Web3App {...{ IS_DEV,mainNavType, setMainNavType:(v:MAIN_NAV_TYPE)=>{setMainNavType(v)} }} />
                 <View
                     hide={mainNavType !== MAIN_NAV_TYPE.DISCOVERY}
                     absolute

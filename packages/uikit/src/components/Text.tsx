@@ -20,6 +20,17 @@ export const H2 = styled.h2`
     margin: 0 0 0.25rem;
 `;
 
+export const H2Responsive = styled(H2)`
+    user-select: none;
+
+    ${p => p.theme.displayType === 'full-width' && Label2Class}
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-bottom: 4px;
+        `}
+`;
+
 export const H3 = styled.h3`
     font-style: normal;
     font-weight: 700;
@@ -115,4 +126,18 @@ export const Num3 = styled.span`
 
 export const Mono = styled.span`
     font-family: ${p => p.theme.fontMono};
+`;
+
+export const TextEllipsis = css`
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+`;
+
+export const NoSelectText = css`
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 `;

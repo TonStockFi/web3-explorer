@@ -16,20 +16,28 @@ import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext'
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
+import {
+    I18nContext,
+    TranslationContext,
+    useTWithReplaces
+} from '@tonkeeper/uikit/dist/hooks/translation';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
+import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
+import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsState,
     useAccountsStateQuery,
     useActiveAccountQuery,
-    useActiveTonNetwork, useMutateActiveAccount
-} from "@tonkeeper/uikit/dist/state/wallet";
+    useActiveTonNetwork,
+    useMutateActiveAccount
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,9 +45,6 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
-import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
-import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
-import { useIsActiveAccountMultisig } from "@tonkeeper/uikit/dist/state/multisig";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -56,17 +61,22 @@ const queryClient = new QueryClient({
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
+// const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
+const langs = 'en,zh_TW,zh_CN';
+
 export const App: FC = () => {
     return <RouterProvider router={router} />;
 };
 
 const Providers: FC<PropsWithChildren> = () => {
-  const { t: tSimple, i18n } = useTranslation();
+    const { t: tSimple, i18n } = useTranslation();
 
-  const t = useTWithReplaces(tSimple);
+    const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
+        // const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
+        const languages = langs.split(',');
+        // console.log(languages)
         const client: I18nContext = {
             t,
             i18n: {
@@ -166,7 +176,7 @@ const Loader: FC = () => {
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
-      globalPreferencesLoading
+        globalPreferencesLoading
     ) {
         return <Loading />;
     }
@@ -191,11 +201,7 @@ const Loader: FC = () => {
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
             <AppContext.Provider value={context}>
-                <Content
-                    activeAccount={activeAccount}
-                    lock={lock}
-                    standalone={standalone}
-                />
+                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
                 <CopyNotification hideSimpleCopyNotifications={!standalone} />
                 <Suspense>
                     <QrScanner />
@@ -211,7 +217,8 @@ const Content: FC<{
     lock: boolean;
     standalone: boolean;
 }> = ({ activeAccount, lock, standalone }) => {
-    const isMobile = useLayout();
+    let isMobile = useLayout();
+    isMobile = false;
     const accounts = useAccountsState();
     const isActiveMultisig = useIsActiveAccountMultisig();
     const { mutate: setActiveAccount } = useMutateActiveAccount();
@@ -220,7 +227,7 @@ const Content: FC<{
         if (isMobile && isActiveMultisig) {
             const firstNotMultisig = accounts.filter(a => a.type !== 'ton-multisig')[0];
             if (firstNotMultisig) {
-                setActiveAccount(firstNotMultisig.id)
+                setActiveAccount(firstNotMultisig.id);
             }
         }
     }, [isMobile, isActiveMultisig, setActiveAccount]);

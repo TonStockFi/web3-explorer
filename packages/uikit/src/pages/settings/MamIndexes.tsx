@@ -1,42 +1,33 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { PencilIcon } from '../../components/Icon';
-import { NotificationFooterPortal } from '../../components/Notification';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label2 } from '../../components/Text';
+import { Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
-    useTonWalletsBalances,
-    useMutateAccountActiveDerivation,
     useActiveAccount,
-    useCreateMAMAccountDerivation,
+    useEnableMAMAccountDerivation,
     useHideMAMAccountDerivation,
-    useEnableMAMAccountDerivation
+    useTonWalletsBalances
 } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
-import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
+import { Navigate } from 'react-router-dom';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
-import { AccountBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
+import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
-import { useAppContext } from '../../hooks/appContext';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
 import { scrollToContainersBottom } from '../../libs/web';
-import { useProState } from '../../state/pro';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -48,10 +39,6 @@ const TextContainer = styled.span`
     flex-direction: column;
     display: flex;
     align-items: flex-start;
-`;
-
-const Body2Secondary = styled(Body2)`
-    color: ${props => props.theme.textSecondary};
 `;
 
 const ButtonsContainer = styled.div`
@@ -96,12 +83,12 @@ export const MAMIndexesPage = () => {
 const ListBlockStyled = styled(ListBlockDesktopAdaptive)`
     margin-bottom: 0;
 `;
-
-const FooterButtonContainerStyled = styled.div`
-    padding: 1rem;
-    margin: 0 -1rem;
-    background-color: ${p => p.theme.backgroundPage};
-`;
+//
+// const FooterButtonContainerStyled = styled.div`
+//     padding: 1rem;
+//     margin: 0 -1rem;
+//     background-color: ${p => p.theme.backgroundPage};
+// `;
 
 const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackground)`
     > svg {
@@ -135,27 +122,26 @@ export const MAMIndexesPageContent: FC<{
     afterWalletOpened?: () => void;
     account: AccountMAM;
     className?: string;
+    page?: number;
+    limit?: number;
     buttonWrapperClassName?: string;
-}> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
+}> = ({ page, limit, account, className }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
-    const { data: proState } = useProState();
     const { onOpen: recovery } = useRecoveryNotification();
-    const { onOpen: buyPro } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
-
-    const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
-        useMutateAccountActiveDerivation();
-    const navigate = useNavigate();
-
     const { data: balances } = useTonWalletsBalances(
         account.allAvailableDerivations.map(
             d => d.tonWallets.find(w => w.id === d.activeTonWalletId)!.rawAddress
         )
     );
 
-    const { mutate: createDerivation, isLoading: isCreatingDerivationLoading } =
-        useCreateMAMAccountDerivation();
+    const { derivations } = account;
+
+    const walletsList = derivations.slice().sort((a, b) => a.index - b.index);
+    let wallets = derivations;
+    if (page !== undefined && limit !== undefined) {
+        wallets = walletsList.slice(page * limit, (page + 1) * limit);
+    }
 
     const { mutate: hideDerivation, isLoading: isHideDerivationLoading } =
         useHideMAMAccountDerivation();
@@ -164,20 +150,6 @@ export const MAMIndexesPageContent: FC<{
         useEnableMAMAccountDerivation();
 
     const { onOpen: rename } = useRenameNotification();
-
-    const onOpenDerivation = async (index: number) => {
-        if (index !== account.activeDerivationIndex) {
-            await selectDerivation({ accountId: account.id, derivationIndex: index });
-        }
-        navigate(AppRoute.home);
-        afterWalletOpened?.();
-    };
-
-    const onCreateDerivation = async () => {
-        createDerivation({
-            accountId: account.id
-        });
-    };
 
     const totalDerivationsDisplayed = balances?.length;
     const totalDerivationsDisplayedPrev = usePrevious(totalDerivationsDisplayed);
@@ -205,33 +177,23 @@ export const MAMIndexesPageContent: FC<{
             derivationIndex: index
         });
     };
-
     if (!balances) {
         return <SkeletonListDesktopAdaptive size={account.allAvailableDerivations.length} />;
     }
 
-    const isLoading =
-        isSelectDerivationLoading ||
-        isCreatingDerivationLoading ||
-        isHideDerivationLoading ||
-        isEnableDerivationLoading;
+    const isLoading = isHideDerivationLoading || isEnableDerivationLoading;
 
     const canHide = account.derivations.length > 1;
-
-    const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
-    const showByProButton =
-        !proState?.subscription.valid &&
-        account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (
         <ContentWrapper className={className} ref={ref}>
             <ListBlockStyled>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        <WalletEmoji containerSize="24px" emoji={account.emoji} />
+                        {/*<WalletEmoji containerSize="24px" emoji={account.emoji} />*/}
                         <FirstLineContainer>
-                            <Label2>{account.name}</Label2>
-                            <AccountBadge accountType="mam" />
+                            <Label2>主钱包</Label2>
+                            {/*<AccountBadge accountType="mam" />*/}
                         </FirstLineContainer>
                         <ButtonsContainer>
                             <IconButtonTransparentBackgroundStyled
@@ -248,18 +210,14 @@ export const MAMIndexesPageContent: FC<{
                         </ButtonsContainer>
                     </ListItemPayload>
                 </ListItem>
-                {balances.map((balance, cycleIndex) => {
-                    const derivationIndex = account.allAvailableDerivations[cycleIndex].index;
-                    const derivation = account.allAvailableDerivations.find(
-                        d => d.index === derivationIndex
-                    )!;
-
+                {wallets!.map(derivation => {
+                    const derivationIndex = derivation.index;
                     const isDerivationAdded = account.derivations.some(
                         d => d.index === derivationIndex
                     );
 
                     return (
-                        <ListItem hover={false} key={balance.address}>
+                        <ListItem style={{ paddingLeft: 24 }} hover={false} key={derivation.index}>
                             <ListItemPayload>
                                 <NameContainer>
                                     <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
@@ -267,14 +225,14 @@ export const MAMIndexesPageContent: FC<{
                                         <FirstLineContainer>
                                             <Label2>{derivation.name}</Label2>
                                             <WalletIndexBadge>
-                                                #{derivationIndex + 1}
+                                                #{derivation.index + 1}
                                             </WalletIndexBadge>
                                         </FirstLineContainer>
-                                        <Body2Secondary>
-                                            {toShortValue(formatAddress(balance.address)) + ' '}·
-                                            {' ' + toFormattedTonBalance(balance.tonBalance)}
-                                            &nbsp;TON
-                                        </Body2Secondary>
+                                        {/*<Body2Secondary>*/}
+                                        {/*    {toShortValue(formatAddress(balance.address)) + ' '}·*/}
+                                        {/*    {' ' + toFormattedTonBalance(balance.tonBalance)}*/}
+                                        {/*    &nbsp;TON*/}
+                                        {/*</Body2Secondary>*/}
                                     </TextContainer>
                                 </NameContainer>
                                 {isDerivationAdded ? (
@@ -286,12 +244,6 @@ export const MAMIndexesPageContent: FC<{
                                         >
                                             <PencilIcon />
                                         </IconButtonTransparentBackgroundStyled>
-                                        <Button
-                                            onClick={() => onOpenDerivation(derivationIndex)}
-                                            loading={isLoading}
-                                        >
-                                            {t('open')}
-                                        </Button>
                                         {canHide && (
                                             <Button
                                                 onClick={() => onHideDerivation(derivationIndex)}
@@ -324,19 +276,6 @@ export const MAMIndexesPageContent: FC<{
                     );
                 })}
             </ListBlockStyled>
-            <NotificationFooterPortal>
-                <FooterButtonContainerStyled className={buttonWrapperClassName}>
-                    {showByProButton ? (
-                        <Button primary fullWidth onClick={buyPro}>
-                            {t('settings_mam_add_wallet_with_pro')}
-                        </Button>
-                    ) : (
-                        <Button fullWidth onClick={onCreateDerivation}>
-                            {t('settings_mam_add_wallet')}
-                        </Button>
-                    )}
-                </FooterButtonContainerStyled>
-            </NotificationFooterPortal>
         </ContentWrapper>
     );
 };

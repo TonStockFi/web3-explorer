@@ -7,7 +7,6 @@ import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
-import { View } from '@web3-explorer/uikit-view';
 
 const Block = styled.form`
     display: flex;

@@ -55,6 +55,7 @@ const AsideMenuItemLargeBody = styled.div`
 
 const AsideMenuItemsBlock = styled.div`
     padding: 0.5rem;
+    margin-top: 1rem;
 `;
 
 export const PreferencesAsideMenu = () => {
@@ -62,65 +63,22 @@ export const PreferencesAsideMenu = () => {
     const location = useLocation();
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
     const isAccountOpened = location.pathname.startsWith(SettingsRoute.account);
-    // const sdk = useAppSdk();
-    // const { config } = useAppContext();
-    // const { isOpen, onClose, onOpen } = useDisclosure();
-    const { data: countryData } = useCountrySetting();
-    const country = countryData === null ? t('auto') : countryData;
-    // const { data: proState } = useProState();
-    // const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
-    // const wallets = useAccountsState();
-
     return (
         <PreferencesAsideContainer>
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.account}>
                     {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive || isAccountOpened || isCoinPageOpened}>
+                        <AsideMenuItemStyled
+                            isSelected={isActive || isAccountOpened || isCoinPageOpened}
+                        >
                             <SlidersIcon />
                             <Label2>{t('Manage_wallets')}</Label2>
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                {/* <NavLink to={AppRoute.settings + SettingsRoute.security}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
-                            <LockIcon />
-                            <Label2>{t('settings_security')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink> */}
-                {/* <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <TonkeeperSkeletIcon />
-                            <Label2>{t('tonkeeper_pro')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink> */}
-                {/* {true && (
-                    <NavLink to={AppRoute.settings + SettingsRoute.theme}>
-                        {({ isActive }) => (
-                            <AsideMenuItemLarge isSelected={isActive}>
-                                <AppearanceIcon />
-                                <AsideMenuItemLargeBody>
-                                    <Label2>{t('preferences_aside_theme')}</Label2>
-                                    <Body2>
-                                        {!uiPreferences ? (
-                                            <Skeleton width="60px" height="14px" margin="3px 0" />
-                                        ) : (
-                                            capitalize(
-                                                uiPreferences.theme ||
-                                                    Object.keys(availableThemes)[0]
-                                            )
-                                        )}
-                                    </Body2>
-                                </AsideMenuItemLargeBody>
-                            </AsideMenuItemLarge>
-                        )}
-                    </NavLink>
-                )} */}
+            </AsideMenuItemsBlock>
+            <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.localization}>
                     {({ isActive }) => (
                         <AsideMenuItemLarge isSelected={isActive}>
@@ -143,42 +101,7 @@ export const PreferencesAsideMenu = () => {
                         </AsideMenuItemLarge>
                     )}
                 </NavLink>
-                <NavLink to={AppRoute.settings + SettingsRoute.country}>
-                    {({ isActive }) => (
-                        <AsideMenuItemLarge isSelected={isActive}>
-                            <PlaceIcon />
-                            <AsideMenuItemLargeBody>
-                                <Label2>{t('country')}</Label2>
-                                <Body2>
-                                    {!country ? (
-                                        <Skeleton width="60px" height="14px" margin="3px 0" />
-                                    ) : (
-                                        getCountryName(i18n.language, country)
-                                    )}
-                                </Body2>
-                            </AsideMenuItemLargeBody>
-                        </AsideMenuItemLarge>
-                    )}
-                </NavLink>
             </AsideMenuItemsBlock>
-
-            {/*<AsideMenuItemsBlock>*/}
-                {/* <AsideMenuItemStyled
-                    onClick={() => config.supportLink && sdk.openPage(config.supportLink)}
-                    isSelected={false}
-                >
-                    <EnvelopeIcon />
-                    <Label2>{t('settings_contact_support')}</Label2>
-                </AsideMenuItemStyled> */}
-                {/* <NavLink to={AppRoute.settings + SettingsRoute.legal}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <DocIcon />
-                            <Label2>{t('settings_legal_documents')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink> */}
-            {/*</AsideMenuItemsBlock>*/}
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.dev}>
                     {({ isActive }) => (
@@ -189,17 +112,6 @@ export const PreferencesAsideMenu = () => {
                     )}
                 </NavLink>
             </AsideMenuItemsBlock>
-            {/* <AsideMenuItemsBlock>
-                <AsideMenuItemStyled onClick={onOpen} isSelected={false}>
-                    <ExitIcon />
-                    <Label2>
-                        {wallets.length > 1
-                            ? t('preferences_aside_sign_out_all')
-                            : t('preferences_aside_sign_out')}
-                    </Label2>
-                </AsideMenuItemStyled>
-                <DeleteAllNotification open={isOpen} handleClose={onClose} />
-            </AsideMenuItemsBlock> */}
         </PreferencesAsideContainer>
     );
 };

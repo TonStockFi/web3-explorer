@@ -2,7 +2,7 @@ name: Web3ExplorerWs CD
 on:
     push:
         branches:
-          main
+          dev
 env:
     node-version: 20.11.1
 
@@ -12,8 +12,25 @@ permissions:
 jobs:
   release:
     name: Release pushed tag
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest
     steps:
       - name: Checkout to git repository
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Enable Corepack
+        run: |
+          corepack enable
+
+      - name: Run install
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: install
+
+      - name: Run install
+        run: |
+          cd packages/core/node_modules/secp256k1
+          ls 

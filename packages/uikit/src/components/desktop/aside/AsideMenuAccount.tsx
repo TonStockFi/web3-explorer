@@ -43,7 +43,7 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
     transition: opacity 0.15s ease-in-out;
 `;
 
-const AsideMenuSubItemContainer = styled.div`
+export const AsideMenuSubItemContainer = styled.div`
     padding-left: 16px;
 `;
 
@@ -59,7 +59,7 @@ const WalletVersionBadgeStyled = styled(WalletVersionBadge)`
     margin-left: -4px;
 `;
 
-const WalletIndexBadgeStyled = styled(WalletIndexBadge)`
+export const WalletIndexBadgeStyled = styled(WalletIndexBadge)`
     margin-left: -4px;
 `;
 
