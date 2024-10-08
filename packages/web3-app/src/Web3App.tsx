@@ -6,8 +6,10 @@ import DevView from './pages/DevView';
 
 export const Web3App = ({
     mainNavType,
+    IS_DEV,
     setMainNavType
 }: {
+    IS_DEV?:boolean;
     setMainNavType: (v:MAIN_NAV_TYPE)=>void;
     mainNavType: MAIN_NAV_TYPE;
 }) => {
@@ -60,7 +62,7 @@ export const Web3App = ({
     const appOptions = { mainNavType, setMainNavType};
     return (
         <View empty>
-            <VerticalToggleButtons options={appOptions} />
+            <VerticalToggleButtons IS_DEV={IS_DEV} options={appOptions} />
             {/*<View displayNone={mainNavType !== MAIN_NAV_TYPE.GAME_FI}>*/}
             {/*    <GameFiView*/}
             {/*        {...{*/}

@@ -17,6 +17,7 @@ export interface SiteInfo {
 }
 
 export interface AppOptions {
+    IS_DEV?:boolean;
     options: {
         mainNavType?: MAIN_NAV_TYPE;
         setMainNavType: (v:MAIN_NAV_TYPE)=>void;

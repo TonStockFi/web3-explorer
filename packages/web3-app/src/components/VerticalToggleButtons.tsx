@@ -1,31 +1,24 @@
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import BugReportIcon from "@mui/icons-material/BugReport";
-import DevicesIcon from "@mui/icons-material/Devices";
-import LanguageIcon from "@mui/icons-material/Language";
-import SettingsIcon from "@mui/icons-material/Settings";
-import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import { useTheme } from "@mui/material/styles";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import Tooltip from "@mui/material/Tooltip";
-import { View } from "@web3-explorer/uikit-view";
-import * as React from "react";
-import { useEffect } from "react";
-import { AppOptions, MAIN_NAV_TYPE } from "../types";
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import BugReportIcon from '@mui/icons-material/BugReport';
+import DevicesIcon from '@mui/icons-material/Devices';
+import LanguageIcon from '@mui/icons-material/Language';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import { useTheme } from '@mui/material/styles';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Tooltip from '@mui/material/Tooltip';
+import { View } from '@web3-explorer/uikit-view';
+import * as React from 'react';
+import { useEffect } from 'react';
+import { AppOptions, MAIN_NAV_TYPE } from '../types';
 
-declare const IS_DEV: string;
-
-export default function VerticalToggleButtons({ options }: AppOptions) {
+export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
     const theme = useTheme();
-    const [view, setView] = React.useState<MAIN_NAV_TYPE | 'LOGIN' | 'MENU'>(
-        MAIN_NAV_TYPE.WALLET
-    );
+    const [view, setView] = React.useState<MAIN_NAV_TYPE | 'LOGIN' | 'MENU'>(MAIN_NAV_TYPE.WALLET);
 
-    const handleChange = (
-        event: React.MouseEvent<HTMLElement>,
-        nextView: MAIN_NAV_TYPE
-    ) => {
-        setView(nextView);
+    const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: MAIN_NAV_TYPE) => {
+        nextView && setView(nextView);
     };
     useEffect(() => {
         setView(options.mainNavType!);
@@ -90,7 +83,6 @@ export default function VerticalToggleButtons({ options }: AppOptions) {
             }
         }
     ];
-
     return (
         <View
             absolute
@@ -125,13 +117,7 @@ export default function VerticalToggleButtons({ options }: AppOptions) {
                                                 borderRadius: 0,
                                                 border: 'none'
                                             }}
-                                            onClick={
-                                                onClick
-                                                    ? onClick
-                                                    : () => {
-                                                        setView(value);
-                                                    }
-                                            }
+                                            onClick={onClick}
                                             value={value}
                                             aria-label={value}
                                         >
@@ -140,7 +126,6 @@ export default function VerticalToggleButtons({ options }: AppOptions) {
                                     </Tooltip>
                                 );
                             })}
-                        s
                     </View>
                     <View w100p>
                         {items
@@ -160,8 +145,8 @@ export default function VerticalToggleButtons({ options }: AppOptions) {
                                                 onClick
                                                     ? onClick
                                                     : () => {
-                                                        setView(value);
-                                                    }
+                                                          setView(value);
+                                                      }
                                             }
                                             value={value}
                                             aria-label={value}

@@ -217,7 +217,7 @@ export function Sites() {
 
 export const WebView3 = () => {
     React.useEffect(() => {
-        window.backgroundApi
+        window.backgroundApi && window.backgroundApi
             .message({
                 king: 'onAction',
                 payload: {

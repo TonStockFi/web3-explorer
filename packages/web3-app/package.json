@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
-    "sync-bg": "cp ../../apps/desktop/src/backgroud.d.ts ./src/backgroud.d.ts"
+    "sync-bg": "cp ../../apps/desktop/src/backgroud.d.ts ./src/backgroud.d.ts",
+    "sync": "rsync -avh --delete --exclude-from='.gitignore' ./dist/ /Volumes/projects/web3-explorer-v1/packages/web3-app/dist"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -18,8 +19,11 @@
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^6.1.0",
     "@mui/material": "^6.1.0",
+    "@ton-keychain/core": "^0.0.4",
     "@ton/crypto": "3.2.0",
+    "@tonkeeper/core": "0.1.0",
     "@tonkeeper/uikit": "0.1.0",
+    "@web3-explorer/lib-crypto": "1.0.0",
     "@web3-explorer/opencv": "1.0.0",
     "@web3-explorer/uikit-desk": "1.0.0",
     "@web3-explorer/uikit-mui": "1.0.0",

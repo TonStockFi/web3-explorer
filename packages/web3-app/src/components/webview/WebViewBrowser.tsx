@@ -31,7 +31,7 @@ const WebViewBrowser = ({
     const [env, setEnv] = useState<null|{__dirname:string}>(null);
 
     useEffect(() => {
-        window.backgroundApi
+        window.backgroundApi && window.backgroundApi
             .message({
                 king: 'onAction',
                 payload: {
