@@ -79,8 +79,10 @@ jobs:
 
             - name: fix:mui:dark
               run: |
-                  cd uikit-mui
+                  cd ${{ github.workspace }}/packages/uikit-mui
                   yarn fix:mui:dark
+                  cd ${{ github.workspace }}/packages/locales
+                  yarn build:rm
 
             - name: Install dependencies
               run: |

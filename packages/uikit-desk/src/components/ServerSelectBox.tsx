@@ -41,7 +41,7 @@ export default function ServerSelectBox({ onChangeApi }: { onChangeApi: any }) {
                         label="Server API"
                         onChange={handleChange}
                     >
-                        {hosts.map(host => {
+                        {hosts.map((host:string) => {
                             return (
                                 <MenuItem key={host} value={host}>
                                     {host}
