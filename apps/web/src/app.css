@@ -1,4 +1,6 @@
-
+body{
+    background-color: rgb(16, 22, 31);
+}
 button{
     text-transform: none!important;
 }

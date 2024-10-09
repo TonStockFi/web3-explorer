@@ -39,10 +39,8 @@ async function getCachedImageAsDataUri(userId,accessKey){
 }
 (() => {
     getCachedImageAsDataUri("${userId}","${accessKey}").then((res) => {
-    debugger
         window.__jsEvalResAvatar = res
     }).catch((e)=>{
-    debugger
         window.__jsEvalResAvatar = {err: e.message}
     });
 })()
@@ -212,3 +210,17 @@ export const sendClick = async (webview: WebviewTag, x: number, y: number) => {
         clickCount: 1
     });
 };
+
+export async function sendToSiteMessage(webview: WebviewTag,action:string, payload?:any) {
+    return window.backgroundApi.message({
+        king:"onAction",
+        payload:{
+            action:"sendToSite",
+            value:{
+                action,
+                payload:payload || {}
+            },
+            webContentsId:webview.getWebContentsId()
+        }
+    })
+}

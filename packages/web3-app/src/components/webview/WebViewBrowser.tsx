@@ -1,8 +1,8 @@
-import ErrorWebview from '@web3-explorer/uikit-desk/dist/components/ErrorWebview';
+import ErrorWebview from '../../components/ErrorWebview';
 import { Loading } from '@web3-explorer/uikit-mui';
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useRef, useState } from 'react';
-import { GLOBAL_CSS, USER_AGENT } from '../../common/constant';
+import { GLOBAL_CSS, USER_AGENT } from '../../constant';
 import { getPartitionKey } from '../../common/utils';
 import { WebviewProps } from '../../types';
 import {WebviewTag} from "electron";
@@ -54,7 +54,31 @@ const WebViewBrowser = ({
         setWebview(webview);
 
         let loadFailed = false;
-        let isMounted = true;
+        let isMounted = false;
+        if (webviewProps && webviewProps.onSiteMessage) {
+            console.log("onSiteMessage bind")
+            window.backgroundApi.onSiteMessage(
+              async (event: {
+                  senderWebContentsId: number;
+                  message: { action: string; payload?: Record<string, any> };
+              }) => {
+                  if (!isMounted) {
+                      return;
+                  }
+                  try {
+                      const webContentsId = webview.getWebContentsId();
+                      console.log("onSiteMessage",webContentsId,event.senderWebContentsId)
+                      if (event.senderWebContentsId === webContentsId) {
+                          if (webviewProps.onSiteMessage) {
+                              await webviewProps.onSiteMessage(event.message, webview);
+                          }
+                      }
+                  }catch (e){
+                      console.error(e)
+                  }
+              }
+            );
+        }
 
         const events: Record<string, any> = {
             'load-commit': async () => {},
@@ -80,10 +104,7 @@ const WebViewBrowser = ({
                     console.error('Skipping dom-ready due to load failure.');
                     return;
                 }
-                if (loadFailed) {
-                    console.error('Skipping did-finish-load due to load failure.');
-                    return;
-                }
+                isMounted = true
                 if (!webview.isAudioMuted()) {
                     webview.setAudioMuted(true);
                 }
@@ -99,29 +120,6 @@ const WebViewBrowser = ({
                 }
                 setError(null);
                 webviewProps?.onReady && (await webviewProps.onReady(webview));
-
-                if (webviewProps && webviewProps.onSiteMessage) {
-                    window.backgroundApi.onSiteMessage(
-                        async (event: {
-                            senderWebContentsId: number;
-                            message: { action: string; payload?: Record<string, any> };
-                        }) => {
-                            if (!isMounted) {
-                                return;
-                            }
-                            try {
-                                const webContentsId = webview.getWebContentsId();
-                                if (event.senderWebContentsId === webContentsId) {
-                                    if (webviewProps.onSiteMessage) {
-                                        await webviewProps.onSiteMessage(event.message, webview);
-                                    }
-                                }
-                            }catch (e){
-                                console.error(e)
-                            }
-                        }
-                    );
-                }
                 setIsReady(true);
             }
         };
@@ -132,8 +130,8 @@ const WebViewBrowser = ({
             }
         });
         return () => {
-            isMounted = false;
             if (webview) {
+                isMounted = false;
                 Object.keys(events).forEach(key => {
                     if (events[key]) {
                         webview.removeEventListener(key, events[key]);

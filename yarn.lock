@@ -4708,7 +4708,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^6.1.0":
+"@mui/icons-material@npm:6.1.1, @mui/icons-material@npm:^6.1.0":
   version: 6.1.1
   resolution: "@mui/icons-material@npm:6.1.1"
   dependencies:
@@ -4724,7 +4724,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^6.1.0":
+"@mui/material@npm:6.1.1, @mui/material@npm:^6.1.0":
   version: 6.1.1
   resolution: "@mui/material@npm:6.1.1"
   dependencies:
@@ -7593,6 +7593,7 @@ __metadata:
     "@types/styled-components": "npm:^5.1.34"
     "@types/uuid": "npm:^9.0.1"
     "@web3-explorer/lib-crypto": "npm:1.0.0"
+    "@web3-explorer/uikit-mui": "npm:1.0.0"
     "@web3-explorer/uikit-view": "npm:1.0.0"
     babel-loader: "npm:^8.3.0"
     bignumber.js: "npm:^9.1.1"
@@ -9121,7 +9122,6 @@ __metadata:
     "@vercel/webpack-asset-relocator-loader": "npm:1.7.3"
     "@web3-explorer/uikit-desk": "npm:1.0.0"
     "@web3-explorer/uikit-mui": "npm:1.0.0"
-    "@web3-explorer/uikit-v1": "npm:1.0.0"
     "@web3-explorer/uikit-view": "npm:1.0.0"
     "@web3-explorer/web3-app": "npm:1.0.0"
     buffer: "npm:^6.0.3"
@@ -9173,6 +9173,7 @@ __metadata:
     bip39: "npm:^3.0.4"
     bn.js: "npm:^4.12.0"
     crypto-browserify: "npm:^3.12.0"
+    crypto-js: "npm:^4.2.0"
     elliptic: "npm:6.5.4"
     ethereum-cryptography: "npm:0.1.3"
     ethereumjs-wallet: "npm:^1.0.2"
@@ -9238,13 +9239,14 @@ __metadata:
     "@storybook/react": "npm:^8.2.9"
     "@storybook/react-vite": "npm:^8.2.9"
     "@storybook/test": "npm:^8.2.9"
+    "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    "@web3-explorer/lib-crypto": "npm:1.0.0"
     "@web3-explorer/opencv": "npm:1.0.0"
     "@web3-explorer/uikit-mui": "npm:1.0.0"
-    "@web3-explorer/uikit-v1": "npm:1.0.0"
     "@web3-explorer/uikit-view": "npm:1.0.0"
     "@web3-explorer/utils": "npm:1.0.0"
     crypto-js: "npm:^4.2.0"
@@ -9273,41 +9275,8 @@ __metadata:
     "@emotion/styled": "npm:^11.13.0"
     "@eslint/js": "npm:^9.9.0"
     "@fontsource/roboto": "npm:^5.1.0"
-    "@mui/icons-material": "npm:^6.1.0"
-    "@mui/material": "npm:^6.1.0"
-    "@storybook/addon-essentials": "npm:^8.2.9"
-    "@storybook/addon-interactions": "npm:^8.2.9"
-    "@storybook/addon-links": "npm:^8.2.9"
-    "@storybook/addon-onboarding": "npm:^8.2.9"
-    "@storybook/blocks": "npm:^8.2.9"
-    "@storybook/react": "npm:^8.2.9"
-    "@storybook/react-vite": "npm:^8.2.9"
-    "@storybook/test": "npm:^8.2.9"
-    "@types/react": "npm:^18.3.3"
-    "@types/react-dom": "npm:^18.3.0"
-    "@vitejs/plugin-react": "npm:^4.3.1"
-    "@web3-explorer/uikit-view": "npm:1.0.0"
-    eslint: "npm:^9.9.0"
-    eslint-plugin-react-hooks: "npm:^5.1.0-rc.0"
-    eslint-plugin-react-refresh: "npm:^0.4.9"
-    eslint-plugin-storybook: "npm:^0.8.0"
-    globals: "npm:^15.9.0"
-    react: "npm:^18.3.1"
-    react-dom: "npm:^18.3.1"
-    storybook: "npm:^8.2.9"
-    typescript: "npm:^5.5.3"
-    typescript-eslint: "npm:^8.0.1"
-    vite: "npm:^5.4.1"
-    vite-plugin-react-native-web: "npm:^1.0.3"
-  languageName: unknown
-  linkType: soft
-
-"@web3-explorer/uikit-v1@npm:1.0.0, @web3-explorer/uikit-v1@workspace:packages/uikit-v1":
-  version: 0.0.0-use.local
-  resolution: "@web3-explorer/uikit-v1@workspace:packages/uikit-v1"
-  dependencies:
-    "@chromatic-com/storybook": "npm:^1.6.1"
-    "@eslint/js": "npm:^9.9.0"
+    "@mui/icons-material": "npm:6.1.1"
+    "@mui/material": "npm:6.1.1"
     "@storybook/addon-essentials": "npm:^8.2.9"
     "@storybook/addon-interactions": "npm:^8.2.9"
     "@storybook/addon-links": "npm:^8.2.9"
@@ -9324,6 +9293,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.9"
     eslint-plugin-storybook: "npm:^0.8.0"
     globals: "npm:^15.9.0"
+    patch-package: "npm:^8.0.0"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     storybook: "npm:^8.2.9"
@@ -9356,6 +9326,7 @@ __metadata:
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    "@web3-explorer/uikit-mui": "npm:1.0.0"
     eslint: "npm:^9.9.0"
     eslint-plugin-react-hooks: "npm:^5.1.0-rc.0"
     eslint-plugin-react-refresh: "npm:^0.4.9"
@@ -9418,9 +9389,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.3.1"
     "@web3-explorer/lib-crypto": "npm:1.0.0"
     "@web3-explorer/opencv": "npm:1.0.0"
-    "@web3-explorer/uikit-desk": "npm:1.0.0"
     "@web3-explorer/uikit-mui": "npm:1.0.0"
-    "@web3-explorer/uikit-v1": "npm:1.0.0"
     "@web3-explorer/uikit-view": "npm:1.0.0"
     "@web3-explorer/utils": "npm:1.0.0"
     crypto-js: "npm:^4.2.0"
@@ -9468,7 +9437,6 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.2.1"
     "@web3-explorer/uikit-desk": "npm:1.0.0"
     "@web3-explorer/uikit-mui": "npm:1.0.0"
-    "@web3-explorer/uikit-v1": "npm:1.0.0"
     "@web3-explorer/uikit-view": "npm:1.0.0"
     "@web3-explorer/web3-app": "npm:1.0.0"
     buffer: "npm:^6.0.3"
@@ -9874,6 +9842,13 @@ __metadata:
   version: 4.2.2
   resolution: "@xtuc/long@npm:4.2.2"
   checksum: 10/7217bae9fe240e0d804969e7b2af11cb04ec608837c78b56ca88831991b287e232a0b7fce8d548beaff42aaf0197ffa471d81be6ac4c4e53b0148025a2c076ec
+  languageName: node
+  linkType: hard
+
+"@yarnpkg/lockfile@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@yarnpkg/lockfile@npm:1.1.0"
+  checksum: 10/cd19e1114aaf10a05126aeea8833ef4ca8af8a46e88e12884f8359d19333fd19711036dbc2698dbe937f81f037070cf9a8da45c2e8c6ca19cafd7d15659094ed
   languageName: node
   linkType: hard
 
@@ -11953,7 +11928,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ci-info@npm:^3.2.0":
+"ci-info@npm:^3.2.0, ci-info@npm:^3.7.0":
   version: 3.9.0
   resolution: "ci-info@npm:3.9.0"
   checksum: 10/75bc67902b4d1c7b435497adeb91598f6d52a3389398e44294f6601b20cfef32cf2176f7be0eb961d9e085bb333a8a5cae121cb22f81cf238ae7f58eb80e9397
@@ -15715,6 +15690,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"find-yarn-workspace-root@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "find-yarn-workspace-root@npm:2.0.0"
+  dependencies:
+    micromatch: "npm:^4.0.2"
+  checksum: 10/7fa7942849eef4d5385ee96a0a9a5a9afe885836fd72ed6a4280312a38690afea275e7d09b343fe97daf0412d833f8ac4b78c17fc756386d9ebebf0759d707a7
+  languageName: node
+  linkType: hard
+
 "flat-cache@npm:^3.0.4":
   version: 3.2.0
   resolution: "flat-cache@npm:3.2.0"
@@ -18722,6 +18706,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-stable-stringify@npm:^1.0.2":
+  version: 1.1.1
+  resolution: "json-stable-stringify@npm:1.1.1"
+  dependencies:
+    call-bind: "npm:^1.0.5"
+    isarray: "npm:^2.0.5"
+    jsonify: "npm:^0.0.1"
+    object-keys: "npm:^1.1.1"
+  checksum: 10/60853c1f63451319b5c7953465a555aa816cf84e60e3ca36b6c05225d8fdc4615127fb4ecb92f9f5ad880c552ab8cbae9a519f78b995e7788d6d89e57afafdeb
+  languageName: node
+  linkType: hard
+
 "json-stringify-safe@npm:^5.0.1":
   version: 5.0.1
   resolution: "json-stringify-safe@npm:5.0.1"
@@ -18780,6 +18776,13 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 10/03014769e7dc77d4cf05fa0b534907270b60890085dd5e4d60a382ff09328580651da0b8b4cdf44d91e4c8ae64d91791d965f05707beff000ed494a38b6fec85
+  languageName: node
+  linkType: hard
+
+"jsonify@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "jsonify@npm:0.0.1"
+  checksum: 10/7b86b6f4518582ff1d8b7624ed6c6277affd5246445e864615dbdef843a4057ac58587684faf129ea111eeb80e01c15f0a4d9d03820eb3f3985fa67e81b12398
   languageName: node
   linkType: hard
 
@@ -18877,6 +18880,15 @@ __metadata:
   version: 6.0.3
   resolution: "kind-of@npm:6.0.3"
   checksum: 10/5873d303fb36aad875b7538798867da2ae5c9e328d67194b0162a3659a627d22f742fc9c4ae95cd1704132a24b00cae5041fc00c0f6ef937dc17080dc4dbb962
+  languageName: node
+  linkType: hard
+
+"klaw-sync@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "klaw-sync@npm:6.0.0"
+  dependencies:
+    graceful-fs: "npm:^4.1.11"
+  checksum: 10/0da397f8961313c3ef8f79fb63af9002cde5a8fb2aeb1a37351feff0dd6006129c790400c3f5c3b4e757bedcabb13d21ec0a5eaef5a593d59515d4f2c291e475
   languageName: node
   linkType: hard
 
@@ -20737,7 +20749,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open@npm:^7.0.3":
+"open@npm:^7.0.3, open@npm:^7.4.2":
   version: 7.4.2
   resolution: "open@npm:7.4.2"
   dependencies:
@@ -20800,6 +20812,13 @@ __metadata:
   version: 1.0.2
   resolution: "os-homedir@npm:1.0.2"
   checksum: 10/af609f5a7ab72de2f6ca9be6d6b91a599777afc122ac5cad47e126c1f67c176fe9b52516b9eeca1ff6ca0ab8587fe66208bc85e40a3940125f03cdb91408e9d2
+  languageName: node
+  linkType: hard
+
+"os-tmpdir@npm:~1.0.2":
+  version: 1.0.2
+  resolution: "os-tmpdir@npm:1.0.2"
+  checksum: 10/5666560f7b9f10182548bf7013883265be33620b1c1b4a4d405c25be2636f970c5488ff3e6c48de75b55d02bde037249fe5dbfbb4c0fb7714953d56aed062e6d
   languageName: node
   linkType: hard
 
@@ -21134,6 +21153,31 @@ __metadata:
   version: 0.1.1
   resolution: "pascalcase@npm:0.1.1"
   checksum: 10/f83681c3c8ff75fa473a2bb2b113289952f802ff895d435edd717e7cb898b0408cbdb247117a938edcbc5d141020909846cc2b92c47213d764e2a94d2ad2b925
+  languageName: node
+  linkType: hard
+
+"patch-package@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "patch-package@npm:8.0.0"
+  dependencies:
+    "@yarnpkg/lockfile": "npm:^1.1.0"
+    chalk: "npm:^4.1.2"
+    ci-info: "npm:^3.7.0"
+    cross-spawn: "npm:^7.0.3"
+    find-yarn-workspace-root: "npm:^2.0.0"
+    fs-extra: "npm:^9.0.0"
+    json-stable-stringify: "npm:^1.0.2"
+    klaw-sync: "npm:^6.0.0"
+    minimist: "npm:^1.2.6"
+    open: "npm:^7.4.2"
+    rimraf: "npm:^2.6.3"
+    semver: "npm:^7.5.3"
+    slash: "npm:^2.0.0"
+    tmp: "npm:^0.0.33"
+    yaml: "npm:^2.2.2"
+  bin:
+    patch-package: index.js
+  checksum: 10/8714322c35b29266e71c82d58443ce5322400a546a3327f1b8907b8eeb7e366dff33c4fdfbd25e3f0b3a9927189c26e9ac60636ca1e4140d6dbc11cca10f9b5d
   languageName: node
   linkType: hard
 
@@ -25298,6 +25342,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tmp@npm:^0.0.33":
+  version: 0.0.33
+  resolution: "tmp@npm:0.0.33"
+  dependencies:
+    os-tmpdir: "npm:~1.0.2"
+  checksum: 10/09c0abfd165cff29b32be42bc35e80b8c64727d97dedde6550022e88fa9fd39a084660415ed8e3ebaa2aca1ee142f86df8b31d4196d4f81c774a3a20fd4b6abf
+  languageName: node
+  linkType: hard
+
 "tmp@npm:^0.2.0":
   version: 0.2.1
   resolution: "tmp@npm:0.2.1"
@@ -26799,7 +26852,6 @@ __metadata:
     prettier: "npm:^2.6.2"
     turbo: "npm:^2.0.4"
     typescript: "npm:^4.9.4"
-    webpack: "npm:^5.80.0"
     webpack-cli: "npm:^5.0.1"
     wrangler: "npm:^3.7.0"
   languageName: unknown
@@ -27033,7 +27085,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:>=4.43.0 <6.0.0, webpack@npm:^5.69.1, webpack@npm:^5.80.0, webpack@npm:^5.88.2, webpack@npm:^5.89.0":
+"webpack@npm:>=4.43.0 <6.0.0, webpack@npm:^5.69.1, webpack@npm:^5.88.2, webpack@npm:^5.89.0":
   version: 5.89.0
   resolution: "webpack@npm:5.89.0"
   dependencies:
@@ -27511,6 +27563,15 @@ __metadata:
   version: 1.10.2
   resolution: "yaml@npm:1.10.2"
   checksum: 10/e088b37b4d4885b70b50c9fa1b7e54bd2e27f5c87205f9deaffd1fb293ab263d9c964feadb9817a7b129a5bf30a06582cb08750f810568ecc14f3cdbabb79cb3
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.2.2":
+  version: 2.5.1
+  resolution: "yaml@npm:2.5.1"
+  bin:
+    yaml: bin.mjs
+  checksum: 10/0eecb679db75ea6a989ad97715a9fa5d946972945aa6aa7d2175bca66c213b5564502ccb1cdd04b1bf816ee38b5c43e4e2fda3ff6f5e09da24dabb51ae92c57d
   languageName: node
   linkType: hard
 

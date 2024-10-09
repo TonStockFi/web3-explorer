@@ -1,6 +1,9 @@
 import { MutableRefObject, Ref, RefCallback } from 'react';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
-
+export function isDesktop(){
+    //@ts-ignore
+    return !!window.backgroundApi
+}
 export const scrollToTop = () => {
     if (!document.body.classList.contains('top')) {
         const body = document.getElementById('body');

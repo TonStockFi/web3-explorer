@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { deepDiff, generateDeviceId, generateRandomPassword } from '../../common/utils';
 import ServerApi from '../../common/ServerApi';
 import { IS_DEV } from '../../constant';
-import { md5 } from '../../common/DESCrypto';
+import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { useLocalStorageState } from '@web3-explorer/uikit-mui';
 import { Snackbar } from '@mui/material';
 

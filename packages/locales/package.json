@@ -5,7 +5,8 @@
     "description": "Tonkeeper locales",
     "scripts": {
         "build": "ts-node ./task/build",
-        "build:pkg": "yarn build"
+        "build:rm": "rm -rf dist/ && yarn build",
+        "sync": "rsync -avh --delete ./dist/ /Volumes/projects/web3-explorer-v1/packages/locales/dist"
     },
     "devDependencies": {
         "@types/node": "^20.6.3",

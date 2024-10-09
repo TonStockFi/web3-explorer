@@ -10,9 +10,9 @@
         "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
         "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/dev/swagger.yaml?token=GHSAT0AAAAAACKHFPNI4HJL4Q4RIAYDUQ3MZPAKM2A' --output ./src/tonConsoleApi",
         "generate:swapsApi": "rm -r ./src/swapsApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/swaps-backend/master/swagger.yaml?token=GHSAT0AAAAAACJYQUODBKR67AB7WULZBFWEZSUUGFQ' --output ./src/swapsApi",
-        "build": "rm -fr dist && tsc",
+        "build": "tsc",
         "start": "tsc -w",
-        "build:pkg": "yarn build"
+        "build:pkg": "rm -fr dist && yarn build"
     },
     "devDependencies": {
         "npm-run-all": "^4.1.5",

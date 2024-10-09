@@ -17,6 +17,7 @@ export const H2 = styled.h2`
     font-weight: 700;
     font-size: 24px;
     line-height: 32px;
+    color: ${props => props.theme.textPrimary};
     margin: 0 0 0.25rem;
 `;
 

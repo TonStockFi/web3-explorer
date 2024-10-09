@@ -55,7 +55,7 @@ export const DesktopConnectedAppsSettings = () => {
 
     return (
         <DesktopViewPageLayoutStyled>
-            <DesktopViewHeaderStyled backButton>
+            <DesktopViewHeaderStyled backButton={false}>
                 <Label2>{t('settings_connected_apps')}</Label2>
                 {showDisconnectAll && (
                     <DisconnectAllButton onClick={onOpen}>

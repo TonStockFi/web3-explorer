@@ -5,10 +5,10 @@ import {
     CutAreaRect,
     DeviceInfo,
     DeviceOptions
-} from '@web3-explorer/uikit-desk/dist/view/DeskMonitor/types';
-import { DefaultCutRect } from '@web3-explorer/uikit-desk/dist/view/DeskMonitor/global';
+} from '../../pages/DeskMonitor/types';
+import { DefaultCutRect } from '../../pages/DeskMonitor/global';
 import { useLocalStorageState } from '@web3-explorer/uikit-mui';
-import ScreenView from '@web3-explorer/uikit-desk/dist/view/DeskMonitor/Screen/ScreenView';
+import ScreenView from '../../pages/DeskMonitor/Screen/ScreenView';
 import WebViewBrowser from './WebViewBrowser';
 import { getDeviceIdFromUrl } from '../../common/utils';
 import { PropTypes } from '@mui/material';
@@ -16,6 +16,7 @@ import { WebviewProps } from '../../types';
 
 const WebViewComponent = ({
     setGlobalUpdatedAt,
+    index,
     tgUserId,
     webviewProps,
     webviewTitle,
@@ -32,6 +33,7 @@ const WebViewComponent = ({
     url,
     noInfo
 }: {
+    index?:number;
     setGlobalUpdatedAt?: (v: number) => void;
     topBarHeight?: number;
     topBar?: boolean;
@@ -88,6 +90,7 @@ const WebViewComponent = ({
     const deviceOptions: DeviceOptions = {
         setGlobalUpdatedAt,
         headerColor,
+        index,
         webviewTitle,
         tgUserId,
         setIsInfoPanel: noInfo ? undefined : setIsInfoPanel,

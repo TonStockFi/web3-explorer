@@ -1,14 +1,13 @@
-import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import styled from 'styled-components';
-import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { fallbackRenderOver } from '../../Error';
-import { ArrowLeftIcon } from '../../Icon';
-import { ScrollContainer } from '../../ScrollContainer';
-import { Label2 } from '../../Text';
-import { AsideMenuIconItem } from '../../shared/AsideItem';
-import { AccountWalletsList, AsideResizeHandle } from './AsideMenu';
-import { View } from '@web3-explorer/uikit-view';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import styled from "styled-components";
+import { useMutateUserUIPreferences, useUserUIPreferences } from "../../../state/theme";
+import { fallbackRenderOver } from "../../Error";
+import { ArrowLeftIcon } from "../../Icon";
+import { Label2 } from "../../Text";
+import { AsideMenuIconItem } from "../../shared/AsideItem";
+import { AccountWalletsList, AsideResizeHandle } from "./AsideMenu";
+import { View } from "@web3-explorer/uikit-view";
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -62,6 +61,7 @@ export const AccountsPager = ({
     if (total <= limit) {
         return null;
     }
+    const totalPages = Math.ceil(total / limit);
     return (
         <View py={4} row jSpaceBetween aCenter px={6}>
             <AsideMenuIconItem
@@ -75,14 +75,14 @@ export const AccountsPager = ({
                 </IconWrapper>
             </AsideMenuIconItem>
             <Label2>
-                {page + 1} / {1 + Math.floor(total / limit)}
+                {page + 1} / {totalPages}
             </Label2>
 
             <AsideMenuIconItem
-                disabled={limit * (page + 1) >= total}
+                disabled={page + 1 >= totalPages}
                 style={{ transform: 'rotate(180deg)' }}
                 onClick={() => {
-                    if (limit * (page + 1) < total) {
+                    if (page + 1 < totalPages) {
                         setPage(page + 1);
                     }
                 }}

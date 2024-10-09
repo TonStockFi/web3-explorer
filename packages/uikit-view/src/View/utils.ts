@@ -1,4 +1,4 @@
-import { SxProps, Theme } from '@mui/system';
+import { SxProps, Theme } from '@web3-explorer/uikit-mui/dist/mui/system';
 import { CSSProperties } from 'react';
 import { ViewProps } from './types';
 

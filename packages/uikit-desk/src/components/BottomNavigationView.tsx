@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import Box from '@web3-explorer/uikit-mui/dist/mui/Box';
+import BottomNavigation from '@web3-explorer/uikit-mui/dist/mui/BottomNavigation';
+import BottomNavigationAction from '@web3-explorer/uikit-mui/dist/mui/BottomNavigationAction';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LinkIcon from '@mui/icons-material/Link';
 

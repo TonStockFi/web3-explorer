@@ -162,14 +162,14 @@ export const DesktopWalletSettingsPage = () => {
                         {/*        <Body3>{t('settings_backup_account_mam_description')}</Body3>*/}
                         {/*    </SettingsListText>*/}
                         {/*</SettingsListItem>*/}
-                        <SettingsListItem
-                            onClick={() =>
-                                recovery({ accountId: account.id, walletId: activeWallet.id })
-                            }
-                        >
-                            <KeyIcon />
-                            <Label2>{t('settings_backup_wallet')}</Label2>
-                        </SettingsListItem>
+                        {/*<SettingsListItem*/}
+                        {/*    onClick={() =>*/}
+                        {/*        recovery({ accountId: account.id, walletId: activeWallet.id })*/}
+                        {/*    }*/}
+                        {/*>*/}
+                        {/*    <KeyIcon />*/}
+                        {/*    <Label2>{t('settings_backup_wallet')}</Label2>*/}
+                        {/*</SettingsListItem>*/}
                     </>
                 )}
                 {/*{canChangeVersion && (*/}
@@ -224,14 +224,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_collectibles_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                {!isReadOnly && (
-                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
-                        <SettingsListItem>
-                            <AppsIcon />
-                            <Label2>{t('settings_connected_apps')}</Label2>
-                        </SettingsListItem>
-                    </LinkStyled>
-                )}
+                {/*{!isReadOnly && (*/}
+                {/*    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>*/}
+                {/*        <SettingsListItem>*/}
+                {/*            <AppsIcon />*/}
+                {/*            <Label2>{t('settings_connected_apps')}</Label2>*/}
+                {/*        </SettingsListItem>*/}
+                {/*    </LinkStyled>*/}
+                {/*)}*/}
             </SettingsListBlock>
             <DesktopViewDivider />
             {/*<SettingsListBlock>*/}

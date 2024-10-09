@@ -2,7 +2,7 @@ import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
-import { PencilIcon } from '../../components/Icon';
+import { PencilIcon,KeyIcon } from '../../components/Icon';
 import { SubHeader } from '../../components/SubHeader';
 import { Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
@@ -90,6 +90,7 @@ const ListBlockStyled = styled(ListBlockDesktopAdaptive)`
 //     background-color: ${p => p.theme.backgroundPage};
 // `;
 
+
 const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackground)`
     > svg {
         color: ${p => p.theme.iconTertiary};
@@ -135,8 +136,7 @@ export const MAMIndexesPageContent: FC<{
         )
     );
 
-    const { derivations } = account;
-
+    const { allAvailableDerivations:derivations } = account;
     const walletsList = derivations.slice().sort((a, b) => a.index - b.index);
     let wallets = derivations;
     if (page !== undefined && limit !== undefined) {
@@ -190,22 +190,15 @@ export const MAMIndexesPageContent: FC<{
             <ListBlockStyled>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        {/*<WalletEmoji containerSize="24px" emoji={account.emoji} />*/}
                         <FirstLineContainer>
-                            <Label2>主钱包</Label2>
-                            {/*<AccountBadge accountType="mam" />*/}
+                            <Label2>{t('wallet_main')}</Label2>
                         </FirstLineContainer>
                         <ButtonsContainer>
-                            <IconButtonTransparentBackgroundStyled
-                                onClick={() => rename({ accountId: account.id })}
-                            >
-                                <PencilIcon />
-                            </IconButtonTransparentBackgroundStyled>
                             <Button
                                 onClick={() => recovery({ accountId: account.id })}
                                 loading={isLoading}
                             >
-                                {t('backup_screen_title')}
+                                <KeyIcon />
                             </Button>
                         </ButtonsContainer>
                     </ListItemPayload>
@@ -215,7 +208,6 @@ export const MAMIndexesPageContent: FC<{
                     const isDerivationAdded = account.derivations.some(
                         d => d.index === derivationIndex
                     );
-
                     return (
                         <ListItem style={{ paddingLeft: 24 }} hover={false} key={derivation.index}>
                             <ListItemPayload>
@@ -237,13 +229,7 @@ export const MAMIndexesPageContent: FC<{
                                 </NameContainer>
                                 {isDerivationAdded ? (
                                     <ButtonsContainer>
-                                        <IconButtonTransparentBackgroundStyled
-                                            onClick={() =>
-                                                rename({ accountId: account.id, derivationIndex })
-                                            }
-                                        >
-                                            <PencilIcon />
-                                        </IconButtonTransparentBackgroundStyled>
+                                       
                                         {canHide && (
                                             <Button
                                                 onClick={() => onHideDerivation(derivationIndex)}
@@ -252,9 +238,31 @@ export const MAMIndexesPageContent: FC<{
                                                 {t('hide')}
                                             </Button>
                                         )}
+                                         <IconButtonTransparentBackgroundStyled
+                                            onClick={() =>
+                                                rename({ accountId: account.id, derivationIndex })
+                                            }
+                                        >
+                                            <PencilIcon />
+                                        </IconButtonTransparentBackgroundStyled>
+                                         <Button
+                                            onClick={() => recovery({ accountId: account.id, walletId: derivation.activeTonWalletId })}
+                                            loading={isLoading}
+                                        >
+                                            <KeyIcon />
+                                        </Button>
+                                        
                                     </ButtonsContainer>
                                 ) : (
                                     <ButtonsContainer>
+
+                                        <Button
+                                            primary
+                                            onClick={() => onEnableDerivation(derivationIndex)}
+                                            loading={isLoading}
+                                        >
+                                            {t('add')}
+                                        </Button>
                                         <IconButtonTransparentBackgroundStyled
                                             onClick={() =>
                                                 rename({ accountId: account.id, derivationIndex })
@@ -262,12 +270,12 @@ export const MAMIndexesPageContent: FC<{
                                         >
                                             <PencilIcon />
                                         </IconButtonTransparentBackgroundStyled>
+                                        
                                         <Button
-                                            primary
-                                            onClick={() => onEnableDerivation(derivationIndex)}
+                                            onClick={() => recovery({ accountId: account.id, walletId: derivation.activeTonWalletId })}
                                             loading={isLoading}
                                         >
-                                            {t('add')}
+                                            <KeyIcon />
                                         </Button>
                                     </ButtonsContainer>
                                 )}

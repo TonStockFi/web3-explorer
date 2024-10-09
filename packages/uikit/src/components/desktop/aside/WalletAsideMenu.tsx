@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
-import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SettingsSmoothIcon, SwapIcon } from '../../Icon';
+import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import { ClockSmoothIcon, CoinsIcon, SaleBadgeIcon, SwapIcon } from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -106,14 +106,14 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             )} */}
-            <NavLink to={AppRoute.walletSettings}>
+            {/* <NavLink to={AppRoute.walletSettings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
                     </AsideMenuItemStyled>
                 )}
-            </NavLink>
+            </NavLink> */}
         </WalletAsideContainer>
     );
 };

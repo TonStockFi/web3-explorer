@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Box } from '@web3-explorer/uikit-v1';
+import { View } from '@web3-explorer/uikit-view';
 
 export default function ShapeDetectionImage() {
     const [imagesLoaded, setImagesLoaded] = useState(false);
@@ -125,17 +125,17 @@ export default function ShapeDetectionImage() {
         src.delete();
     }, [imagesLoaded]);
     return (
-        <Box column alignItems={'flex-start'}>
-            <Box>
+        <View column alignItems={'flex-start'}>
+            <View>
                 <img
                     onLoad={handleImageLoad}
                     id="referenceImage"
                     src="shape_detect_matching/shapes.jpg"
                 />
-            </Box>
-            <Box mt12>
+            </View>
+            <View mt12>
                 <canvas id="canvasOutput"></canvas>
-            </Box>
-        </Box>
+            </View>
+        </View>
     );
 }

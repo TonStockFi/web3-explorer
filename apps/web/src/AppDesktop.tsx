@@ -4,10 +4,14 @@ import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectL
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
 import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
+import { AsideAccountsMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideAccountsMenu';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
+import { DeviceAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/DeviceAsideMenu';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
+import { DesktopDeviceHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopDeviceHeader';
 import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
+import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
 import { DesktopWalletHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopWalletHeader';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
@@ -20,13 +24,12 @@ import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/S
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
-import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
-import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
-import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
-import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import {
+    DesktopConnectedAppsSettings
+} from "@tonkeeper/uikit/dist/desktop-pages/settings/DesktopConnectedAppsSettings";
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -38,21 +41,16 @@ import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { useLocalStorageState } from '@web3-explorer/uikit-mui';
+import DeviceView from '@web3-explorer/uikit-desk/dist/view/DeskMonitor/DeviceView';
+import { DarkTheme, IAppProvider, IThemeProvider, useLocalStorageState } from '@web3-explorer/uikit-mui';
 import { View } from '@web3-explorer/uikit-view';
+import { TgSiteView, Web3App } from '@web3-explorer/web3-app';
+import { MAIN_NAV_TYPE } from '@web3-explorer/web3-app/dist/types';
 import { Buffer } from 'buffer';
 import React, { FC, Suspense, useMemo } from 'react';
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { createGlobalStyle, ThemeProvider, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
-import { DeviceAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/DeviceAsideMenu';
-import { DesktopDeviceHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopDeviceHeader';
-import { AsideAccountsMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideAccountsMenu';
-import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
-import DeviceView from '@web3-explorer/uikit-desk/dist/view/DeskMonitor/DeviceView';
-import { MAIN_NAV_TYPE } from '@web3-explorer/web3-app/dist/types';
-import { TgSiteView, Web3App } from '@web3-explorer/web3-app';
-import { createTheme } from '@mui/material/styles';
 
 window.Buffer = Buffer;
 
@@ -226,22 +224,22 @@ const WalletContent = () => {
                                 path={any(AppRoute.purchases)}
                                 element={<DesktopCollectables />}
                             />
-                            <Route path={any(AppRoute.dns)} element={<DesktopDns />} />
+                            {/* <Route path={any(AppRoute.dns)} element={<DesktopDns />} /> */}
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
-                            <Route
+                            {/* <Route
                                 path={AppRoute.multisigWallets}
                                 element={<DesktopManageMultisigsPage />}
-                            />
-                            <Route
+                            /> */}
+                            {/* <Route
                                 path={AppRoute.multisigOrders}
                                 element={<DesktopMultisigOrdersPage />}
-                            />
-                            <Route
+                            /> */}
+                            {/* <Route
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}
-                            />
+                            /> */}
                             <Route path={AppRoute.swap} element={<DesktopSwapPage />} />
                             <Route path="*" element={<DesktopTokens />} />
                         </Route>
@@ -263,6 +261,7 @@ const DeviceContent = () => {
                         <Route element={<OldAppRouting />}>
                             <Route path={AppRoute.device} element={<DeviceView />} />
                             <Route path={AppRoute.tgSite} element={<TgSiteView />} />
+                            <Route path={AppRoute.connect_apps} element={<DesktopConnectedAppsSettings />} />
                             <Route path="*" element={<TgSiteView />} />
                         </Route>
                     </Routes>
@@ -311,16 +310,6 @@ const BackgroundElements = () => {
     );
 };
 
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        background: {
-            default: 'rgb(16, 22, 31)',
-            paper: 'rgb(16,24,40)'
-        }
-    }
-});
-
 const DesktopView: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -336,77 +325,76 @@ const DesktopView: FC<{
         theme.displayType = 'full-width';
         return theme;
     }, [theme]);
-
     return (
-        <ThemeProvider theme={updated}>
-            <GlobalStyle />
-            <DesktopContent activeAccount={activeAccount} lock={lock} />
-        </ThemeProvider>
+        <IAppProvider>
+            <ThemeProvider theme={updated}>
+                <GlobalStyle />
+                <DesktopContent activeAccount={activeAccount} lock={lock} />
+            </ThemeProvider>
+        </IAppProvider>
     );
 };
 
 const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     const [mainNavType, setMainNavType] = useLocalStorageState(
         'MAIN_NAV_TYPE_3',
-        MAIN_NAV_TYPE.GAME_FI
+        MAIN_NAV_TYPE.WALLET
     );
     return (
-        <ThemeProvider theme={darkTheme}>
-            <>
-                <Web3App
-                    {...{
-                        mainNavType,
-                        setMainNavType: (v: MAIN_NAV_TYPE) => {
-                            setMainNavType(v);
-                        }
-                    }}
-                />
-                <View
-                    hide={mainNavType !== MAIN_NAV_TYPE.DISCOVERY}
-                    absolute
-                    x={64}
-                    y={0}
-                    right={0}
-                    bottom={0}
-                >
-                    <DesktopBrowser />
-                </View>
-                <View
-                    absFull
-                    displayNone={mainNavType !== MAIN_NAV_TYPE.MOBILE_MONITORS}
-                    x={64}
-                    y={0}
-                    right={0}
-                    bottom={0}
-                >
-                    <WideLayout>
-                        <AsideAccountsMenu />
-                        <WideContent>
-                            <Routes>
-                                <Route path="*" element={<DeviceContent />} />
-                            </Routes>
-                        </WideContent>
-                    </WideLayout>
-                </View>
+        <IThemeProvider theme={DarkTheme}>
+            <Web3App
+                {...{
+                    mainNavType,
+                    setMainNavType: (v: MAIN_NAV_TYPE) => {
+                        setMainNavType(v);
+                    }
+                }}
+            />
+            <View
+                hide={mainNavType !== MAIN_NAV_TYPE.DISCOVERY}
+                absolute
+                x={64}
+                y={0}
+                right={0}
+                bottom={0}
+            >
+                <DesktopBrowser />
+            </View>
+            <View
+                absFull
+                displayNone={mainNavType !== MAIN_NAV_TYPE.MOBILE_MONITORS}
+                x={64}
+                y={0}
+                right={0}
+                bottom={0}
+            >
+                <WideLayout>
+                    <AsideAccountsMenu />
+                    <WideContent>
+                        <Routes>
+                            <Route path="*" element={<DeviceContent />} />
+                        </Routes>
+                    </WideContent>
+                </WideLayout>
+            </View>
 
-                <View
-                    hide={mainNavType !== MAIN_NAV_TYPE.SETTING}
-                    absolute
-                    x={64}
-                    y={0}
-                    right={0}
-                    bottom={0}
-                >
-                    <Routes>
-                        <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
-                        <Route path="*" element={<PreferencesContent />} />
-                    </Routes>
-                </View>
-                <View absFull x={64} hide={mainNavType !== MAIN_NAV_TYPE.WALLET}>
-                    {children}
-                </View>
-            </>
-        </ThemeProvider>
+            <View
+                hide={mainNavType !== MAIN_NAV_TYPE.SETTING}
+                absolute
+                x={64}
+                y={0}
+                right={0}
+                bottom={0}
+            >
+                <Routes>
+                    <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
+                    <Route path="*" element={<PreferencesContent />} />
+                </Routes>
+            </View>
+            <View absFull x={64} hide={mainNavType !== MAIN_NAV_TYPE.WALLET}>
+                {children}
+            </View>
+        </IThemeProvider>
     );
 };
 

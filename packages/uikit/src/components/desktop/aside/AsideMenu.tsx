@@ -30,6 +30,11 @@ import { Label2 } from '../../Text';
 import { PlusIcon } from '../../Icon';
 import { AccountsPager } from './AsideAccountsMenu';
 import { useTranslation } from '../../../hooks/translation';
+import { View } from '@web3-explorer/uikit-view';
+import { WalletBatchCreateNumber } from '../../create/WalletBatchCreateNumber';
+import { useTheme } from 'styled-components';
+import { useIAppContext } from '@web3-explorer/uikit-mui';
+
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -187,7 +192,12 @@ export const AccountWalletsList = () => {
         (walletId: WalletId) => setActiveWallet(walletId).then(handleNavigateHome),
         [setActiveWallet, handleNavigateHome]
     );
+
+    const [openSetCountDialog, setOpenSetCountDialog] = useState(false);
     const [page, setPage] = useState(0);
+
+    const theme = useTheme();
+    const { showBackdrop } = useIAppContext();
 
     if (accounts.length === 0) {
         return null;
@@ -201,20 +211,49 @@ export const AccountWalletsList = () => {
     const limit = 20;
 
     const onCreateDerivation = async () => {
-        const d = await createDerivation({
-            accountId: accountMAM.id
-        });
-        if (d) {
-            await onClickWallet(d.activeTonWalletId);
-            setPage(Math.floor(total / limit));
-        }
+        setOpenSetCountDialog(true);
     };
 
     const walletsList = derivations.slice().sort((a, b) => a.index - b.index);
     const wallets = walletsList.slice(page * limit, (page + 1) * limit);
-
     return (
         <>
+            <View
+                dialog={{
+                    dialogProps: {
+                        open: openSetCountDialog,
+                        sx: {
+                            '& .MuiDialog-paper': { width: 850, height: 400 }
+                        }
+                    },
+
+                    content: (
+                        <View wh100p row aCenter center bgColor={theme.backgroundContent}>
+                            <View p={'12px'}>
+                                <WalletBatchCreateNumber
+                                    onClose={() => {
+                                        setOpenSetCountDialog(false);
+                                    }}
+                                    submitHandler={async ({ count }: { count: number }) => {
+                                        setOpenSetCountDialog(false);
+                                        showBackdrop(true);
+                                        showBackdrop(true);
+                                        const d = await createDerivation({
+                                            accountId: accountMAM.id,
+                                            count: count
+                                        });
+                                        if (d) {
+                                            await onClickWallet(d.activeTonWalletId);
+                                        }
+                                        showBackdrop(false);
+                                        setPage(Math.ceil((total + count) / limit) - 1);
+                                    }}
+                                />
+                            </View>
+                        </View>
+                    )
+                }}
+            />
             <AsideMenuBottom style={{ flex: 0 }}>
                 <AsideMenuItem
                     style={{ marginBottom: 4 }}
@@ -253,7 +292,9 @@ export const AccountWalletsList = () => {
                 })}
             </ScrollContainer>
             <AsideMenuBottom>
-                <DividerStyled isHidden={false} style={{ marginBottom: 4 }} />
+                {
+                    total > limit && <DividerStyled isHidden={false} style={{ marginBottom: 4 }} />
+                }
                 <AccountsPager
                     total={total}
                     limit={limit}

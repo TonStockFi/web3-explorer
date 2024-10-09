@@ -1,13 +1,11 @@
-import { FC } from 'react';
-import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
-import { AsideHeaderWallet } from './AsideHeaderWallet';
-import { AppProRoute, AppRoute } from '../../../libs/routes';
-import { AsideHeaderDashboard } from './AsideHeaderDashboard';
-import { AsideHeaderContainer } from './AsideHeaderElements';
-import { AsideHeaderPreferences } from './AsideHeaderPreferences';
-import { AsideHeaderDiscover } from './AsideHeaderDiscover';
-import { ErrorBoundary } from 'react-error-boundary';
-import { fallbackRenderOver } from '../../Error';
+import { FC } from "react";
+import { useAsideActiveRoute } from "../../../hooks/desktop/useAsideActiveRoute";
+import { AsideHeaderWallet } from "./AsideHeaderWallet";
+import { AppProRoute, AppRoute } from "../../../libs/routes";
+import { AsideHeaderDashboard } from "./AsideHeaderDashboard";
+import { AsideHeaderDiscover } from "./AsideHeaderDiscover";
+import { ErrorBoundary } from "react-error-boundary";
+import { fallbackRenderOver } from "../../Error";
 
 export const AsideHeaderContent: FC<{ width: number }> = ({ width }) => {
     const route = useAsideActiveRoute();

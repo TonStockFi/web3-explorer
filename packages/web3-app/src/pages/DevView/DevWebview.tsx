@@ -198,7 +198,7 @@ export const TgWeb = () => {
 
 export function Sites() {
     return (
-        <View absFull top={70} row jStart fWrap h100p overflowYAuto w100p bottom={24}>
+        <View left={12} absFull top={70} row jStart fWrap h100p overflowYAuto w100p bottom={24}>
             <View mr12 mb12>
                 <Google />
             </View>

@@ -15,7 +15,8 @@ export enum AppRoute {
     multisigWallets = '/multisig-wallets',
     home = '/',
     device = '/device',
-    tgSite = '/tg-site'
+    tgSite = '/tg-site',
+    connect_apps = '/connect-apps'
 }
 
 export enum AppProRoute {

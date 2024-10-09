@@ -8,8 +8,7 @@
     "scripts": {
         "build": "npx turbo build",
         "build:desktop": "npx turbo build:desktop",
-        "build:pkg": "npx turbo build:pkg",
-        "runAll": "yarn workspace @web3-explorer/lib-crypto start & yarn workspace @web3-explorer/uikit-view start & yarn workspace @web3-explorer/web3-app start & yarn workspace @web3-explorer/uikit-desk start & yarn workspace @web3-explorer/uikit-mui start & yarn workspace @tonkeeper/core start & yarn workspace @tonkeeper/uikit start"
+        "build:pkg": "npx turbo build:pkg"
     },
     "private": true,
     "devDependencies": {
@@ -30,7 +29,6 @@
         "prettier": "^2.6.2",
         "turbo": "^2.0.4",
         "typescript": "^4.9.4",
-        "webpack": "^5.80.0",
         "webpack-cli": "^5.0.1",
         "wrangler": "^3.7.0"
     },

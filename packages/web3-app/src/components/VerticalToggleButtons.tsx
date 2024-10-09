@@ -1,31 +1,28 @@
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import BugReportIcon from '@mui/icons-material/BugReport';
-import DevicesIcon from '@mui/icons-material/Devices';
-import LanguageIcon from '@mui/icons-material/Language';
-import SettingsIcon from '@mui/icons-material/Settings';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-import { useTheme } from '@mui/material/styles';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import Tooltip from '@mui/material/Tooltip';
+import {
+    AccountBalanceWalletIcon,BugReportIcon,DevicesIcon,LanguageIcon,SettingsIcon,SportsEsportsIcon
+} from "@web3-explorer/uikit-mui/dist/mui/Icons"
+import ToggleButton from '@web3-explorer/uikit-mui/dist/mui/ToggleButton';
+import ToggleButtonGroup from '@web3-explorer/uikit-mui/dist/mui/ToggleButtonGroup';
+import { useColorScheme } from '@web3-explorer/uikit-mui/dist/mui/styles';
+import Tooltip from '@web3-explorer/uikit-mui/dist/mui/Tooltip';
 import { View } from '@web3-explorer/uikit-view';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { AppOptions, MAIN_NAV_TYPE } from '../types';
-
+import {useTranslation} from "@tonkeeper/uikit/dist/hooks/translation"
 export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
-    const theme = useTheme();
+    const {t} = useTranslation();
     const [view, setView] = React.useState<MAIN_NAV_TYPE | 'LOGIN' | 'MENU'>(MAIN_NAV_TYPE.WALLET);
-
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: MAIN_NAV_TYPE) => {
         nextView && setView(nextView);
     };
     useEffect(() => {
         setView(options.mainNavType!);
     }, [options.mainNavType]);
+
     const items = [
         {
-            tips: '钱包',
+            tips: t("wallet_title"),
             value: MAIN_NAV_TYPE.WALLET,
             icon: <AccountBalanceWalletIcon />,
             onClick: () => {
@@ -34,7 +31,7 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
             }
         },
         {
-            tips: '远程设备',
+            tips: t('apps_connect'),
             value: MAIN_NAV_TYPE.MOBILE_MONITORS,
             icon: <DevicesIcon />,
             onClick: () => {
@@ -43,7 +40,7 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
             }
         },
         {
-            tips: '发现',
+            tips: t('aside_discover'),
             value: MAIN_NAV_TYPE.DISCOVERY,
             icon: <LanguageIcon />,
             onClick: () => {
@@ -52,7 +49,7 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
             }
         },
         {
-            tips: '玩赚',
+            tips: t('game_fi'),
             value: MAIN_NAV_TYPE.GAME_FI,
             icon: <SportsEsportsIcon />,
             onClick: () => {
@@ -74,7 +71,7 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
         {
             bottom: true,
             hide: !IS_DEV,
-            tips: 'Setting',
+            tips: t('aside_settings'),
             value: MAIN_NAV_TYPE.SETTING,
             icon: <SettingsIcon />,
             onClick: () => {
@@ -86,13 +83,9 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
     return (
         <View
             absolute
-            sx={{
-                borderRight: `1px solid ${theme.palette.divider}`,
-                bgcolor: theme.palette.background.default
-            }}
             x={0}
             y={0}
-            w={'63px'}
+            w={'64px'}
             h100p
         >
             <View column aCenter jStart w100p h100p>
@@ -115,7 +108,14 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
                                                 width: '100%',
                                                 py: 2,
                                                 borderRadius: 0,
-                                                border: 'none'
+                                                border: 'none',
+
+                                                '&.Mui-selected': {
+                                                    bgcolor: '#1D2633',
+                                                },
+                                                '&.Mui-selected:hover': {
+                                                    bgcolor: '#1D2633',
+                                                },
                                             }}
                                             onClick={onClick}
                                             value={value}
@@ -139,7 +139,15 @@ export default function VerticalToggleButtons({ IS_DEV, options }: AppOptions) {
                                                 width: '100%',
                                                 py: 2,
                                                 borderRadius: 0,
-                                                border: 'none'
+                                                border: 'none',
+                                                '&.Mui-selected': {
+                                                    bgcolor: '#1D2633',
+                                                    color:"white"
+                                                },
+                                                '&.Mui-selected:hover': {
+                                                    bgcolor: '#1D2633',
+                                                },
+                                                color:"white"
                                             }}
                                             onClick={
                                                 onClick

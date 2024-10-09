@@ -420,11 +420,13 @@ export const createMAMAccountByMnemonic = async (
                     rawAddress: tonWallet.address.toRawString()
                 }
             ];
-
+            const emoji1 = getFallbackAccountEmoji(
+                Address.parse(tonWallet.address.toRawString()).hash.toString('hex')
+            );
             return {
                 item: {
                     name: AccountMAM.getNewDerivationFallbackName(w.derivationIndex),
-                    emoji,
+                    emoji: emoji1,
                     index: w.derivationIndex,
                     tonWallets,
                     activeTonWalletId: tonWallets[0].id

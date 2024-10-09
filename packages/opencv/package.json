@@ -4,9 +4,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -fr dist && tsc -P tsconfig.build.json",
+    "build": "tsc -P tsconfig.build.json",
     "start": "tsc -w  -P tsconfig.build.json",
-    "build:pkg": "yarn build",
+    "build:pkg": "rm -fr dist && yarn build",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6010",
     "build-storybook": "storybook build",

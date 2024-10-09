@@ -1,5 +1,5 @@
 import { SERVER_URL } from '../constant';
-import { md5 } from './DESCrypto';
+import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 
 export default class ServerApi {
     static url(path: string): any {

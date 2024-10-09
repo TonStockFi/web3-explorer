@@ -4,9 +4,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -fr dist && tsc",
+    "build": "tsc",
     "start": "tsc -w",
-    "build:pkg": "yarn build",
+    "build:pkg": "rm -fr dist && yarn build",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6009",
     "build-storybook": "storybook build",
@@ -18,6 +18,7 @@
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^6.1.0",
     "@mui/material": "^6.1.0",
+    "@web3-explorer/uikit-mui": "1.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

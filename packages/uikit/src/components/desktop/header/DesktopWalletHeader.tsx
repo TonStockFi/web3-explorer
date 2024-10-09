@@ -66,14 +66,14 @@ const DesktopWalletHeaderPayload = () => {
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
-                        <LinkStyled to={AppProRoute.multiSend}>
-                            <ButtonStyled size="small">
-                                <ArrowUpIcon />
-                                {t('wallet_multi_send')}
-                            </ButtonStyled>
-                        </LinkStyled>
-                    )}
+                    {/*{!isReadOnly && isStandardTonWallet(activeWallet) && (*/}
+                    {/*    <LinkStyled to={AppProRoute.multiSend}>*/}
+                    {/*        <ButtonStyled size="small">*/}
+                    {/*            <ArrowUpIcon />*/}
+                    {/*            {t('wallet_multi_send')}*/}
+                    {/*        </ButtonStyled>*/}
+                    {/*    </LinkStyled>*/}
+                    {/*)}*/}
                     <ButtonStyled
                         size="small"
                         onClick={() => {
@@ -86,10 +86,10 @@ const DesktopWalletHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                    <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIconSmall />
-                        {t('wallet_buy')}
-                    </ButtonStyled>
+                    {/*<ButtonStyled size="small" onClick={onOpen}>*/}
+                    {/*    <PlusIconSmall />*/}
+                    {/*    {t('wallet_buy')}*/}
+                    {/*</ButtonStyled>*/}
                 </ButtonsContainer>
             </DesktopRightPart>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />

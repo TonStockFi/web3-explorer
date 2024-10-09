@@ -1,4 +1,4 @@
-import { Box } from '@web3-explorer/uikit-v1';
+import { View } from '@web3-explorer/uikit-view';
 import * as React from 'react';
 import { useState } from 'react';
 
@@ -30,16 +30,16 @@ export default function UsingTrackbars() {
         setValue(Number(trackbar.value)); // 设置当前滑动条的值
     };
     return (
-        <Box column alignItems={'flex-start'}>
-            <Box mt12>
-                <Box mr12>
+        <View column alignItems={'flex-start'}>
+            <View mt12>
+                <View mr12>
                     <img src="reading_writing_img_video/img1.png" id="imgInput1" />
-                </Box>
-                <Box mr12>
+                </View>
+                <View mr12>
                     <img src="reading_writing_img_video/img2.png" id="imgInput2" />
-                </Box>
-            </Box>
-            <Box mt12>
+                </View>
+            </View>
+            <View mt12>
                 <input
                     value={value}
                     min="0"
@@ -49,10 +49,10 @@ export default function UsingTrackbars() {
                     type="range"
                     onChange={onChange}
                 />
-            </Box>
-            <Box mt12>
+            </View>
+            <View mt12>
                 <canvas id="canvasOutput"></canvas>
-            </Box>
-        </Box>
+            </View>
+        </View>
     );
 }

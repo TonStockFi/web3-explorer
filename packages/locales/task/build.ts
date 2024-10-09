@@ -40,7 +40,7 @@ const loadTransactions = async () => {
         fs.rmSync(src, { recursive: true, force: true });
     }
     if (!fs.existsSync(src)) {
-        fs.mkdirSync(src);
+        mkdirSync(src);
     }
 
     const file = await fetch(
@@ -54,16 +54,22 @@ const loadTransactions = async () => {
 
     fs.unlinkSync(zipFile);
 };
-
+const mkdirSync = (path)=>{
+    try{
+        mkdirSync(path);
+    }catch (e){
+        //console.error(e);
+    }
+}
 const createDirFolders = () => {
     if (fs.existsSync(dist)) {
-        fs.rmSync(dist, { recursive: true, force: true });
+        //fs.rmSync(dist, { recursive: true, force: true });
     }
     if (!fs.existsSync(dist)) {
-        fs.mkdirSync(dist);
-        fs.mkdirSync(path.join(dist, extension));
-        fs.mkdirSync(path.join(dist, i18n));
-        fs.mkdirSync(path.join(dist, locales));
+        mkdirSync(dist);
+        mkdirSync(path.join(dist, extension));
+        mkdirSync(path.join(dist, i18n));
+        mkdirSync(path.join(dist, locales));
     }
 };
 const fillMissingLocales = (
@@ -88,13 +94,13 @@ const writeFiles = (
             return acc;
         }, {} as Record<string, Message>);
 
-        fs.mkdirSync(path.join(dist, extension, locale));
+        mkdirSync(path.join(dist, extension, locale));
         fs.writeFileSync(
             path.join(dist, extension, locale, 'messages.json'),
             JSON.stringify(extensionFormat, null, 2)
         );
 
-        fs.mkdirSync(path.join(dist, locales, locale));
+        mkdirSync(path.join(dist, locales, locale));
         fs.writeFileSync(
             path.join(dist, locales, locale, 'translation.json'),
             JSON.stringify(translation, null, 2)
@@ -105,7 +111,6 @@ const writeFiles = (
         path.join(dist, i18n, 'default.json'),
         JSON.stringify({ [defaultLocale]: { translation: defaultResource } }, null, 2)
     );
-
     fs.writeFileSync(path.join(dist, i18n, 'resources.json'), JSON.stringify(resources, null, 2));
 };
 
@@ -137,7 +142,7 @@ const main = async () => {
     console.log('----------Build Locales----------');
 
     createDirFolders();
-    await loadTransactions();
+    // await loadTransactions();
 
     let resources: Record<string, { translation: Record<string, string> }> = {};
     let defaultResource: Record<string, string> = {};
@@ -148,7 +153,6 @@ const main = async () => {
 
             const locale = localeMap[externalLocale] ?? externalLocale;
             console.log(namespace, locale);
-
             if (!resources[locale]) {
                 resources[locale] = { translation: {} };
             }

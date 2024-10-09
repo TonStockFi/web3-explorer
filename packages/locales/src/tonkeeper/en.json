@@ -1,4 +1,5 @@
 {
+  "wallet_main": "Main Wallet",
   "wallet_create_number_label": "Number",
   "wallet_create_number": "Please enter the number of wallets to create.",
   "wallet_create_max_number": "The number of wallets created each time cannot exceed {maxCount}.",

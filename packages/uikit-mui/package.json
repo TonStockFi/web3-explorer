@@ -4,20 +4,20 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -fr dist && tsc -P tsconfig.build.json",
+    "build": "tsc -P tsconfig.build.json",
     "start": "tsc -w  -P tsconfig.build.json",
-    "build:pkg": "yarn build",
+    "build:pkg": "rm -fr dist && yarn build",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6011",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "fix:mui:dark": "cp patches/createTheme.js node_modules/@mui/material/styles/createTheme.js "
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fontsource/roboto": "^5.1.0",
-    "@mui/icons-material": "^6.1.0",
-    "@mui/material": "^6.1.0",
-    "@web3-explorer/uikit-view": "1.0.0",
+    "@mui/icons-material": "6.1.1",
+    "@mui/material": "6.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -40,6 +40,7 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "eslint-plugin-storybook": "^0.8.0",
     "globals": "^15.9.0",
+    "patch-package": "^8.0.0",
     "storybook": "^8.2.9",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",

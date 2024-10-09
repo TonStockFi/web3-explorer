@@ -1,4 +1,4 @@
-import { initialize as aptabaseInitialize } from '@aptabase/electron/main';
+// import { initialize as aptabaseInitialize } from '@aptabase/electron/main';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { app, BrowserWindow, powerMonitor } from 'electron';
 import log from 'electron-log/main';
@@ -103,8 +103,8 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 updateElectronApp({ logger: log });
-
-declare const REACT_APP_APTABASE: string;
-declare const REACT_APP_APTABASE_HOST: string;
-
-aptabaseInitialize(REACT_APP_APTABASE, { host: REACT_APP_APTABASE_HOST });
+//
+// declare const REACT_APP_APTABASE: string;
+// declare const REACT_APP_APTABASE_HOST: string;
+//
+// aptabaseInitialize(REACT_APP_APTABASE, { host: REACT_APP_APTABASE_HOST });

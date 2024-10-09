@@ -156,7 +156,7 @@ export abstract class MainWindow {
                     policy => {
                         // Add blob: to connect-src if not already present
                         if (!policy.includes("connect-src 'self' blob:")) {
-                            return policy.replace("connect-src 'self'", "connect-src 'self' blob:");
+                            return policy.replace("connect-src 'self'", "connect-src 'self' blob: aptabase-ipc:");
                         }
                         return policy;
                     }

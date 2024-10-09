@@ -33,10 +33,10 @@ export const DesktopWalletSettingsRouting = () => {
                 </Route>
                 <Route path={WalletSettingsRoute.jettons} element={<JettonsSettings />} />
             </Route>
-            <Route
-                path={WalletSettingsRoute.connectedApps}
-                element={<DesktopConnectedAppsSettings />}
-            />
+            {/*<Route*/}
+            {/*    path={WalletSettingsRoute.connectedApps}*/}
+            {/*    element={<DesktopConnectedAppsSettings />}*/}
+            {/*/>*/}
             <Route path={WalletSettingsRoute.nft} element={<DesktopNftSettings />} />
             {/*<Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />*/}
             <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />

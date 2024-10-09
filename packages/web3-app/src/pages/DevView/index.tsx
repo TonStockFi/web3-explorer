@@ -1,6 +1,6 @@
 import { TonKeychainRoot } from "@ton-keychain/core";
 import { useAppContext } from "@tonkeeper/uikit/dist/hooks/appContext";
-import TabViewContainer from "@web3-explorer/uikit-desk/dist/components/TabViewContainer";
+import TabViewContainer from "../../components/TabViewContainer";
 import { useLocalStorageState } from "@web3-explorer/uikit-mui";
 import Mnemonic from "@web3-explorer/lib-crypto/dist/Mnemonic";
 import { View } from "@web3-explorer/uikit-view";
@@ -41,9 +41,8 @@ const FeatureView = () => {
   const context = useAppContext();
   const [debug, setDebug] = useState<any>(null);
   const sdk = useAppSdk();
-  console.log({debug})
   return (
-    <View>
+    <View >
       <View row>
         <View
           mb12
@@ -198,13 +197,15 @@ export default function() {
       node: WebView1
     }
   ];
+
   return (
-    <View zIdx={1001} absFull left={64} pl12>
+    <View zIdx={1001} absFull left={64} pl12 wh100p>
       <View w100p row center mt12 h100p>
         <TabViewContainer
           panelStyle={{ paddingTop: 2 }}
           onChangeTabIndex={setCurrentTabIndex}
           tabs={tabs}
+          topTabStyle={{color:"white"}}
           currentTabIndex={currentTabIndex}
         />
       </View>

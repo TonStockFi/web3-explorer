@@ -4,9 +4,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -fr dist && tsc",
+    "build": "tsc",
     "start": "tsc -w",
-    "build:pkg": "yarn build",
+    "build:pkg": "rm -fr dist && yarn build",
     "lint": "eslint ."
   },
   "dependencies": {

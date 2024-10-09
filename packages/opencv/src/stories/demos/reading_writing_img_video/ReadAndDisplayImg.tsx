@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { Box } from '@web3-explorer/uikit-v1';
+import { View } from '@web3-explorer/uikit-view';
 import { useOpenCv } from '../../../lib/useOpenCv';
 
 export default function ReadAndDisplayImg() {
@@ -32,17 +32,17 @@ export default function ReadAndDisplayImg() {
         dst.delete();
     }, [imagesLoaded]);
     return (
-        <Box>
-            <Box mr12>
+        <View>
+            <View mr12>
                 <img
                     onLoad={handleImageLoad}
                     id="imageSrc"
                     src="reading_writing_img_video/sampleImgTwo.jpg"
                 />
-            </Box>
-            <Box mr12>
+            </View>
+            <View mr12>
                 <canvas id="canvasOutput"></canvas>
-            </Box>
-        </Box>
+            </View>
+        </View>
     );
 }

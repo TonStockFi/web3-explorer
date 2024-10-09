@@ -4,11 +4,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 console.log('preload site init!');
 
-contextBridge.exposeInMainWorld('__appApi', {
-    message: (message: { action: string; payload: never }) =>
-        ipcRenderer.invoke('siteMessage', message)
-});
-
 function sendMessageToMain(
     action: 'onTgWebLogged' | 'onTgWebLogout' | 'onTgWebIframe',
     payload: never
@@ -92,19 +87,54 @@ function observePortals() {
 
 let tgLogged = false;
 
+async function getTgGlobalState() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('tt-data', 1);
+        request.onsuccess = (event) => {
+            const db = request.result;
+            const transaction = db.transaction(['store'], 'readonly');
+            const objectStore = transaction.objectStore('store');
+            const getRequest = objectStore.get('tt-global-state'); // replace 'yourKey' with your actual key
+            getRequest.onsuccess = (event) => {
+                resolve(event.target.result);
+            };
+            getRequest.onerror = (event) => {
+                reject('Error retrieving data from IndexedDB');
+            };
+        };
+        request.onerror = (event) => {
+            reject('Error opening IndexedDB');
+        };
+    });
+}
+let loading_getTgGlobalState = false;
 function observeTgWebSite() {
     const user_auth = JSON.parse(localStorage.getItem('user_auth') || '{}');
-    //console.log(user_auth);
-    if (user_auth.dcID) {
+    console.debug("tgLogged:",tgLogged,user_auth);
+    if (user_auth.dcID && user_auth.id) {
         if (!tgLogged) {
-            const userId = user_auth.id;
-            sendMessageToMain('onTgWebLogged', { userId });
-            tgLogged = true;
+            if(loading_getTgGlobalState){
+                return
+            }
+            loading_getTgGlobalState = true;
+            getTgGlobalState().then((state)=>{
+                if(state && state.users && state.users.byId && state.users.byId[user_auth.id]){
+                    user = state.users.byId[user_auth.id];
+                    console.log("send event: onTgWebLogged",user)
+                    sendMessageToMain('onTgWebLogged', { user });
+                }else{
+                    loading_getTgGlobalState = false
+                }
+            }).catch(e=>{
+                loading_getTgGlobalState = false
+            })
         }
 
         const portals = document.querySelector('#portals');
         if (portals) {
             observePortals();
+        }else{
+            PortalsObserved = false
         }
     } else {
         if (tgLogged) {
@@ -136,7 +166,20 @@ function observeBody() {
 }
 
 const callback = (message: { action: string; payload: never }) => {
-    console.log('render callback', message);
+    console.debug('render callback', message);
+    switch (message.action){
+        case "tgLogged":
+            loading_getTgGlobalState = false
+            tgLogged = true;
+            break;
+        case "tgLogout":
+            localStorage.removeItem('user_auth')
+            localStorage.clear()
+            location.reload();
+            break;
+        default:
+            break;
+    }
 };
 
 document.addEventListener(

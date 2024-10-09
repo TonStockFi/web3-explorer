@@ -59,6 +59,9 @@ import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { View } from '@web3-explorer/uikit-view';
 import { MAMIndexesPageContent } from '../../pages/settings/MamIndexes';
 import { AccountsPager } from '../../components/desktop/aside/AsideAccountsMenu';
+import { WalletBatchCreateNumber } from '../../components/create/WalletBatchCreateNumber';
+import { useTheme } from 'styled-components';
+import { useIAppContext } from '@web3-explorer/uikit-mui';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -127,29 +130,60 @@ export const DesktopManageAccountsPage = () => {
     const accountMAM = accounts[0] as AccountMAM;
 
     const { t } = useTranslation();
+    const { showBackdrop } = useIAppContext();
 
     const { mutateAsync: createDerivation } = useCreateMAMAccountDerivation();
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
 
-    const { derivations } = accountMAM;
+    const { allAvailableDerivations:derivations } = accountMAM;
     const total = derivations.length;
     const limit = 10;
     const [page, setPage] = useState(0);
+    const [openSetCountDialog, setOpenSetCountDialog] = useState(false);
 
     const onClickWallet = (walletId: WalletId) => setActiveWallet(walletId);
     const onCreateDerivation = async () => {
-        const d = await createDerivation({
-            accountId: accountMAM.id,
-            count: 2
-        });
-        if (d) {
-            await onClickWallet(d.activeTonWalletId);
-            setPage(Math.floor(total / limit));
-        }
+        setOpenSetCountDialog(true);
     };
+    const theme = useTheme();
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
+            <View
+                dialog={{
+                    dialogProps: {
+                        open: openSetCountDialog,
+                        sx: {
+                            '& .MuiDialog-paper': { width: 850, height: 400 }
+                        }
+                    },
+
+                    content: (
+                        <View wh100p row aCenter center bgColor={theme.backgroundContent}>
+                            <View p={'12px'}>
+                                <WalletBatchCreateNumber
+                                    onClose={() => {
+                                        setOpenSetCountDialog(false);
+                                    }}
+                                    submitHandler={async ({ count }: { count: number }) => {
+                                        setOpenSetCountDialog(false);
+                                        showBackdrop(true);
+                                        const d = await createDerivation({
+                                            accountId: accountMAM.id,
+                                            count: count
+                                        });
+                                        if (d) {
+                                            await onClickWallet(d.activeTonWalletId);
+                                        }
+                                        setPage(Math.ceil((total + count) / limit) - 1);
+                                        showBackdrop(false);
+                                    }}
+                                />
+                            </View>
+                        </View>
+                    )
+                }}
+            />
             <DesktopViewHeader borderBottom={!closeTop}>
                 <View w100p row aCenter jSpaceBetween>
                     <Label2>{t('Manage_wallets')}</Label2>

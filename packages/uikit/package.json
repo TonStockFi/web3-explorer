@@ -8,10 +8,10 @@
     "scripts": {
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
-        "build": "rm -fr dist && tsc",
+        "build": "tsc",
         "start": "tsc -w",
-        "build:pkg": "yarn build",
-        "sync": "rsync -avh --delete ./dist/pages/import/ /Volumes/projects/web3-explorer-v1/packages/uikit/dist/pages/import"
+        "build:pkg": "rm -fr dist && yarn build",
+        "sync": "rsync -avh --delete ./dist/ /Volumes/projects/web3-explorer-v1/packages/uikit/dist"
     },
     "license": "ISC",
     "dependencies": {
@@ -32,6 +32,7 @@
         "@ton/crypto": "3.2.0",
         "@tonkeeper/core": "0.1.0",
         "@web3-explorer/lib-crypto": "1.0.0",
+        "@web3-explorer/uikit-mui": "1.0.0",
         "@web3-explorer/uikit-view": "1.0.0",
         "bignumber.js": "^9.1.1",
         "country-flag-icons": "^1.5.7",

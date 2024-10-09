@@ -21,8 +21,9 @@ const Body = styled(Body2)`
 `;
 
 export const WalletBatchCreateNumber: FC<{
-    submitHandler: ({ count }: { count: number }) => void;
-}> = ({ submitHandler }) => {
+    onClose?: () => void;
+    submitHandler: ({ count }: { count: number }) => void | Promise<void>;
+}> = ({ submitHandler, onClose }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLInputElement | null>(null);
@@ -51,7 +52,11 @@ export const WalletBatchCreateNumber: FC<{
         <CenterContainer>
             <BackButtonBlock
                 onClick={() => {
-                    navigate(-1);
+                    if (onClose) {
+                        onClose();
+                    } else {
+                        navigate(-1);
+                    }
                 }}
             />
             <Block onSubmit={onSubmit}>

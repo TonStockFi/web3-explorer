@@ -5,9 +5,9 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"build": "rm -fr dist && tsc",
+		"build": "tsc",
 		"start": "tsc -w",
-		"build:pkg": "yarn build"
+		"build:pkg": "rm -fr dist && yarn build"
 	},
 	"author": "",
 	"license": "",
@@ -15,6 +15,7 @@
 		"bip39": "^3.0.4",
 		"bn.js": "^4.12.0",
 		"crypto-browserify": "^3.12.0",
+		"crypto-js": "^4.2.0",
 		"elliptic": "6.5.4",
 		"ethereum-cryptography": "0.1.3",
 		"ethereumjs-wallet": "^1.0.2",

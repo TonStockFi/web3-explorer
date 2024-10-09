@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { Box } from '@web3-explorer/uikit-v1';
+import { View } from '@web3-explorer/uikit-view';
 
 export default function QRCodeReadingImage() {
     const canvasView = useRef(null);
@@ -41,8 +41,8 @@ export default function QRCodeReadingImage() {
         };
     }, [canvasView]);
     return (
-        <Box>
+        <View>
             <canvas ref={canvasView} id="result" width="440" height="275"></canvas>
-        </Box>
+        </View>
     );
 }
