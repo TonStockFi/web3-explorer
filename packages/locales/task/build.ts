@@ -56,9 +56,10 @@ const loadTransactions = async () => {
 };
 const mkdirSync = (path)=>{
     try{
-        mkdirSync(path);
+        console.log("mkdirSync:",path)
+        fs.mkdirSync(path);
     }catch (e){
-        //console.error(e);
+        console.error(e);
     }
 }
 const createDirFolders = () => {
