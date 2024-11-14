@@ -1,7 +1,3 @@
-import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-
-import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { ColumnText } from '@tonkeeper/uikit/dist/components/Layout';
 import { ListBlock, ListItem, ListItemPayload } from '@tonkeeper/uikit/dist/components/List';
 import { Body1, Title } from '@tonkeeper/uikit/dist/components/Text';
@@ -10,13 +6,13 @@ import { Radio } from '@tonkeeper/uikit/dist/components/fields/Checkbox';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
-import { PRO_RECV_ADDRESS } from '../../constant';
-import { getProLevelText } from '../../providers/ProProvider';
-import { PRO_LEVEL } from '../../types';
+import styled from 'styled-components';
+import { currentTs } from '../../common/utils';
+import { usePro } from '../../providers/ProProvider';
+
+import { ProInfoProps, ProPlan } from '../../types';
 
 const Block = styled.div`
     display: flex;
@@ -46,32 +42,47 @@ const RadioStyled = styled(Radio)`
     }
 `;
 const SelectProPlans: FC<{
-    plans: ProServiceTier[];
-    selected: number | null;
-    setPlan: (id: number) => void;
+    plans: ProPlan[];
+    isLongProLevel: boolean;
+    currentProInfo: ProInfoProps | null;
+
+    selected: ProPlan;
+    setPlan: (plan: ProPlan) => void;
     disabled?: boolean;
-}> = ({ plans, selected, setPlan, disabled }) => {
+}> = ({ plans, isLongProLevel, currentProInfo, selected, setPlan, disabled }) => {
     const format = useFormatCoinValue();
+    if (isLongProLevel) {
+        disabled = true;
+    }
     return (
         <>
             <ListBlock>
-                {plans.map((plan, index) => (
-                    <ListItem key={plan.id} onClick={() => !disabled && setPlan(index)}>
+                {plans.map(plan => (
+                    <ListItem
+                        key={plan.level}
+                        onClick={() => {
+                            if (!disabled && currentProInfo?.level !== plan.level) {
+                                setPlan(plan);
+                            }
+                        }}
+                    >
                         <ListItemPayload>
                             <ColumnText
                                 noWrap
                                 text={plan.name}
-                                secondary={
-                                    <>
-                                        {format(plan.amount)} {CryptoCurrency.TON}
-                                    </>
-                                }
+                                secondary={<>{format(plan.amount)} TON</>}
                             />
-                            <RadioStyled
-                                disabled={disabled}
-                                checked={selected === index}
-                                onChange={() => setPlan(index)}
-                            />
+                            {currentProInfo?.level === plan.level && (
+                                <View pr12 textFontSize="0.8rem" text={'当前'}></View>
+                            )}
+
+                            {currentProInfo?.level !== plan.level && (
+                                <RadioStyled
+                                    disabled={disabled}
+                                    checked={selected.level === plan.level}
+                                    onChange={() => setPlan(plan)}
+                                />
+                            )}
                         </ListItemPayload>
                     </ListItem>
                 ))}
@@ -80,50 +91,70 @@ const SelectProPlans: FC<{
     );
 };
 
-export const ProSettings: FC = () => {
+export const ProSettings: FC<{
+    accountId: string;
+    accountTitle: string;
+    currentProInfo: ProInfoProps | null;
+    isLongProLevel: boolean;
+    walletTitle: string;
+    accountIndex: number;
+}> = ({ currentProInfo, isLongProLevel, accountId, accountIndex, accountTitle, walletTitle }) => {
+    console.log({
+        currentProInfo,
+        isLongProLevel,
+        accountId,
+        accountIndex,
+        accountTitle,
+        walletTitle
+    });
     const { t } = useTranslation();
+    const { proPlans, proRecvAddress, updateOrderComment } = usePro();
 
-    const account = useActiveAccount() as AccountMAM;
-    const wallet = account.activeTonWallet;
+    let plans: ProPlan[] = proPlans.map(proPlan => {
+        let { description } = proPlan;
+        description = description?.replace('{accountTitle}', accountTitle);
+        description = description?.replace('{walletTitle}', walletTitle);
+        return { ...proPlan, description };
+    });
+    if (isLongProLevel) {
+        plans = plans.filter(row => row.level === 'LONG');
+    }
 
-    const walletAccount = account.derivations.find(d => d.index === account.activeDerivationIndex)!;
-
-    const [selectedPlan, setPlan] = useState<number>(0);
-
+    if (currentProInfo && currentProInfo.level === 'YEAR') {
+        plans = plans.filter(row => row.level !== 'MONTH');
+    }
+    const [selectedPlan, setPlan] = useState<ProPlan>(plans[0]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [_, setOrderComment] = useState<string>('');
 
     const { onOpen: sendTransfer } = useSendTransferNotification();
-
-    const plans: ProServiceTier[] = [
-        {
-            id: PRO_LEVEL.LONG,
-            name: t('永久至尊'),
-            description: `提供 ${account.emoji} ${account.name} 下的n个钱包帐号的无限制无期限使用功能。包括不限于:一对多转帐、超级智能机器识别辅助`,
-            amount: '99990000000'
-        },
-        {
-            id: PRO_LEVEL.MONTH,
-            name: t('月付'),
-            description: `提供 ${walletAccount.emoji} ${walletAccount.name} 无限制功能,使用期限一个月。包括不限于:一对多转帐、超级智能机器识别辅助`,
-            amount: '999000000'
-        },
-        {
-            id: PRO_LEVEL.YEAR,
-            name: t('年付'),
-            description: `提供 ${walletAccount.emoji} ${walletAccount.name} 无限制功能,使用期限一年。包括不限于:一对多转帐、超级智能机器识别辅助`,
-            amount: '9999000000'
-        }
-    ];
-    const theme = useTheme();
     const format = useFormatCoinValue();
+    useEffect(() => {
+        function finishPay(e: any) {
+            console.log(e.detail);
+            setOrderComment(text => {
+                updateOrderComment(text);
+                return '';
+            });
+        }
+        window.addEventListener('finishPay', finishPay);
+        return () => {
+            window.removeEventListener('finishPay', finishPay);
+        };
+    }, []);
     const onSubmit = async () => {
-        const { id, amount } = plans[selectedPlan];
-        const text = getProLevelText(id as PRO_LEVEL);
+        if (!selectedPlan) {
+            return;
+        }
+        const { level, amount } = selectedPlan;
+        const amount1 = String(format(amount));
+        const text = `${level}/${amount1}/${accountIndex}/${currentTs()}/${accountId}`;
+        setOrderComment(text);
         setIsLoading(true);
         sendTransfer({
             transfer: {
-                address: PRO_RECV_ADDRESS,
-                amount: String(format(amount)),
+                address: proRecvAddress,
+                amount: amount1,
                 text,
                 jetton: 'TON'
             },
@@ -139,31 +170,36 @@ export const ProSettings: FC = () => {
             window.removeEventListener('onCloseNotify', onCloseNotify);
         };
     }, []);
+
     return (
         <View px={24} py12>
             <View>
                 <Block>
                     <Icon src="https://explorer.web3r.site/logo-128x128.png" />
                     <Title>{t('Web3 Explorer')}</Title>
-                    <Description>{plans[selectedPlan].description}</Description>
+                    <Description>{selectedPlan.description}</Description>
                 </Block>
                 <SelectProPlans
+                    isLongProLevel={isLongProLevel}
+                    currentProInfo={currentProInfo}
                     plans={plans ?? []}
                     setPlan={setPlan}
                     selected={selectedPlan}
-                    disabled={isLoading}
+                    disabled={isLongProLevel ? true : isLoading}
                 />
-                <Line>
-                    <Button
-                        primary={!isLoading}
-                        size="large"
-                        fullWidth
-                        loading={isLoading}
-                        onClick={onSubmit}
-                    >
-                        {t('wallet_buy')}
-                    </Button>
-                </Line>
+                {!isLongProLevel && (
+                    <Line>
+                        <Button
+                            primary={!isLoading}
+                            size="large"
+                            fullWidth
+                            loading={isLoading}
+                            onClick={onSubmit}
+                        >
+                            {currentProInfo ? t('升级') : t('wallet_buy')}
+                        </Button>
+                    </Line>
+                )}
             </View>
         </View>
     );

@@ -5,7 +5,6 @@ import {
     clipboard,
     globalShortcut,
     ipcMain,
-    Menu,
     nativeImage,
     screen,
     Tray,
@@ -229,7 +228,7 @@ export class MainWindow {
         }
 
         this.mainWindow.loadURL(this.currentUrl);
-        Menu.setApplicationMenu(Menu.buildFromTemplate([]));
+        // Menu.setApplicationMenu(Menu.buildFromTemplate([]));
 
         if (flagDev) {
             this.mainWindow.webContents.openDevTools({ mode: 'right' });

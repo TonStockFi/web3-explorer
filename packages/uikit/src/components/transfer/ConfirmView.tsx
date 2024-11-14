@@ -164,6 +164,13 @@ export function ConfirmView<T extends Asset = Asset>({
             if (isDone) {
                 setDone(true);
                 setTimeout(() => {
+                    window.dispatchEvent(
+                        new CustomEvent('finishPay', {
+                            detail: {
+                                recipient
+                            }
+                        })
+                    );
                     setTimeout(() => client.invalidateQueries(), 100);
                     onClose(true);
                 }, 2000);

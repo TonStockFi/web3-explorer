@@ -1,5 +1,5 @@
-import { MAIN_NAV_TYPE } from './types';
-export const PRO_RECV_ADDRESS="UQADqIQZOdr59a3rnkbOODavzd7p3nthgSO6Zr1deqXTbPIX"
+import { MAIN_NAV_TYPE, ProPlan } from './types';
+export const PRO_RECV_ADDRESS="UQAonoXuQ_1WzZhwbuoIHYFwBqkVCmZSf-yr0DQ1uhnIz53g"
 export const P2E_ChatId = '7363481027';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
 export const TELEGRAME_WEB_P2E = `${TELEGRAME_WEB}#${P2E_ChatId}`
@@ -140,4 +140,26 @@ export const MainNavList = [
         tabId: MAIN_NAV_TYPE.SETTING,
         icon: 'Settings'
     }
+];
+
+
+export const ProPlans: ProPlan[] = [
+    {
+        level: "LONG",
+        name: '永久至尊',
+        description: `提供 {accountTitle} 下的n个钱包帐号的无限制无期限使用功能。包括不限于:一对多转帐、超级智能机器识别辅助`,
+        amount: '99990000000'
+    },
+    {
+        level: "YEAR",
+        name: '年付',
+        description: `提供 {walletTitle} 无限制功能,使用期限一年。包括不限于:一对多转帐、超级智能机器识别辅助`,
+        amount: '9999000000'
+    },
+    {
+        level: "MONTH",
+        name: '月付',
+        description: `提供 {walletTitle} 无限制功能,使用期限一个月。包括不限于:一对多转帐、超级智能机器识别辅助`,
+        amount: '9990000'
+    },
 ];

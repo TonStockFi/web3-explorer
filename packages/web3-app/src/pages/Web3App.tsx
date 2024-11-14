@@ -18,12 +18,13 @@ import { onAction } from '../common/electron';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
-import { usePublicAccountsInfo } from '../hooks/wallets';
+import { useAccountInfo, usePublicAccountsInfo } from '../hooks/wallets';
 import { PlaygroundProvider } from '../providers/PlaygroundProvider';
 import { ProProvider, usePro } from '../providers/ProProvider';
 import { RecognitionProvider } from '../providers/RecognitionProvider';
 import { ScreenshotProvider } from '../providers/ScreenshotProvider';
 import { Web3AppThemeWrpper } from '../providers/Web3AppThemeWrpper';
+import ProService from '../services/ProService';
 import DevView from './DevView';
 import { BrowserFavorPage } from './Discover/BrowserFavorPage';
 import { BrowserHistoryPage } from './Discover/BrowserHistoryPage';
@@ -78,6 +79,7 @@ function Pages() {
 export function MainMessageDispatcher() {
     const { onShowProBuyDialog } = usePro();
     const accounts = usePublicAccountsInfo();
+    const { id: accountId } = useAccountInfo();
     const activeAcount = useActiveAccount();
     const { mutateAsync: setActiveAccount } = useMutateActiveTonWallet();
 
@@ -96,6 +98,17 @@ export function MainMessageDispatcher() {
                             setActiveAccount(account.activeTonWalletId);
                         }
                     }
+                }
+
+                if (e.action === 'getProInfo') {
+                    const proInfoList = await new ProService(accountId).getAll();
+                    onAction('subWin', {
+                        toWinId: e.fromWinId,
+                        action: 'updateProInfo',
+                        payload: {
+                            proInfoList
+                        }
+                    });
                 }
                 if (e.action === 'getAccountsPublic') {
                     onAction('subWin', {

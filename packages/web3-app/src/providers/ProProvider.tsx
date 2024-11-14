@@ -1,58 +1,81 @@
 import { useLocalStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { PRO_LEVEL } from '../types';
+import { PRO_RECV_ADDRESS } from '../constant';
+import ProService from '../services/ProService';
+import { ProInfoProps, ProPlan } from '../types';
 
 interface AppContextType {
-    proLevel: PRO_LEVEL;
+    proRecvAddress: string;
     showProBuyDialog: boolean;
+    orderComment: string;
+    proPlans: ProPlan[];
+    isLongProLevel: boolean;
+    proInfo: ProInfoProps | null;
+    proInfoList: ProInfoProps[];
+    updateOrderComment: (comment: string) => void;
+    updateProPlans: (v: { proRecvAddress: string; proPlans: ProPlan[] }) => void;
     onShowProBuyDialog: (v: boolean) => void;
-    fetchProLevel: (id: string) => void;
-    onChangeProLevel: (v: PRO_LEVEL) => void;
+    onChangeProInfo: (v: ProInfoProps) => void;
+    updateProInfo: (v: ProInfoProps[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function getProLevelText(id: PRO_LEVEL) {
-    let text;
-    switch (id) {
-        case PRO_LEVEL.MONTH:
-            text = 'MONTH';
-            break;
-        case PRO_LEVEL.YEAR:
-            text = 'YEAR';
-            break;
-        case PRO_LEVEL.LONG:
-            text = 'LONG';
-            break;
-        default:
-            text = 'COMMON';
-            break;
-    }
-    return text;
-}
 export const ProProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
-    const [proLevel, setProLevel] = useLocalStorageState<PRO_LEVEL>('proLevel', PRO_LEVEL.COMMON);
     const [showProBuyDialog, setShowProBuyDialog] = useState(false);
+    const [orderComment, setOrderComment] = useState('');
+    const [proInfo, setProInfo] = useState<null | ProInfoProps>(null);
+    const [proInfoList, setProInfoList] = useState<ProInfoProps[]>([]);
+    const [proRecvAddress, setProRecvAddress] = useLocalStorageState<string>(
+        'proRecvAddress',
+        PRO_RECV_ADDRESS
+    );
+    const [proPlans, setProPlans] = useLocalStorageState<ProPlan[]>('proPlans', []);
 
-    const onChangeProLevel = (v: PRO_LEVEL) => {
-        console.log('onChangeProLevel', v);
-        setProLevel(v);
+    const onChangeProInfo = (proInfo: ProInfoProps) => {
+        setProInfo(proInfo);
+        new ProService(proInfo.id).save(proInfo.index, proInfo);
     };
 
-    const fetchProLevel = (id: string) => {};
     const onShowProBuyDialog = (v: boolean) => {
         setShowProBuyDialog(v);
     };
-
+    const updateOrderComment = (comment: string) => {
+        console.log('updateOrderComment', comment);
+        setOrderComment(comment);
+    };
+    const updateProInfo = (proInfoList: ProInfoProps[]) => {
+        setProInfoList(proInfoList);
+    };
+    const updateProPlans = ({
+        proRecvAddress,
+        proPlans
+    }: {
+        proRecvAddress: string;
+        proPlans: ProPlan[];
+    }) => {
+        setProPlans(proPlans);
+        setProRecvAddress(proRecvAddress);
+    };
+    const isLongProLevel = Boolean(
+        proInfoList && proInfoList.find((row: ProInfoProps) => row.level === 'LONG')
+    );
     return (
         <AppContext.Provider
             value={{
+                proInfoList,
+                isLongProLevel,
+                updateProInfo,
+                proInfo,
+                orderComment,
+                updateOrderComment,
+                proRecvAddress,
+                proPlans,
+                updateProPlans,
                 onShowProBuyDialog,
                 showProBuyDialog,
-                fetchProLevel,
-                onChangeProLevel,
-                proLevel
+                onChangeProInfo
             }}
         >
             {children}

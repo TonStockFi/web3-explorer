@@ -1,78 +1,104 @@
-import Loading from '@web3-explorer/uikit-mui/dist/components/Loading';
 import { View } from '@web3-explorer/uikit-view';
 import { useTimeoutLoop } from '@web3-explorer/utils';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
+import { onAction } from '../../common/electron';
 import WebViewBrowser from '../../components/webview/WebViewBrowser';
-import {
-    useAccountAddress,
-    useBlockChainExplorer,
-    usePublicAccountsInfo
-} from '../../hooks/wallets';
+import { useAccountAddress, useBlockChainExplorer } from '../../hooks/wallets';
 import { usePro } from '../../providers/ProProvider';
 import WebviewService from '../../services/WebviewService';
-import { PRO_LEVEL, WebveiwEventType } from '../../types';
+import { PRO_LEVEL, ProInfoProps, SUB_WIN_ID, WebveiwEventType } from '../../types';
 let address = '';
+
 export function BalanceBackgroundPage() {
     address = useAccountAddress();
-    const accounts = usePublicAccountsInfo();
-    const url = useBlockChainExplorer().replace(
-        '%s',
-        accounts.find(row => row.index === 0)!.address
-    );
+    const { proRecvAddress, updateOrderComment, orderComment } = usePro();
+    const url = useBlockChainExplorer().replace('%s', proRecvAddress);
     const [webview, setWebview] = useState<null | WebviewTag>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const { onChangeProLevel } = usePro();
+    const { onChangeProInfo } = usePro();
     useEffect(() => {
         const ws = new WebviewService('Explore');
         if (ws.webviewIsReady()) {
             ws.goTo(url);
         }
     }, [url]);
-    const checkProLevel = async () => {
+    const checkProLevel = async (orderComment: string) => {
+        setLoading(true);
         const ws = new WebviewService('Explore');
+        const content = await ws.waitForElemenBoundingClientRect(`.tx-mobile-comment__contents`, 0);
+        console.log('comment__contents', content);
 
-        const content = await ws.waitForElemenBoundingClientRect(`.tx-table`, 0);
-        console.log('content', content);
         if (content) {
-            const adr = '0QAonoXuQ_1WzZhwbuoIHYFwBqkVCmZSf-yr0DQ1uhnIzyZq';
-            const flag = await ws.execJs(
+            const rows = await ws.execJs(
                 `
-                const rows = document.querySelectorAll(".tx-table .tx-table-cell-icon--out");
-                let flag = false
+                const rows = document.querySelectorAll(".tx-mobile-content");
+                const items = []
                 rows.forEach(row=>{
-                    const h = row.parentElement.innerHTML;
-                    console.log(h)
-                    if(h.toLowerCase().indexOf("${adr.toLowerCase()}") > -1){
-                        flag = true;
-                    }
+                    const comment = row.querySelector(".tx-mobile-comment__contents")?.textContent
+                    const amount = row.querySelector(".tx-amount--in")?.textContent
+                    items.push({amount,comment})
                 })
-                return flag`
+                return items;`
             );
-            console.log('checkProLevel', address, flag);
-            onChangeProLevel(flag ? PRO_LEVEL.LONG : PRO_LEVEL.COMMON);
+            let flag = false;
+            const [level, amount1, accountIndex, ts, id] = orderComment.split('/');
+
+            if (rows && rows.length > 0) {
+                for (let index = 0; index < rows.length; index++) {
+                    const { amount, comment } = rows[index] as { amount: string; comment: string };
+                    if (
+                        amount &&
+                        comment &&
+                        comment.toLowerCase().indexOf(orderComment.toLowerCase()) > -1 &&
+                        amount.replace(' TON', '') === amount1
+                    ) {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                const proInfo: ProInfoProps = {
+                    level: level as PRO_LEVEL,
+                    amount: Number(amount1),
+                    index: Number(accountIndex),
+                    ts: Number(ts),
+                    id
+                };
+                onChangeProInfo(proInfo);
+                updateOrderComment('');
+                onAction('subMin', {
+                    toWinId: SUB_WIN_ID.PLAYGROUND,
+                    action: 'onChangeProInfo',
+                    payload: {
+                        proInfo
+                    }
+                });
+                return;
+            }
         }
+        setLoading(false);
     };
     useTimeoutLoop(async () => {
-        const ws = new WebviewService('Explore');
-        if (ws.webviewIsReady()) {
-            ws.goTo(url);
+        if (orderComment && !loading) {
+            const ws = new WebviewService('Explore');
+            if (ws.webviewIsReady()) {
+                ws.goTo(url);
+            }
         }
-    }, 10000);
+    }, 5000);
     const onEvent = async (webview1: WebviewTag, eventType: WebveiwEventType, payload: any) => {
         const ws = new WebviewService('Explore');
         switch (eventType) {
-            case 'did-stop-loading':
-                break;
             case 'dom-ready': {
                 console.log('BalanceBackgroundPage', 'dom-ready');
                 if (!webview) {
                     setWebview(webview1);
                 }
 
-                checkProLevel();
-
-                setLoading(false);
+                checkProLevel(orderComment);
+                setLoading(true);
                 break;
             }
             default: {
@@ -99,9 +125,6 @@ export function BalanceBackgroundPage() {
                         onEvent
                     }}
                 />
-            </View>
-            <View center absFull hide={!loading}>
-                <Loading />
             </View>
         </View>
     );

@@ -11,7 +11,7 @@ import { DISCOVER_PID, START_URL } from '../../constant';
 import { BalanceBackgroundPage } from '../../pages/Wallet/BalanceBackgroundPage';
 import { usePro } from '../../providers/ProProvider';
 import WebviewService from '../../services/WebviewService';
-import { MAIN_NAV_TYPE } from '../../types';
+import { MAIN_NAV_TYPE, ProPlan } from '../../types';
 import { onOpenTab } from '../discover/DiscoverView';
 import { LoadingView } from '../LoadingView';
 import WebViewBrowser from './WebViewBrowser';
@@ -32,21 +32,13 @@ export function WebviewTwa() {
     const { theme, editTab, openTab, closeTab, newTab, browserTabs } = useBrowserContext();
     const tab = browserTabs.get(MAIN_NAV_TYPE.GAME_FI);
     const [loading, setLoading] = useState<boolean>(true);
-    const [showBlockViewer, setShowBlockViewer] = useState<boolean>(env.isDev);
-    const { onShowProBuyDialog } = usePro();
+    const [showBlockViewer, setShowBlockViewer] = useState<boolean>(false);
+    const { updateProPlans, orderComment } = usePro();
     const { name, emoji, index, id, address } = useAccountInfo();
     const currentAccount = { name, emoji, index, id, address };
     sessionStorage.setItem('currentAccount', JSON.stringify(currentAccount));
     const tabId = 'game_center';
-    const { proLevel } = usePro();
-    useEffect(() => {
-        const ws = new WebviewService(tabId);
-        if (ws.webviewIsReady()) {
-            // onPayPro();
-            console.log('localStorage set ', proLevel);
-            ws.execJs(`localStorage.setItem('proLevel', ${proLevel});`);
-        }
-    }, [proLevel]);
+
     useEffect(() => {
         _tabId = tabId;
     }, [tabId]);
@@ -75,6 +67,15 @@ export function WebviewTwa() {
             if (env.isDev) {
                 setShowBlockViewer(showBlockViewer => !showBlockViewer);
             }
+        }
+
+        if (action === 'updateProPlan') {
+            const { proPlans, proRecvAddress } = payload as {
+                proPlans: ProPlan[];
+                proRecvAddress: string;
+            };
+            console.log('updateProPlan', proPlans);
+            updateProPlans({ proPlans, proRecvAddress });
         }
         if (action === 'openWindow') {
             openWindow(payload as any);
@@ -106,29 +107,30 @@ export function WebviewTwa() {
                 </View>
             </View>
 
-            <View
-                hide={!showBlockViewer}
-                opacity={showBlockViewer ? 1 : 0}
-                top={44}
-                w={360}
-                right={12}
-                abs
-                top0
-                bottom0
-                zIdx={showBlockViewer ? 1 : -1}
-            >
-                <BalanceBackgroundPage />
-            </View>
+            {Boolean(showBlockViewer || orderComment) && (
+                <View
+                    opacity={showBlockViewer ? 1 : 0}
+                    top={44}
+                    w={360}
+                    right={12}
+                    abs
+                    top0
+                    bottom0
+                    zIdx={showBlockViewer ? 1 : -1}
+                >
+                    <BalanceBackgroundPage />
+                </View>
+            )}
+
             <View
                 abs
                 borderRadius={8}
                 overflowHidden
-                right={showBlockViewer ? 400 : 0}
-                xx0
+                right={showBlockViewer ? 400 : 8}
+                left={8}
+                bottom={0}
                 top={44}
                 borderBox
-                bottom={0}
-                px={4}
             >
                 <WebViewBrowser
                     hideBoxShadow

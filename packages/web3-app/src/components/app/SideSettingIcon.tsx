@@ -9,11 +9,11 @@ import { View } from '@web3-explorer/uikit-view';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import { useBrowserContext } from '../providers/BrowserProvider';
-import { useIAppContext } from '../providers/IAppProvider';
-import { MAIN_NAV_TYPE } from '../types';
+import { useBrowserContext } from '../../providers/BrowserProvider';
+import { useIAppContext } from '../../providers/IAppProvider';
+import { MAIN_NAV_TYPE } from '../../types';
 
-export default function SettingItems({}: {}) {
+export default function SideSettingIcon() {
     const { t } = useTranslation();
     const theme = useTheme();
     const { openTab } = useBrowserContext();

@@ -3,14 +3,14 @@ import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { HomHeaderHeight, MainNavList, SiderBarWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { usePro } from '../../providers/ProProvider';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import { MAIN_NAV_TYPE } from '../../types';
-import SettingItems from '../SettingItems';
+import SideProIcon from './SideProIcon';
+import SideSettingIcon from './SideSettingIcon';
 
 export const SideBarVert = () => {
     const { env, isFullScreen } = useIAppContext();
-    const { onShowProBuyDialog } = usePro();
+
     const { t, theme, openTab, currentTabId } = useBrowserContext();
     const actions = MainNavList.filter(row => row.side);
     const currentTabNav = currentTabId;
@@ -86,16 +86,8 @@ export const SideBarVert = () => {
             </View>
             <View pb12 w100p>
                 <View w100p center column>
-                    <View
-                        mb={6}
-                        iconButton
-                        iconSmall
-                        icon={'Diamond'}
-                        onClick={() => {
-                            onShowProBuyDialog(true);
-                        }}
-                    ></View>
-                    <SettingItems />
+                    <SideProIcon />
+                    <SideSettingIcon />
                 </View>
             </View>
         </View>

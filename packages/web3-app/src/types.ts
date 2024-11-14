@@ -284,11 +284,22 @@ export interface CutItemProps {
     name: string;
     screen: ScreenInfo;
 }
+export type PRO_LEVEL =  "MONTH"|"YEAR"|"LONG"
 
+export interface ProPlan {
+    level:PRO_LEVEL;
+    name: string;
+    description?: string;
+    /**
+     * nanoton
+     */
+    amount: string;
+}
 
-export enum PRO_LEVEL {
-    COMMON,
-    MONTH,
-    YEAR,
-    LONG
+export interface ProInfoProps{
+    id:string,
+    index:number,
+    level:PRO_LEVEL,
+    amount:number,
+    ts:number
 }
