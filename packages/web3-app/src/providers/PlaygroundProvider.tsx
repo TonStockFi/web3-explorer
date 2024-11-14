@@ -2,16 +2,8 @@ import { deepDiff, useLocalStorageState, useSessionStorageState } from '@web3-ex
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { AccountPublic, SUB_WIN_ID } from '../types';
+import { AccountPublic } from '../types';
 import { BrowserTab, useBrowserContext } from './BrowserProvider';
-
-export function isPlaygroundMaster() {
-    return location.hash === `#${SUB_WIN_ID.PLAYGROUND}`;
-}
-
-export function getWinId() {
-    return location.hash.replace('#', '');
-}
 
 interface AppContextType {
     currentTabId: string;

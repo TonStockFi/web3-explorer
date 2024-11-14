@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useCreateMAMAccountDerivation } from '../../hooks/wallets';
 import { AccountsPager } from '../aside/AccountsPager';
+import { AccountsMoreView } from './AccountsMoreView';
 import { AccountsSelect } from './AccountsSelect';
 import { DialogCreateAccount } from './DialogCreateAccount';
 import { ImportExistingWallet } from './ImportExistingWallet';
@@ -65,15 +66,8 @@ export const ManageSubWalletPage = () => {
     const limit = 18;
     return (
         <DesktopViewPageLayoutStyled>
-            <View borderBox w100p h={58} row aCenter jSpaceBetween>
-                <View pl12>
-                    <AccountsSelect
-                        accounts={accountsMAM}
-                        onChange={(val: Account) => setSelectAccount(val)}
-                        account={selectAccount}
-                    ></AccountsSelect>
-                </View>
-                <View row aCenter jEnd>
+            <View borderBox w100p h={58} row aCenter jSpaceBetween mb12>
+                <View row aCenter jStart pl12>
                     <View
                         center
                         onClick={() => setImportDialog(true)}
@@ -94,6 +88,16 @@ export const ManageSubWalletPage = () => {
                         button={t('add_sub_wallet')}
                         buttonStartIcon={<View icon="Add" iconSmall />}
                     />
+                </View>
+                <View rowVCenter jStart>
+                    <AccountsSelect
+                        accounts={accountsMAM}
+                        onChange={(val: Account) => setSelectAccount(val)}
+                        account={selectAccount}
+                    ></AccountsSelect>
+                    <View ml12 center mr={16}>
+                        <AccountsMoreView />
+                    </View>
                 </View>
             </View>
             <ListBlockDesktopAdaptive margin={false}>

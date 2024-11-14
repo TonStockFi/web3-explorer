@@ -51,11 +51,13 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import NorthEast from '@mui/icons-material/NorthEast';
 import NotificationImportant from '@mui/icons-material/NotificationImportant';
+import OpenInFull from '@mui/icons-material/OpenInFull';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PrecisionManufacturing from '@mui/icons-material/PrecisionManufacturing';
 import Psychology from '@mui/icons-material/Psychology';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Remove from '@mui/icons-material/Remove';
 import Save from '@mui/icons-material/Save';
 import SearchIcon from '@mui/icons-material/Search';
 import SendIcon from '@mui/icons-material/Send';
@@ -116,6 +118,7 @@ export type IconList =
     | 'Stop'
     | 'NotificationImportant'
     | 'Https'
+    | 'Remove'
     | 'TabUnselected'
     | 'Style'
     | 'Screenshot'
@@ -139,6 +142,7 @@ export type IconList =
     | 'Add'
     | 'Close'
     | 'Edit'
+    | 'OpenInFull'
     | 'PrecisionManufacturing'
     | 'ArrowRight'
     | 'Delete'
@@ -174,7 +178,9 @@ export const IconsMap: Record<string, React.ElementType> = {
     ArrowDownward,
     ContentCut,
     Diamond,
+    Remove,
     AutoFixHigh,
+    OpenInFull,
     EmojiEvents,
     GiClick,
     Stop: StopIcon,

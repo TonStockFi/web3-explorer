@@ -2,6 +2,7 @@ export function getPartitionKey(key: string) {
     return `persist:${key}`;
 }
 
+
 export function getDeviceIdFromUrl(url: string) {
     const uri = new URL(url);
     const { host, pathname } = uri;

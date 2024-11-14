@@ -1,7 +1,6 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
-import { onAction } from '../../common/electron';
 import { AsideWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
@@ -51,16 +50,7 @@ export const WalletSide = () => {
                 />
                 <View iconSmall icon="MoreVert" />
             </View>
-            <View
-                hide={!env.isWin}
-                mb={4}
-                ml={6}
-                icon={'Close'}
-                iconButtonSmall
-                onClick={() => {
-                    onAction('closeApp');
-                }}
-            ></View>
+
             <View
                 drawer={{
                     sx: { '& .MuiPaper-root': { top: 44 } },

@@ -33,7 +33,7 @@ export function t(key: string) {
 
 let flagDev = isDev;
 
-if (true) {
+if (flagDev) {
     contextMenu({
         showInspectElement: true,
         showSaveImageAs: false,
@@ -91,7 +91,7 @@ export class MainWindow {
             resizable: true,
             backgroundColor: '#232323',
             icon: icon,
-            frame:false,
+            frame: false,
             webPreferences: {
                 allowRunningInsecureContent: false,
                 experimentalFeatures: false,
@@ -120,7 +120,16 @@ export class MainWindow {
         });
         this.tray = tray;
     }
-
+    static getWinById(winId: string) {
+        let win;
+        if (winId && this.windows.get(winId)) {
+            win = this.windows.get(winId);
+        }
+        if (winId && winId === 'main') {
+            win = this.mainWindow;
+        }
+        return win;
+    }
     static async createWindow({
         openDevTools,
         winId,
@@ -363,7 +372,6 @@ export class MainWindow {
         return this.mainWindow;
     }
     static onWinEvent(win: BrowserWindow) {
-
         win.on('enter-full-screen', () => {
             win.webContents.send('onMainMessage', {
                 action: 'onFullScreen',
@@ -404,14 +412,14 @@ export class MainWindow {
 
             win.webContents.send('onMainMessage', {
                 action: 'onBlur',
-                payload: {  }
+                payload: {}
             });
         });
 
         win.on('focus', () => {
             win.webContents.send('onMainMessage', {
                 action: 'onFocus',
-                payload: {  }
+                payload: {}
             });
             shortcutKeys.forEach(key => {
                 globalShortcut.register(key, () => {
@@ -492,37 +500,40 @@ export class MainWindow {
             return WebSocketServerWrapper.startServer(port || 6788);
         } else if (messageAction === 'closeApp') {
             app.quit();
-        }
-        if (messageAction === 'getSubWindows') {
+        } else if (messageAction === 'closeWin') {
+            const { winId } = messageValue || {};
+            const win = this.getWinById(winId);
+            if (win) {
+                win.close();
+            }
+        } else if (messageAction === 'minWin') {
+            const { winId } = messageValue || {};
+            const win = this.getWinById(winId);
+            if (win && win.isResizable) {
+                win.minimize();
+            }
+        } else if (messageAction === 'maxWin') {
+            const { winId } = messageValue || {};
+            const win = this.getWinById(winId);
+            if (win && win.isResizable) {
+                win.setFullScreen(!win.isFullScreen());
+            }
+        } else if (messageAction === 'showWin') {
+            const { winId } = messageValue || {};
+            const win = this.getWinById(winId);
+            if (win) {
+                if (win.isMinimized()) {
+                    win.restore();
+                }
+                win.show();
+                win.focus();
+            }
+        } else if (messageAction === 'getSubWindows') {
             return {
                 windows: this.windows.keys(),
                 windowsIsReady: this.windowsReady.keys()
             };
-        } else if (messageAction === 'closeWin') {
-            const { winId } = messageValue || {};
-            if (winId && this.windows.get(winId)) {
-                this.windows.get(winId).close();
-            }
-        } else if (messageAction === 'showWin') {
-            const { winId } = messageValue || {};
-            let win;
-            if (winId && this.windows.get(winId)) {
-                win = this.windows.get(winId)
-                if (win.isMinimized()) {
-                    win.restore();
-                }
-                win.show();
-                win.focus();
-            }
-            if(winId === 'main'){
-                win = this.mainWindow
-                if (win.isMinimized()) {
-                    win.restore();
-                }
-                win.show();
-                win.focus();
-            }
-        }else if (messageAction === 'regShortcutKeys') {
+        } else if (messageAction === 'regShortcutKeys') {
             const { keys } = messageValue || {};
             if (keys && keys.length > 0) {
                 this.shortcutKeys = keys;
@@ -540,22 +551,19 @@ export class MainWindow {
             }
         } else if (messageAction === 'getBounds') {
             const { winId } = messageValue || {};
-            if (!winId) {
-                return this.mainWindow.getBounds();
-            } else if (this.windows.has(winId)) {
-                return this.windows.get(winId)!.getBounds();
+            const win = this.getWinById(winId||"main");
+            if(win){
+                return win.getBounds();
             }
         } else if (messageAction === 'getTrayBounds') {
             return this.tray ? this.tray.getBounds() : null;
         } else if (messageAction === 'setBounds') {
             const { winId, bounds, animate } = messageValue || {};
-            if (!winId) {
-                return this.mainWindow.setBounds(bounds, animate);
-            } else if (this.windows.has(winId)) {
-                return this.windows.get(winId)!.setBounds(bounds, animate);
-            } else {
-                return false;
+            const win = this.getWinById(winId||"main");
+            if(win){
+                return win.setBounds(bounds, animate);
             }
+            return false
         } else if ('winReady' === messageAction) {
             const { winId } = messageValue;
             this.windowsReady.set(winId, true);
@@ -611,7 +619,7 @@ export class MainWindow {
                 workArea,
                 dirname: __dirname,
                 ip: getLocalIPAddress(),
-                isDev:flagDev,
+                isDev: flagDev,
                 isMac,
                 isWin,
                 isFullScreen

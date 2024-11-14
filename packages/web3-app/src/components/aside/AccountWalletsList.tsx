@@ -173,7 +173,7 @@ export const AccountWalletsList = () => {
                         iconButton
                         iconButtonSmall
                         iconSmall
-                        iconProps={{ sx: { color: theme.textPrimary } }}
+                        iconProps={{ sx: { width: 18, height: 18, color: theme.textPrimary } }}
                         icon={'Settings'}
                         onClick={() => {
                             showWalletAside(false);

@@ -1,9 +1,10 @@
 import { useLocalStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { onAction } from '../common/electron';
+import { isPlaygroundMaster } from '../common/helpers';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { isPlaygroundMaster, usePlayground } from './PlaygroundProvider';
+import { usePlayground } from './PlaygroundProvider';
 
 interface AppContextType {
     roiAreaList: RoiInfo[];

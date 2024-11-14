@@ -3,14 +3,14 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { onAction } from '../../common/electron';
 import { sleep } from '../../common/utils';
 
 import { MAC_TITLE_BAR_WIDTH } from '../../constant';
 import { SideWebType, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import WebviewService from '../../services/WebviewService';
-import { SUB_WIN_ID, WebveiwEventType } from '../../types';
+import { WebveiwEventType } from '../../types';
+import { TitleBarControlView } from '../app/TitleBarControlView';
 import { ControlsView } from './ControlsView';
 import MoreTopbarDropdown from './MoreTopbarDropdown';
 import { PromptAction } from './PromptAction';
@@ -268,15 +268,7 @@ export function SideWebview() {
                 }}
             >
                 <View h100p rowVCenter pl={isMacNotFullScreen ? MAC_TITLE_BAR_WIDTH : 0}>
-                    <View
-                        hide={isMacNotFullScreen}
-                        mx={6}
-                        icon={'Close'}
-                        iconButtonSmall
-                        onClick={() => {
-                            onAction('closeWin', { winId: SUB_WIN_ID.LLM });
-                        }}
-                    />
+                    <TitleBarControlView />
                     <WebviewTopBarSideActions selected={site} isSideWeb={false} />
                 </View>
                 <View flex1 appRegionDrag />

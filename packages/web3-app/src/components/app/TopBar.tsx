@@ -74,7 +74,7 @@ export const TopBar = () => {
     };
     return (
         <View borderBox relative flx rowVCenter m={8} borderRadius={8} mr={0}>
-            <View flex1 rowVCenter overflowXAuto ref={ref} mr={env.isWin ? 180 : 140} miniScrollBar>
+            <View flex1 rowVCenter overflowXAuto ref={ref} mr={140} miniScrollBar>
                 <TabBar
                     tabId={MAIN_NAV_TYPE.GAME_FI}
                     minTabBar={minTabBar}

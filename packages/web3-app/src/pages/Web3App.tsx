@@ -7,7 +7,7 @@ import DashboardPage from './Dashboard/DashboardPage';
 
 import { SideBarVert } from '../components/app/SideBarVert';
 import { TopBar } from '../components/app/TopBar';
-import { AsideWidth, HomHeaderHeight, SiderBarWidth } from '../constant';
+import { HomHeaderHeight, SiderBarWidth } from '../constant';
 import { FavorProvider } from '../providers/FavorProvider';
 import { useIAppContext } from '../providers/IAppProvider';
 
@@ -15,6 +15,7 @@ import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useActiveAccount, useMutateActiveTonWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect } from 'react';
 import { onAction } from '../common/electron';
+import { TitleBarControlView } from '../components/app/TitleBarControlView';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
 import { usePublicAccountsInfo } from '../hooks/wallets';
@@ -110,13 +111,9 @@ export function MainMessageDispatcher() {
     return null;
 }
 export const Web3AppInner = () => {
-    const { walletAside, env, isFullScreen } = useIAppContext();
-    const { theme, currentTabId } = useBrowserContext();
-    let topLeft = 0,
-        pageRight = 0;
-    if (walletAside) {
-        pageRight = AsideWidth;
-    }
+    const { env, isFullScreen } = useIAppContext();
+    const { theme, t, currentTabId } = useBrowserContext();
+    let topLeft = 0;
 
     if (env.isMac && !isFullScreen) {
         topLeft = 80;
@@ -125,7 +122,7 @@ export const Web3AppInner = () => {
         topLeft = 54;
     }
     if (env.isWin) {
-        topLeft = 54;
+        topLeft = 80;
     }
 
     return (
@@ -139,6 +136,7 @@ export const Web3AppInner = () => {
         >
             <AppRegionDrag />
             <SideBarVert />
+            <TitleBarControlView main />
             <View
                 borderBox
                 sx={{

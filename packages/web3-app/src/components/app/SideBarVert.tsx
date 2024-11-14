@@ -18,9 +18,6 @@ export const SideBarVert = () => {
     if (env.isMac && isFullScreen) {
         top = 0;
     }
-    if (env.isWin) {
-        top = 0;
-    }
     return (
         <View
             userSelectNone

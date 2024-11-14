@@ -148,7 +148,7 @@ export class Tonendpoint {
     boot = async (): Promise<TonendpointConfig> => {
         this.toSearchParams()
         const response = await this.fetchApi(
-            `https://api-explorer.web3r.site/app/Settings?${this.toSearchParams()}`,
+            `https://api-explorer.web3r.site/api/app/Settings?${this.toSearchParams()}`,
             {
                 method: 'GET'
             }
