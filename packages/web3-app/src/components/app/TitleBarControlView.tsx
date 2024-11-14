@@ -12,11 +12,9 @@ export function TitleBarControlView({ main }: { main?: boolean }) {
     const size = 11;
     const mr = 9;
     const [hover, setHover] = useState(false);
-    const { isMac, isWin, isFullScreen } = env;
+    const { isWin } = env;
     let hide = !isWin;
-    if (isMac && isFullScreen) {
-        hide = true;
-    }
+
     return (
         <View hide={hide} height={HomHeaderHeight} w={80} jCenter rowVCenter>
             <View
