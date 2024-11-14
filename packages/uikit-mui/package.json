@@ -4,13 +4,16 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "yarn fix:mui:dark && yarn fix:mui:dark && tsc -P tsconfig.build.json",
-    "start": "yarn fix:mui:dark && tsc -w  -P tsconfig.build.json",
+    "build": "yarn fix:mui && tsc -P tsconfig.build.json",
+    "start": "yarn fix:mui && tsc -w  -P tsconfig.build.json",
     "build:pkg": "rm -fr dist && yarn build",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6011",
     "build-storybook": "storybook build",
-    "fix:mui:dark": "cp patches/createTheme.js node_modules/@mui/material/styles/createTheme.js "
+    "fix:mui": "yarn fix:mui:dark && yarn fix:mui:getScrollbarSize && yarn fix:mui:esm:getScrollbarSize",
+    "fix:mui:dark": "cp patches/createTheme.js node_modules/@mui/material/styles/createTheme.js",
+    "fix:mui:getScrollbarSize": "cp patches/getScrollbarSize.js node_modules/@mui/utils/getScrollbarSize/getScrollbarSize.js",
+    "fix:mui:esm:getScrollbarSize": "cp patches/esm_getScrollbarSize.js node_modules/@mui/utils/esm/getScrollbarSize/getScrollbarSize.js"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
