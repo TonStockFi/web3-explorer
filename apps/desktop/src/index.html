@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Web3 Explorer</title>
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' blob: * 'unsafe-eval';">
+    <style>
+        webview {
+          touch-action: manipulation;
+        }
+        body{
+            margin:0;
+            padding:0;
+        }
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.3s ease;
+          -webkit-overflow-scrolling: touch; /* Fix for iOS smooth scrolling */
+          pointer-events: auto; /* Ensure pointer events work properly */
+        }
+
+        /* WebKit Scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px; /* Global scrollbar width */
+          height: 8px; /* For horizontal scrollbars */
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background-color: transparent; /* Transparent initially */
+          border-radius: 0.375rem; /* Rounded scrollbar */
+          box-shadow: 0 0 1px rgba(255, 255, 255, 0.01); /* Prevents repainting on macOS */
+        }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
