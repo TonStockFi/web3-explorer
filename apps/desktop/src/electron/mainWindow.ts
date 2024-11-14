@@ -33,7 +33,7 @@ export function t(key: string) {
 
 let flagDev = isDev;
 
-if (flagDev) {
+if (true) {
     contextMenu({
         showInspectElement: true,
         showSaveImageAs: false,
