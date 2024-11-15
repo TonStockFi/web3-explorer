@@ -2,6 +2,34 @@ export function getPartitionKey(key: string) {
     return `persist:${key}`;
 }
 
+export async function copyTextToClipboard(text: string) {
+    try {
+
+        if(window.ClipboardItem){
+            const clipboardItem = new ClipboardItem({
+                'text/plain': new Blob([text], { type: 'text/plain' })
+            });
+            await navigator.clipboard.write([clipboardItem]);
+            return true;
+        }else if(window.__appApi){
+            await window.__appApi.writeText(text)
+            return true;
+        }else{
+            return false;
+        }
+    } catch (error) {
+        console.error('Failed to copy image to clipboard:', error);
+        return false;
+    }
+}
+
+export const toShortAddress = (value: string, length = 4): string => {
+    if (value.length > length * 2) {
+        return value.slice(0, length) + '…' + value.slice(-length);
+    } else {
+        return value;
+    }
+};
 
 export function getDeviceIdFromUrl(url: string) {
     const uri = new URL(url);
@@ -13,9 +41,9 @@ export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function isDesktop(){
+export function isDesktop() {
     //@ts-ignore
-    return !!window.backgroundApi
+    return !!window.backgroundApi;
 }
 
 export function formatDappUrl(dappUrl?: string) {
@@ -26,7 +54,7 @@ export function formatDappUrl(dappUrl?: string) {
 }
 
 export function currentTs() {
-    return + new Date();
+    return +new Date();
 }
 
 export function isValidDomain(domain: string): boolean {

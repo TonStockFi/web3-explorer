@@ -46,7 +46,7 @@ export const TonAsset = forwardRef<
 
     return (
         <ListItem
-            onClick={() => (onClick ? onClick("ton") : navigate(AppRoute.coins + '/ton'))}
+            onClick={() => (onClick ? onClick('ton') : navigate(AppRoute.coins + '/ton'))}
             className={className}
             ref={ref}
         >

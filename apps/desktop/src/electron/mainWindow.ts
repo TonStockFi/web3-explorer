@@ -238,6 +238,7 @@ export class MainWindow {
                 { type: 'separator' },
                 { role: 'cut' },
                 { role: 'copy' },
+                { role: 'reload' },
                 { role: 'paste' },
                 { role: 'selectAll' },
               ],

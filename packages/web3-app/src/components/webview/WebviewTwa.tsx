@@ -9,12 +9,12 @@ import { useIAppContext } from '../../providers/IAppProvider';
 import { getDiscoverHost } from '../../common/helpers';
 import { currentTs } from '../../common/utils';
 import { DISCOVER_PID, START_URL } from '../../constant';
-import { BalanceBackgroundPage } from '../../pages/Wallet/BalanceBackgroundPage';
 import { usePro } from '../../providers/ProProvider';
 import WebviewService from '../../services/WebviewService';
 import { MAIN_NAV_TYPE, ProPlan } from '../../types';
 import { onOpenTab } from '../discover/DiscoverView';
 import { LoadingView } from '../LoadingView';
+import { PayPlanBackgroundPage } from '../webview-background/PayPlanBackgroundPage';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
 
@@ -80,7 +80,7 @@ export function WebviewTwa() {
                 proPlans: ProPlan[];
                 proRecvAddress: string;
             };
-            console.log('updateProPlan', proPlans);
+            // console.log('updateProPlan', proPlans);
             updateProPlans({ proPlans, proRecvAddress });
         }
         if (action === 'openWindow') {
@@ -126,7 +126,7 @@ export function WebviewTwa() {
                     bottom0
                     zIdx={showBlockViewer ? 1 : -1}
                 >
-                    <BalanceBackgroundPage />
+                    <PayPlanBackgroundPage />
                 </View>
             )}
 

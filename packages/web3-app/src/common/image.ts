@@ -50,22 +50,6 @@ export function resizeImage(
     });
   }
   
-  export async function copyBlobToClipboard(blob: Blob): Promise<boolean> {
-    try {
-      // Convert Blob to File
-      const file = new File([blob], 'image.jpg', { type: blob.type });
-      // Create a new ClipboardItem
-      const clipboardItem = new ClipboardItem({ [file.type]: file });
-      // Write to the clipboard
-      await navigator.clipboard.write([clipboardItem]);
-      console.log('Image copied to clipboard successfully!');
-      return true;
-    } catch (error) {
-      console.error('Failed to copy image to clipboard:', error);
-      return false;
-    }
-  }
-  
   async function blobToDataUrl(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -109,7 +93,6 @@ export function resizeImage(
               await onAction("copyImageDataUrlToClipBoard",{base64Data})
             }else{
               throw new Error('clipboard is not valid');
-
             }
           } else {
             throw new Error('Failed to convert canvas to Blob');

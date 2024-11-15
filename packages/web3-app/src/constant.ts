@@ -141,19 +141,19 @@ export const ProPlans: ProPlan[] = [
     {
         level: "LONG",
         name: '永久至尊',
-        description: `提供 {accountTitle} 下的n个钱包帐号的无限制无期限使用功能。包括不限于:一对多转帐、超级智能机器识别辅助`,
-        amount: '99990000000'
+        description: `提供 {accountTitle} 下的N个钱包帐号的无限制无期限使用功能。包括不限于: 一对多转帐、超级智能机器识别辅助、多帐户资产汇总分析`,
+        amount: '199990000000'
     },
     {
         level: "YEAR",
         name: '年付',
-        description: `提供 {walletTitle} 无限制功能,使用期限一年。包括不限于:一对多转帐、超级智能机器识别辅助`,
-        amount: '9999000000'
+        description: `提供 {walletTitle} 无限制功能,使用期限一年。包括不限于: 一对多转帐、超级智能机器识别辅助、多帐户资产汇总分析`,
+        amount: '19999000000'
     },
     {
         level: "MONTH",
         name: '月付',
-        description: `提供 {walletTitle} 无限制功能,使用期限一个月。包括不限于:一对多转帐、超级智能机器识别辅助`,
-        amount: '9990000'
+        description: `提供 {walletTitle} 无限制功能,使用期限一个月。包括不限于: 一对多转帐、超级智能机器识别辅助`,
+        amount: '1999900000'
     },
 ];

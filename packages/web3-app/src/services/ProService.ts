@@ -1,6 +1,6 @@
 import { IndexedDbCache } from '@web3-explorer/utils';
 import { currentTs } from '../common/utils';
-import { ProInfoProps } from '../types';
+import { CurrentPayPlan, ProInfoProps } from '../types';
 
 export default class ProService {
     indexedDb: IndexedDbCache;
@@ -56,6 +56,6 @@ export default class ProService {
                 }
             }
         }
-        return { isLoginProLevel, currentPlan };
+        return { isLoginProLevel, plan:currentPlan,plans:proInfoList } as CurrentPayPlan;
     }
 }

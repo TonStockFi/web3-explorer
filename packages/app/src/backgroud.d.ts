@@ -23,6 +23,7 @@ interface BackgroundApi {
 }
 
 interface AppApi {
+    writeText: (text: string) => Promise<void>;
     message: <Result>(message: { action: string; payload: any }) => Promise<Result>;
     onRenderMessage: (callback: (e:{action:string,payload?: Record<string, any>}) => void) => void;
 }

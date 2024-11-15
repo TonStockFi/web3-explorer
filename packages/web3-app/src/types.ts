@@ -304,3 +304,23 @@ export interface ProInfoProps{
     amount:number,
     ts:number
 }
+
+export interface CurrentPayPlan{
+    isLoginProLevel:boolean, 
+    plans:ProInfoProps[],
+    plan:ProInfoProps
+}
+
+export interface AssetBalanceProps{
+    amount:number,
+    name:string,
+    symbol:string,
+    image:string
+}
+
+export interface AccountAssetBalance {
+    id:string,
+    index:number,
+    balance:string,
+    assetList:AssetBalanceProps[]
+}

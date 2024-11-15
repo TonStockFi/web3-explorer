@@ -81,11 +81,11 @@ const SendSubmitButton: FC<{
     const theme = useTheme();
     const { proInfoList, onShowProBuyDialog } = usePro();
     const { index, id } = useAccountInfo();
-    const { isLoginProLevel, currentPlan } = ProService.getCurrentPlan(proInfoList, id, index);
+    const { isLoginProLevel, plan } = ProService.getCurrentPlan(proInfoList, id, index);
     let showProButton = false;
     if (watch('rows').length > 2) {
         if (!isLoginProLevel) {
-            if (!currentPlan) {
+            if (!plan) {
                 showProButton = true;
             }
         }

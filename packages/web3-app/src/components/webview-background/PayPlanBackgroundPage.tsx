@@ -10,7 +10,7 @@ import WebviewService from '../../services/WebviewService';
 import { PRO_LEVEL, ProInfoProps, SUB_WIN_ID, WebveiwEventType } from '../../types';
 let address = '';
 
-export function BalanceBackgroundPage() {
+export function PayPlanBackgroundPage() {
     address = useAccountAddress();
     const { proRecvAddress, updateOrderComment, orderComment } = usePro();
     const url = useBlockChainExplorer().replace('%s', proRecvAddress);
@@ -75,6 +75,7 @@ export function BalanceBackgroundPage() {
                         proInfo
                     }
                 });
+                window.dispatchEvent(new CustomEvent('updatePayPlan', {}));
                 return;
             }
         }
