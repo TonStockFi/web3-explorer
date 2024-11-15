@@ -46,11 +46,7 @@ function Pages() {
                 <DesktopMultiSendFormPage />
             </View>
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.DASHBOARD}>
-                <DashboardPage
-                    onCloseDashBoard={() => {
-                        openTab(MAIN_NAV_TYPE.WALLET);
-                    }}
-                />
+                <DashboardPage />
             </View>
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.DEV}>
                 <DevView />
