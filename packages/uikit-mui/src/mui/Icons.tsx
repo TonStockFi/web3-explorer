@@ -8,6 +8,7 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
+import BubbleChart from '@mui/icons-material/BubbleChart';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import CloseIcon from '@mui/icons-material/Close';
 import CodeIcon from '@mui/icons-material/Code';
@@ -88,6 +89,7 @@ import { GiClick } from 'react-icons/gi';
 
 export type IconList =
     | 'Folder'
+    | 'BubbleChart'
     | 'GiClick'
     | 'Psychology'
     | 'Forum'
@@ -204,6 +206,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     AdsClick,
     WifiOff,
     GridView,
+    BubbleChart,
     Screenshot: ContentCut,
     Save,
     HighlightOff,

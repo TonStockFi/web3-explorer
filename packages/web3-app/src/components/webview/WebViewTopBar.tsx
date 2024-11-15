@@ -12,9 +12,11 @@ import { WebviewTopBarSideActions } from './WebviewTopBarSideActions';
 
 export function WebviewTopBar({
     hideOpenInNew,
+    urlReadOnly,
     tab,
     currentUrl
 }: {
+    urlReadOnly?: boolean;
     hideOpenInNew?: boolean;
     tab: BrowserTab;
     currentUrl?: string;
@@ -89,7 +91,12 @@ export function WebviewTopBar({
                 />
             </View>
             <View h={44} row aCenter ml12 flex1>
-                <UrlInput isDiscover={false} currentUrl={currentUrl} tab={tab} />
+                <UrlInput
+                    urlReadOnly={urlReadOnly}
+                    isDiscover={false}
+                    currentUrl={currentUrl}
+                    tab={tab}
+                />
             </View>
 
             <View ml12 rowVCenter>

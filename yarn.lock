@@ -8142,9 +8142,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@web3-explorer/desktop-app@workspace:apps/desktop":
+"@web3-explorer/desktop@workspace:apps/desktop":
   version: 0.0.0-use.local
-  resolution: "@web3-explorer/desktop-app@workspace:apps/desktop"
+  resolution: "@web3-explorer/desktop@workspace:apps/desktop"
   dependencies:
     "@aptabase/electron": "npm:^0.3.1"
     "@electron-forge/cli": "npm:7.4.0"

@@ -19,6 +19,9 @@ import { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+import { useAccountInfo } from '../../hooks/wallets';
+import { usePro } from '../../providers/ProProvider';
+import ProService from '../../services/ProService';
 import { getWillBeMultiSendValue } from './utils';
 
 const FooterErrorMessage = styled(Body2)`
@@ -76,6 +79,17 @@ const SendSubmitButton: FC<{
 
     const isLedger = useIsActiveWalletLedger();
     const theme = useTheme();
+    const { proInfoList, onShowProBuyDialog } = usePro();
+    const { index, id } = useAccountInfo();
+    const { isLoginProLevel, currentPlan } = ProService.getCurrentPlan(proInfoList, id, index);
+    let showProButton = false;
+    if (watch('rows').length > 2) {
+        if (!isLoginProLevel) {
+            if (!currentPlan) {
+                showProButton = true;
+            }
+        }
+    }
     return (
         <View row aCenter jEnd userSelectNone>
             <View aCenter h100p row mr12 hide={showButton}>
@@ -108,16 +122,35 @@ const SendSubmitButton: FC<{
                     </View>
                 )}
             </View>
+
             {showButton && (
-                <Button
-                    style={{ width: 120 }}
-                    type="submit"
-                    primary
-                    disabled={remainingBalanceBN?.lt(0) || maxMsgsNumberExceeded || isLedger}
-                    loading={formValidationState === 'validating'}
-                >
-                    {t('continue')}
-                </Button>
+                <>
+                    {showProButton && (
+                        <View mr12>
+                            <View
+                                onClick={() => {
+                                    onShowProBuyDialog(true);
+                                }}
+                                buttonContained
+                                button={'升级专业版一次发送超过两个地址的交易'}
+                            ></View>
+                        </View>
+                    )}
+                    <Button
+                        style={{ width: 120 }}
+                        type="submit"
+                        primary
+                        disabled={
+                            showProButton ||
+                            remainingBalanceBN?.lt(0) ||
+                            maxMsgsNumberExceeded ||
+                            isLedger
+                        }
+                        loading={formValidationState === 'validating'}
+                    >
+                        {t('continue')}
+                    </Button>
+                </>
             )}
         </View>
     );

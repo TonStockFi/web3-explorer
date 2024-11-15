@@ -13,6 +13,7 @@ import FormGroup from '@web3-explorer/uikit-mui/dist/mui/FormGroup';
 import Input from '@web3-explorer/uikit-mui/dist/mui/Input';
 import { View } from '@web3-explorer/uikit-view';
 import { useTheme } from 'styled-components';
+import { hexToRGBA } from '../../common/utils';
 import { AccountsSelect } from '../accounts/AccountsSelect';
 import TabViewContainer from '../TabViewContainer';
 import { WalletEmoji } from '../WalletEmoji';
@@ -53,7 +54,14 @@ function CheckboxItemRow({
                 }
             }}
             control={
-                <View w100p aCenter jSpaceBetween px={4} py={1.5}>
+                <View
+                    w100p
+                    aCenter
+                    jSpaceBetween
+                    px={4}
+                    py={1.5}
+                    bgColor={disabled ? hexToRGBA(theme.backgroundContentTint, 0.3) : undefined}
+                >
                     <View row aCenter>
                         <Checkbox
                             disabled={disabled}

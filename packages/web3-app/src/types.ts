@@ -127,6 +127,7 @@ export interface BoundingClientRect {
 
 export enum SUB_WIN_ID {
     DEVICES = 'DEVICES',
+    ASSETS = 'ASSETS',
     PLAYGROUND = 'PLAYGROUND',
     LLM = 'LLM',
     OPENCV = 'OPENCV',

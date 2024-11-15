@@ -21,7 +21,7 @@ export const AccountsMoreView: FC = () => {
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
     const wallet = activeAccount.activeTonWallet;
-
+    console.log(activeAccount.id, wallet.id);
     const { t } = useTranslation();
     const { onOpen: recovery } = useRecoveryNotification();
 
@@ -48,12 +48,12 @@ export const AccountsMoreView: FC = () => {
                 options={[
                     {
                         name: t('settings_backup_seed'),
-                        onClick: () => recovery({ accountId: wallet.id }),
+                        onClick: () => recovery({ accountId: activeAccount.id }),
                         icon: <KeyIcon />
                     },
                     {
                         name: t('Rename'),
-                        onClick: () => onRename({ accountId: wallet.id }),
+                        onClick: () => onRename({ accountId: activeAccount.id }),
                         icon: <PencilIcon />
                     },
                     {
@@ -63,7 +63,7 @@ export const AccountsMoreView: FC = () => {
                             if (accounts.length < 2) {
                                 return;
                             }
-                            onDelete({ accountId: wallet.id });
+                            onDelete({ accountId: activeAccount.id });
                         },
                         icon: <View icon="Delete" iconSmall />
                     }

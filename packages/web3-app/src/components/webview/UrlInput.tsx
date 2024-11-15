@@ -11,8 +11,10 @@ import { TopFavorView } from './TopFavorView';
 export function UrlInput({
     isDiscover,
     currentUrl,
+    urlReadOnly,
     tab
 }: {
+    urlReadOnly?: boolean;
     isDiscover?: boolean;
     currentUrl?: string;
     tab?: BrowserTab;
@@ -36,6 +38,9 @@ export function UrlInput({
             type="url"
             ref={inputRef}
             onKeyDown={async e => {
+                if (urlReadOnly) {
+                    return;
+                }
                 if (e.key === 'Enter') {
                     let newUrl = urlEdit;
                     if (!newUrl) {
@@ -83,6 +88,9 @@ export function UrlInput({
                 }
             }}
             onChange={e => {
+                if (urlReadOnly) {
+                    return;
+                }
                 setUrlEdit(e.target.value.trim());
             }}
             value={urlEdit}
@@ -129,7 +137,11 @@ export function UrlInput({
                     endAdornment: tab ? (
                         <View
                             empty
-                            hide={currentUrl === '' || tab?.tabId === MAIN_NAV_TYPE.GAME_FI}
+                            hide={
+                                currentUrl === '' ||
+                                urlReadOnly ||
+                                tab?.tabId === MAIN_NAV_TYPE.GAME_FI
+                            }
                         >
                             <InputAdornment sx={{ mr: '-10px' }} position="end">
                                 <TopFavorView tabId={tab!.tabId} currentUrl={currentUrl!} />

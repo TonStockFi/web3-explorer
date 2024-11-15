@@ -72,6 +72,18 @@ export const MainNavList = [
         side: true
     },
     {
+        name: '资产分析',
+        tabId: MAIN_NAV_TYPE.DASHBOARD,
+        icon: 'Insights',
+        side: true
+    },
+    {
+        icon: 'BubbleChart',
+        name: 'Market',
+        tabId: MAIN_NAV_TYPE.MARKET,
+        side: true
+    },
+    {
         name: 'Games',
         tabId: MAIN_NAV_TYPE.GAME_FI,
         icon: 'SportsEsports',
@@ -82,12 +94,6 @@ export const MainNavList = [
         name: 'Favor',
         tabId: MAIN_NAV_TYPE.FAVOR,
         icon: 'Folder',
-        side: true
-    },
-    {
-        icon: 'Insights',
-        name: 'Market',
-        tabId: MAIN_NAV_TYPE.MARKET,
         side: true
     },
 
@@ -111,22 +117,10 @@ export const MainNavList = [
         tabId: MAIN_NAV_TYPE.CONNECTED_APPS,
         icon: 'Link'
     },
-
-    {
-        name: 'Market',
-        tabId: MAIN_NAV_TYPE.MARKET,
-        icon: 'Insights'
-    },
     {
         name: 'AccountsManage',
         tabId: MAIN_NAV_TYPE.ACCOUNTS_MANAGE,
         icon: 'Style'
-    },
-
-    {
-        name: 'aside_dashboard',
-        tabId: MAIN_NAV_TYPE.DASHBOARD,
-        icon: 'FormatListBulleted'
     },
 
     {

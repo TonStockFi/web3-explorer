@@ -5,6 +5,7 @@ import {
     clipboard,
     globalShortcut,
     ipcMain,
+    Menu,
     nativeImage,
     screen,
     Tray,
@@ -228,7 +229,22 @@ export class MainWindow {
         }
 
         this.mainWindow.loadURL(this.currentUrl);
-        // Menu.setApplicationMenu(Menu.buildFromTemplate([]));
+        const menu = Menu.buildFromTemplate([
+            {
+              label: 'Edit',
+              submenu: [
+                { role: 'undo' },
+                { role: 'redo' },
+                { type: 'separator' },
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
+                { role: 'selectAll' },
+              ],
+            },
+          ]);
+        
+          Menu.setApplicationMenu(menu);
 
         if (flagDev) {
             this.mainWindow.webContents.openDevTools({ mode: 'right' });

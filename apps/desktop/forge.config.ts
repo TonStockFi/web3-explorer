@@ -23,12 +23,12 @@ console.log('>> IsDev', IsDev);
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc', 'web3'];
 
 const devAndRpmOptions = {
-    name: 'Web3ExplorerBeta',
-    productName: 'Web3ExplorerBeta',
-    genericName: 'Web3ExplorerBeta',
+    name: 'Web3Explorer',
+    productName: 'Web3Explorer',
+    genericName: 'Web3Explorer',
     license: 'Apache-2.0',
     maintainer: 'Web3Explorer Group',
-    bin: 'Web3ExplorerBeta', // bin name
+    bin: 'Web3Explorer', // bin name
     description: 'Your desktop web3 explorer on The Open Network',
     homepage: 'https://web3or.site',
     icon: path.join(__dirname, 'public', 'icon.png'),
@@ -46,15 +46,15 @@ const config: ForgeConfig = {
         },
         asar: true,
         icon: path.join(__dirname, 'public', 'icon'),
-        name: 'Web3ExplorerBeta',
-        executableName: 'Web3ExplorerBeta',
+        name: 'Web3Explorer',
+        executableName: 'Web3Explorer',
         protocols: [
             {
                 name: 'Web3Explorer Protocol',
                 schemes: schemes
             }
         ],
-        appBundleId: IsDev ? 'com.web3.explorer.dev' : 'org.web3.explorer',
+        appBundleId: IsDev ? 'com.web3.explorer.dev' : 'com.beta.web3.explorer',
         ...(process.env.APPLE_API_KEY
             ? {
                   osxSign: {
@@ -77,7 +77,7 @@ const config: ForgeConfig = {
     makers: [
         new MakerSquirrel(
             {
-                name: 'Web3ExplorerBeta',
+                name: 'Web3Explorer',
                 authors: 'Web3Explorer Group',
                 description: 'Your desktop web3 explorer on The Open Network',
                 iconUrl: 'https://raw.githubusercontent.com/TonStockFi/web3-explorer/refs/heads/main/apps/desktop/public/icon.ico',
@@ -99,7 +99,7 @@ const config: ForgeConfig = {
                         x: 200,
                         y: 170,
                         type: 'file',
-                        path: `${process.cwd()}/out/Web3Explorer-darwin-${arch}/Web3Explorer.app`
+                        path: `${process.cwd()}/out/Web3Explorer-darwin-${arch}/Web3ExplorerBeta.app`
                     },
                     { x: 400, y: 170, type: 'link', path: '/Applications' }
                 ]

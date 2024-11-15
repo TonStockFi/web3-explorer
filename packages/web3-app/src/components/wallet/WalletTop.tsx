@@ -61,7 +61,7 @@ export function WalletTop() {
         <View
             userSelectNone
             mb={24}
-            pt={68}
+            pt={44}
             row
             jSpaceBetween
             zIdx={2}
