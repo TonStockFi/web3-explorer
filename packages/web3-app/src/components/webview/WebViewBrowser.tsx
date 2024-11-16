@@ -315,8 +315,11 @@ const WebViewBrowser = ({
                 onEvent('did-start-navigation', e);
                 if (isMainFrame) {
                     siteLoading(true);
-                    TabIdUrlMap.set(tabId, url);
-                    if (url) {
+                    if (url.startsWith('http') || url.startsWith('about')) {
+                        TabIdUrlMap.set(tabId, url);
+                    }
+
+                    if (url && url.startsWith('http')) {
                         new WebviewMuteService(url, getAccountIndexByTabId(tabId))
                             .get()
                             .then((isMute: boolean) => {
@@ -371,6 +374,8 @@ const WebViewBrowser = ({
             },
 
             'dom-ready': async () => {
+                const url = webview.getURL();
+
                 if (!webContentsId) {
                     webContentsId = webview.getWebContentsId();
                     console.log('>> _ET dom-ready webContentsId', webContentsId);
@@ -383,6 +388,10 @@ const WebViewBrowser = ({
                             handleOnSiteMessage
                         );
                     }
+                } else {
+                    if (url === 'about:blank') {
+                        return;
+                    }
                 }
 
                 if (loadFailed) {
@@ -391,7 +400,6 @@ const WebViewBrowser = ({
                 }
 
                 await webview.insertCSS(GLOBAL_CSS);
-                const url = webview.getURL();
 
                 if (url.indexOf('mail.proton.me') > -1) {
                     await webview.insertCSS(
@@ -407,6 +415,7 @@ const WebViewBrowser = ({
                 if (webviewProps?.insertJs) {
                     webview.executeJavaScript(webviewProps?.insertJs);
                 }
+                console.log('onReady >> ', url);
                 setError(null);
                 onEvent('dom-ready');
                 TabIdWebviewReadyMap.set(tabId, true);

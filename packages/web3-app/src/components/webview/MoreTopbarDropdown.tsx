@@ -62,7 +62,7 @@ export default function MoreTopbarDropdown({
                 bgcolor: theme.backgroundContentAttention,
                 overflow: 'visible',
                 filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                mt: 1.9,
+                mt: 2.5,
                 ml: 1.6,
                 '&::before': {
                     content: '""',

@@ -5,6 +5,8 @@ import { CutAreaRect } from '../providers/ScreenshotProvider';
 export interface RoiInfo{
     id:string,
     catId:string,
+    accountId:string,
+    accountIndex:number,
     threshold:number,
     name?:string,
     priority:number,
@@ -27,7 +29,7 @@ export default class RoiService {
         this.catId = catId;
         this.indexedDb = new IndexedDbCache().init(`roi-Info/${catId}`);
         this.indexedDbImg = new IndexedDbCache().init(`roi-Img/${catId}`);
-        this.indexedDbIds = new IndexedDbCache().init(`roi/Ids`);
+        this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${catId}`);
     }
 
     async getImage(id: string): Promise<string> {

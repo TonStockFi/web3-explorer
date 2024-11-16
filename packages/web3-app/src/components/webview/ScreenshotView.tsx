@@ -46,6 +46,9 @@ export default function ScreenshotView({
     const { currentAccount, tab } = usePlayground();
     const { env } = useIAppContext();
     const handleRecognition = async (tabId: string, cutAreaRect: CutAreaRect) => {
+        if (!currentAccount) {
+            return;
+        }
         let cutImageUrl;
         const catId = tabId;
 
@@ -65,6 +68,8 @@ export default function ScreenshotView({
         const ts = currentTs();
         const roiInfo: RoiInfo = {
             priority: 10,
+            accountIndex: currentAccount.index,
+            accountId: currentAccount.id,
             id: '',
             ts,
             catId,

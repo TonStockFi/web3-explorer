@@ -2,16 +2,20 @@ import { useLocalStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { onAction } from '../common/electron';
 import { isPlaygroundMaster } from '../common/helpers';
+import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
+import { AccountPublic, ProInfoProps } from '../types';
 import { usePlayground } from './PlaygroundProvider';
+import { usePro } from './ProProvider';
 
 interface AppContextType {
     roiAreaList: RoiInfo[];
     notifyTestRoi: (roi: RoiInfo) => void;
     notifyWindow: (action: string, payload?: any) => void;
     notifyWindows: (action: string, payload?: any) => void;
-    loadCacheRoiList: (tabId: string) => Promise<RoiInfo[]>;
+    loadCacheRoiList: (tabId: string, account?: AccountPublic) => Promise<RoiInfo[]>;
+
     selectedRoiId: string;
     screenPushDelayMs: number;
     recognitionCatId: string;
@@ -41,11 +45,34 @@ export const MatchResults: Map<string, MatchResult> = new Map();
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+export function getServiceId(
+    {
+        tabId,
+        accountId,
+        accountIndex
+    }: {
+        tabId: string;
+        accountIndex: number;
+        accountId: string;
+    },
+    proInfoList: ProInfoProps[]
+) {
+    const currentProPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
+    console.log('getServiceId', currentProPlan, tabId, accountId, accountIndex);
+    if (currentProPlan && (currentProPlan.isLoginProLevel || currentProPlan.plan)) {
+        return `${tabId}`;
+    } else {
+        return `${tabId}_${accountId}_${accountIndex}`;
+    }
+}
 export const RecognitionProvider = (props: { children: ReactNode }) => {
+    const { proInfoList } = usePro();
+
     const { children } = props || {};
     const [selectedRoiId, setSelectedRoiId] = useState<string>('');
     const { accounts, currentTabId, currentAccount } = usePlayground();
     const index = currentAccount?.index || 0;
+
     const [clickStopped, setClickStopped] = useState<boolean>(false);
 
     const [recognitionCatId, setRecognitionCatId] = useLocalStorageState(
@@ -135,9 +162,22 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             }
         });
     };
-    const loadCacheRoiList = async (tabId: string) => {
-        console.log('loadCacheRoiList', tabId);
-        const rows = await new RoiService(tabId).getAll();
+    const loadCacheRoiList = async (tabId: string, account?: AccountPublic) => {
+        console.log('loadCacheRoiList', tabId, currentAccount);
+        let currentAccount_ = account || currentAccount;
+        if (!currentAccount_) {
+            return [];
+        }
+        const rows = await new RoiService(
+            getServiceId(
+                {
+                    tabId,
+                    accountId: currentAccount_?.id,
+                    accountIndex: currentAccount_.index
+                },
+                proInfoList
+            )
+        ).getAll();
         rows.sort((a, b) => b.ts - a.ts);
         setRoiAreaList(() => rows);
         return rows;
@@ -155,6 +195,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             if (!tabId) {
                 setRoiAreaList(() => []);
             } else {
+                console.log('loadCacheRoiList', { tabId });
                 loadCacheRoiList(tabId);
             }
         }, 500);
@@ -162,12 +203,39 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string) => {
         console.log('addRoiArea', { recognitionCatId, selectedRoiId });
-        const id = await new RoiService(r.catId).getId();
+        const id = await new RoiService(
+            getServiceId(
+                {
+                    tabId: r.catId,
+                    accountId: r.accountId,
+                    accountIndex: r.accountIndex
+                },
+                proInfoList
+            )
+        ).getId();
         const row: RoiInfo = { ...r, priority: 0, id };
-        await new RoiService(r.catId).save(id, row, cutImageUrl);
+        await new RoiService(
+            getServiceId(
+                {
+                    tabId: r.catId,
+                    accountId: r.accountId,
+                    accountIndex: r.accountIndex
+                },
+                proInfoList
+            )
+        ).save(id, row, cutImageUrl);
 
         if (!recognitionCatId) {
-            const rows = await new RoiService(r.catId).getAll();
+            const rows = await new RoiService(
+                getServiceId(
+                    {
+                        tabId: r.catId,
+                        accountId: r.accountId,
+                        accountIndex: r.accountIndex
+                    },
+                    proInfoList
+                )
+            ).getAll();
             setRoiAreaList(prv => {
                 return rows;
             });
@@ -187,7 +255,16 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const updateRoiArea = (r: RoiInfo) => {
-        new RoiService(r.catId).update(r);
+        new RoiService(
+            getServiceId(
+                {
+                    tabId: r.catId,
+                    accountId: r.accountId,
+                    accountIndex: r.accountIndex
+                },
+                proInfoList
+            )
+        ).update(r);
         setRoiAreaList(prv => {
             return prv.map(row => {
                 return row.id !== r.id ? row : r;
@@ -195,11 +272,21 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         });
         notifyWindows('onUpdateRoi');
     };
+
     const removeRoiArea = (r: RoiInfo) => {
         setSelectedRoiId(prev => {
             return r.id === prev ? '' : prev;
         });
-        new RoiService(r.catId).remove(r.id);
+        new RoiService(
+            getServiceId(
+                {
+                    tabId: r.catId,
+                    accountId: r.accountId,
+                    accountIndex: r.accountIndex
+                },
+                proInfoList
+            )
+        ).remove(r.id);
         setRoiAreaList(prv => {
             return prv.filter(row => row.id !== r.id);
         });
