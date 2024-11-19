@@ -93,7 +93,7 @@ export function DiscoverView({ showDiscover, tabId }: { showDiscover: boolean; t
 
     const [loading, setLoading] = useState<boolean>(true);
     const { env } = useIAppContext();
-    const { newTab, closeTab, openTab, browserTabs, editTab } = useBrowserContext();
+    const { newTab, closeTab, openTab, currentTabId, browserTabs, editTab } = useBrowserContext();
     const { name, emoji, address, id, index } = useAccountInfo();
     const url = `${getDiscoverHost(env.isDev)}#Discover`;
 
@@ -104,8 +104,8 @@ export function DiscoverView({ showDiscover, tabId }: { showDiscover: boolean; t
         }
     }, [showDiscover]);
     useEffect(() => {
-        _tabId = tabId;
-    }, [tabId]);
+        _tabId = currentTabId;
+    }, [currentTabId]);
     const onSiteMessage = async ({
         action,
         payload
@@ -117,7 +117,6 @@ export function DiscoverView({ showDiscover, tabId }: { showDiscover: boolean; t
             onOpenTab({ _tabId, payload, editTab, openTab, closeTab, newTab, browserTabs });
         }
     };
-
     return (
         <View borderBox wh100p relative transitionEase="width 0.3s" pr={8} pb={0} overflowHidden>
             {!firstLoad && (

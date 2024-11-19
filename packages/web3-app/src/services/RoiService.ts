@@ -2,21 +2,21 @@ import { IndexedDbCache } from '@web3-explorer/utils';
 import { urlToDataUri } from '../common/opencv';
 import { CutAreaRect } from '../providers/ScreenshotProvider';
 
-export interface RoiInfo{
-    id:string,
-    catId:string,
-    accountId:string,
-    accountIndex:number,
-    threshold:number,
-    name?:string,
-    priority:number,
-    ts:number,
-    tag?:string,
-    clickOffsetX?:number;
-    clickOffsetY?:number;
-    cutAreaRect:CutAreaRect,
-    clickOnVisible?:boolean;
-    clickIdOnVisible?:string;
+export interface RoiInfo {
+    id: string;
+    catId: string;
+    threshold: number;
+    name?: string;
+    priority: number;
+    pageBelongTo?: string;
+    ts: number;
+    page?: string;
+    isMark?: boolean;
+    clickOffsetX?: number;
+    clickOffsetY?: number;
+    cutAreaRect: CutAreaRect;
+    clickOnVisible?: boolean;
+    clickIdOnVisible?: string;
 }
 
 export default class RoiService {
@@ -32,11 +32,21 @@ export default class RoiService {
         this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${catId}`);
     }
 
+    static async getProVersionId(catId:string): Promise<number> {
+        const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
+        return indexedDb.get(catId) || 0;
+    }
+
+    static async saveProVersionId(catId: string,ts:number): Promise<void> {
+        const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
+        await indexedDb.put(catId,ts);
+    }
+
     async getImage(id: string): Promise<string> {
         return await this.indexedDbImg.get(id);
     }
-    async updateImage(id:string,data:string){
-        return await this.indexedDbImg.put(id,data);
+    async updateImage(id: string, data: string) {
+        return await this.indexedDbImg.put(id, data);
     }
 
     async getAll() {
@@ -50,21 +60,27 @@ export default class RoiService {
 
     async getId() {
         let id = await this.indexedDbIds.get(this.catId);
-        if(!id){
+        if (!id) {
             id = `#1`;
-        }else{
-            id =  `#${id+1}`;
+        } else {
+            id = `#${id + 1}`;
         }
-        await this.indexedDbIds.put(this.catId,Number(id.replace("#","")));
-        return id
+        await this.saveId(Number(id.replace('#', '')))
+        return id;
     }
-    async update(info:RoiInfo) {
+    async saveId(id:number) {
+        await this.indexedDbIds.put(this.catId, id);
+        return id;
+    }
+    
+    async update(info: RoiInfo) {
         await this.indexedDb.put(`${info.id}`, info);
         return true;
     }
-    async save(id:string,info: RoiInfo, imageUrl: string) {
+
+    async save(id: string, info: RoiInfo, imageUrl: string, isDataUrl?: boolean) {
         await this.indexedDb.put(`${id}`, info);
-        const dataUrl = await urlToDataUri(imageUrl);
+        const dataUrl = isDataUrl ? imageUrl : await urlToDataUri(imageUrl);
         await this.indexedDbImg.put(`${id}`, dataUrl);
         return true;
     }
@@ -72,5 +88,14 @@ export default class RoiService {
     async remove(id: string) {
         await this.indexedDb.delete(id);
         await this.indexedDbImg.delete(id);
+
+    }
+    async emptyDb() {
+        const rows  = await this.indexedDb.getAll();
+        for (let index = 0; index < rows.length; index++) {
+            const {id} = rows[index];
+            await this.remove(id)
+        }
+        this.indexedDbIds.delete(this.catId)
     }
 }

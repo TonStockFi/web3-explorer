@@ -110,7 +110,7 @@ export default function DeviceScreenView({
         >
             <View>
                 <View h={44} w100p jSpaceBetween rowVCenter>
-                    <View></View>
+                    <View />
                     <View rowVCenter mr={6}>
                         <DeviceScreenDropdownMenu ws={ws} deviceId={deviceId} />
                     </View>

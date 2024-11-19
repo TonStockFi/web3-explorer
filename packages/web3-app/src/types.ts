@@ -306,7 +306,8 @@ export interface ProInfoProps{
 }
 
 export interface CurrentPayPlan{
-    isLoginProLevel:boolean, 
+    isLongProLevel:boolean, 
+    isPayMmeber:boolean, 
     plans:ProInfoProps[],
     plan:ProInfoProps
 }

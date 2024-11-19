@@ -17,6 +17,14 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
             }
         },
         components: {
+            MuiDialog: {
+                styleOverrides: {
+                    paper: {
+                        backgroundColor: theme.backgroundPage,
+                        color: theme.textPrimary
+                    }
+                }
+            },
             MuiMenuItem: {
                 styleOverrides: {
                     root: {
@@ -70,6 +78,9 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
             },
             MuiButton: {
                 styleOverrides: {
+                    root: {
+                        textTransform: 'unset'
+                    },
                     outlined: {
                         color: theme.textPrimary
                     },

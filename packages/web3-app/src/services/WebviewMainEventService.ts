@@ -21,7 +21,7 @@ import { BaseWindowConstructorOptions } from 'electron';
 import { onAction, openWindow } from '../common/electron';
 import { getDiscoverHost } from '../common/helpers';
 import { getPartitionKey } from '../common/utils';
-import { DISCOVER_PID } from '../constant';
+import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
 import { AccountPublic, SUB_WIN_ID } from '../types';
@@ -64,7 +64,7 @@ export default class WebviewMainEventService {
     async openFeatureWindow(env: AppEnv, action: string, payload?: any) {
         const { isDev } = env;
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.PLAYGROUND}`;
-        const width = 1100;
+        const width = 1160;
         const height = 860;
         const x = 24;
         const y = 24;
@@ -155,7 +155,7 @@ export default class WebviewMainEventService {
     }) {
         const topColor = getTopColor(index);
 
-        let height = 776;
+        let height = PLAYGROUND_WIN_HEIGHT;
         let resizable_ = resizable || false;
         const minWidth = 368;
         let y = 12;
@@ -211,8 +211,8 @@ export default class WebviewMainEventService {
         onAction('setBounds', {
             winId,
             bounds: {
-                y: 12,
                 width,
+                y: 12,
                 x
             },
             animate: true
@@ -286,7 +286,7 @@ export default class WebviewMainEventService {
         return new Promise((resolve, reject) => {
             const checkWinReady = async () => {
                 const isReady = await this.isWinReady(winId);
-                console.log({isReady},winId)
+                console.debug({isReady},winId)
                 if (isReady) {
                     resolve(true); // Resolve the promise if the window is ready
                 } else if (timeout > 0 && Date.now() - startTime >= timeout) {

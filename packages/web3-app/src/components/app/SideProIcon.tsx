@@ -13,6 +13,6 @@ export default function SideProIcon() {
             onClick={() => {
                 onShowProBuyDialog(true);
             }}
-        ></View>
+        />
     );
 }

@@ -11,12 +11,12 @@ export function getBorderWidthFromRect(width: number, height: number, rect: CutA
             borderBottomWidth: 0
         };
     }
-    const { start, end } = rect;
+    const { x, y, w, h } = rect;
 
-    const borderLeftWidth = start.x < end.x ? `${start.x}px` : `${end.x}px`;
-    const borderTopWidth = start.y < end.y ? `${start.y}px` : `${end.y}px`;
-    const borderRightWidth = start.x < end.x ? `${width - end.x}px` : `${width - start.x}px`;
-    const borderBottomWidth = start.y < end.y ? `${height - end.y}px` : `${height - start.y}px`;
+    const borderLeftWidth = `${x}px`;
+    const borderTopWidth = `${y}px`;
+    const borderRightWidth = `${width - w - x}px`;
+    const borderBottomWidth = `${height - h - y}px`;
 
     return {
         borderLeftWidth,
@@ -56,11 +56,15 @@ export default function CutAreaRectView({
     handleRecognition
 }: {
     tabId?: string;
-    handleRecognition: (tabId: string, cutAreaRect: CutAreaRect) => Promise<void>;
+    handleRecognition: (
+        tabId: string,
+        cutAreaRect: CutAreaRect,
+        selectedPage?: string
+    ) => Promise<void>;
     inPlayground?: boolean;
     viewSize: { width: number; height: number };
 }) {
-    const { recognitionCatId } = useRecognition();
+    const { recognitionCatId, selectedPage } = useRecognition();
     const { isCutEnable, changeCutAreaRect, onCut, cutAreaRect, onCutting, isCutting } =
         useScreenshotContext();
 
@@ -125,7 +129,7 @@ export default function CutAreaRectView({
             changeCutAreaRect(t);
             if (inPlayground) {
                 if (tabId && recognitionCatId) {
-                    handleRecognition(tabId, t);
+                    handleRecognition(tabId, t, selectedPage);
                     onCutting(false);
                     setTimeout(() => {
                         onCut(false);

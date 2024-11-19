@@ -19,8 +19,10 @@ export interface AppEnv {
     workAreaSize: { width: number; height: number };
     workArea: { x: number; y: number; width: number; height: number };
 }
+
 interface AlertProps {
     message: string;
+    title?: string;
     cancelTxt?: string;
 }
 

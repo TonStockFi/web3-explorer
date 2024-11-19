@@ -98,7 +98,14 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
     }
 
     let webviewUrl = initUrl || '';
-    //console.log('>>', { currentUrl, initUrl, twa, twaPid });
+    // console.log('>>', {
+    //     currentUrl,
+    //     browserTabs,
+    //     currentTabId,
+    //     tab,
+    //     initUrl,
+    //     displayNone
+    // });
     return (
         <View
             wh100p

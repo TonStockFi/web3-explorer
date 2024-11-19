@@ -81,10 +81,10 @@ const SendSubmitButton: FC<{
     const theme = useTheme();
     const { proInfoList, onShowProBuyDialog } = usePro();
     const { index, id } = useAccountInfo();
-    const { isLoginProLevel, plan } = ProService.getCurrentPlan(proInfoList, id, index);
+    const { isLongProLevel, plan } = ProService.getCurrentPlan(proInfoList, id, index);
     let showProButton = false;
     if (watch('rows').length > 2) {
-        if (!isLoginProLevel) {
+        if (!isLongProLevel) {
             if (!plan) {
                 showProButton = true;
             }
@@ -133,7 +133,7 @@ const SendSubmitButton: FC<{
                                 }}
                                 buttonContained
                                 button={'升级专业版一次发送超过两个地址的交易'}
-                            ></View>
+                            />
                         </View>
                     )}
                     <Button

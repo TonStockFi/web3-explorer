@@ -93,7 +93,7 @@ export default function DeviceScreenDropdownMenu({
                         }}
                     >
                         <ListItemIcon>
-                            <View icon={'Home'}></View>
+                            <View icon={'Home'} />
                         </ListItemIcon>
                         {t('home')}
                     </MenuItem>
@@ -107,7 +107,7 @@ export default function DeviceScreenDropdownMenu({
                     >
                         <ListItemIcon>
                             <GridViewIcon />
-                            <View icon="GridView"></View>
+                            <View icon="GridView" />
                         </ListItemIcon>
                         {t('Recent')}
                     </MenuItem>
@@ -132,7 +132,7 @@ export default function DeviceScreenDropdownMenu({
                     }}
                 >
                     <ListItemIcon>
-                        <View iconProps={{ color: 'error' }} icon="Delete"></View>
+                        <View iconProps={{ color: 'error' }} icon="Delete" />
                     </ListItemIcon>
                     {t('delete')}
                 </MenuItem>

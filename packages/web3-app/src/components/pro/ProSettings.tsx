@@ -8,10 +8,11 @@ import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { currentTs } from '../../common/utils';
 import { usePro } from '../../providers/ProProvider';
 
+import ProService from '../../services/ProService';
 import { ProInfoProps, ProPlan } from '../../types';
 
 const Block = styled.div`
@@ -73,7 +74,13 @@ const SelectProPlans: FC<{
                                 secondary={<>{format(plan.amount)} TON</>}
                             />
                             {currentProInfo?.level === plan.level && (
-                                <View pr12 textFontSize="0.8rem" text={'当前'}></View>
+                                <View
+                                    pr12
+                                    textBold
+                                    textFontSize="0.8rem"
+                                    textColor={'green'}
+                                    text={'当前'}
+                                />
                             )}
 
                             {currentProInfo?.level !== plan.level && (
@@ -93,36 +100,32 @@ const SelectProPlans: FC<{
 
 export const ProSettings: FC<{
     accountId: string;
+    accountIndex: number;
     accountTitle: string;
     currentProInfo: ProInfoProps | null;
     isLongProLevel: boolean;
     walletTitle: string;
-    accountIndex: number;
-}> = ({ currentProInfo, isLongProLevel, accountId, accountIndex, accountTitle, walletTitle }) => {
-    console.log({
-        currentProInfo,
-        isLongProLevel,
-        accountId,
-        accountIndex,
-        accountTitle,
-        walletTitle
-    });
+}> = ({ accountId, accountIndex, accountTitle, walletTitle }) => {
     const { t } = useTranslation();
-    const { proPlans, proRecvAddress, updateOrderComment } = usePro();
-
+    const { proPlans, proInfoList, proRecvAddress, updateOrderComment } = usePro();
     let plans: ProPlan[] = proPlans.map(proPlan => {
         let { description } = proPlan;
         description = description?.replace('{accountTitle}', accountTitle);
         description = description?.replace('{walletTitle}', walletTitle);
         return { ...proPlan, description };
     });
-    if (isLongProLevel) {
+    const currentPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
+    console.log({ currentPlan });
+    const isLongProLevel = currentPlan.isLongProLevel;
+    const currentProInfo = currentPlan.plan;
+    if (currentPlan && currentPlan.isLongProLevel) {
         plans = plans.filter(row => row.level === 'LONG');
     }
 
-    if (currentProInfo && currentProInfo.level === 'YEAR') {
+    if (currentPlan && currentPlan.plan && currentPlan.plan.level === 'YEAR') {
         plans = plans.filter(row => row.level !== 'MONTH');
     }
+
     const [selectedPlan, setPlan] = useState<ProPlan>(plans[0]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [_, setOrderComment] = useState<string>('');
@@ -171,12 +174,24 @@ export const ProSettings: FC<{
         };
     }, []);
 
+    const theme = useTheme();
     return (
-        <View px={24} py12>
+        <View px={24} py12 relative userSelectNone>
+            <View abs xx0 center bottom={8}>
+                <View
+                    useSelectText
+                    textFontSize="0.8rem"
+                    textColor={theme.textSecondary}
+                    text={`${accountId},${accountIndex}`}
+                ></View>
+            </View>
             <View>
                 <Block>
-                    <Icon src="https://explorer.web3r.site/logo-128x128.png" />
-                    <Title>{t('Web3 Explorer')}</Title>
+                    <Icon
+                        style={{ marginBottom: 1, paddingBottom: 0 }}
+                        src="https://explorer.web3r.site/logo-128x128.png"
+                    />
+                    <Title style={{ marginTop: 0, paddingTop: 0 }}>{t('Web3 Explorer')}</Title>
                     <Description>{selectedPlan.description}</Description>
                 </Block>
                 <SelectProPlans

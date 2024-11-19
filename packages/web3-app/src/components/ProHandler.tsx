@@ -13,8 +13,8 @@ export function ProHandler() {
     const theme = useTheme();
     const account = useActiveAccount() as AccountMAM;
     const walletAccount = account.derivations.find(d => d.index === account.activeDerivationIndex)!;
-    const accountTitle = `${account.emoji} ${account.name}`;
-    const walletTitle = `${walletAccount.emoji} ${walletAccount.name}`;
+    const accountTitle = `${account.emoji.substring(0, 2)} ${account.name}`;
+    const walletTitle = `${walletAccount.emoji.substring(0, 2)} ${walletAccount.name}`;
     const [currentProInfo, setCurrentProInfo] = useState<ProInfoProps | null>(null);
     const [isLongProLevel, setIsLongProLevel] = useState<boolean>(false);
     const [ready, setReady] = useState<boolean>(false);
@@ -51,6 +51,7 @@ export function ProHandler() {
                     <View wh100p row center relative>
                         <View
                             abs
+                            zIdx={10}
                             top={12}
                             right={12}
                             icon={'Close'}
@@ -58,7 +59,7 @@ export function ProHandler() {
                             onClick={() => {
                                 onShowProBuyDialog(false);
                             }}
-                        ></View>
+                        />
                         <View sx={{ maxWidth: 800 }}>
                             {ready && (
                                 <ProSettings

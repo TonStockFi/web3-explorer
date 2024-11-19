@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useIAppContext } from '../providers/IAppProvider';
 
 export function GlobalUi() {
-    const { alert, showAlert, showConfirm, confirm, backdrop, snackbar, showSnackbar } =
-        useIAppContext();
+    const { alert, showAlert, confirm, backdrop, snackbar, showSnackbar } = useIAppContext();
     const { t } = useTranslation();
     return (
         <View empty>
@@ -29,7 +28,7 @@ export function GlobalUi() {
             <View
                 confirm={{
                     id: 'alert',
-                    title: t('Alert'),
+                    title: t(alert ? alert.title || 'Alert' : 'Alert'),
                     content: alert ? alert.message : '',
                     open: Boolean(alert),
                     cancelTxt: Boolean(alert && alert.cancelTxt) ? alert!.cancelTxt : t('ok'),

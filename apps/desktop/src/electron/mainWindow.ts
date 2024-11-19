@@ -509,6 +509,15 @@ export class MainWindow {
             return true;
         } else if (messageAction === 'serverIsReady') {
             return WebSocketServerWrapper.serverIsReady();
+        } else if (messageAction === 'fetch') {
+            const { url } = messageValue;
+            try{
+                const response = await fetch(url)
+                return response.text()
+            }catch(e){
+                console.error("error onAction fetch",e)
+                return null
+            }
         } else if (messageAction === 'stopServer') {
             return WebSocketServerWrapper.stopServer();
         } else if (messageAction === 'startServer') {

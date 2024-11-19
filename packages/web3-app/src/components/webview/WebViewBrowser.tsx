@@ -485,7 +485,7 @@ const WebViewBrowser = ({
                 zIndex: 1
             }}
         >
-            <View hide={!ready} absFull bgColor="white" borderRadius={10} zIdx={1}></View>
+            <View hide={!ready} absFull bgColor="white" borderRadius={10} zIdx={1} />
             <View absFull zIdx={2}>
                 <webview
                     src={initUrl}

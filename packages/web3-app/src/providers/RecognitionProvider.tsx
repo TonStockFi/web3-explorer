@@ -1,7 +1,9 @@
-import { useLocalStorageState } from '@web3-explorer/utils';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { onAction } from '../common/electron';
 import { isPlaygroundMaster } from '../common/helpers';
+import { PAGE_ALL_ROI } from '../constant';
+
 import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
@@ -9,13 +11,32 @@ import { AccountPublic, ProInfoProps } from '../types';
 import { usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
 
+export const CacheImage: Map<string, string> = new Map();
+
+export interface RoiRunInfo {
+    matchedId?: string;
+    matchPath?: string[];
+    duration: number;
+    total: number;
+    inspectTotal: number;
+    clickedTotal: number;
+    matchedTotal: number;
+    roiRunTimeTotal: number;
+    matchRunTimeTotal: number;
+}
+
 interface AppContextType {
+    roiRunInfo: RoiRunInfo | null;
     roiAreaList: RoiInfo[];
+    onChangeRoiRunInfo: (roi: RoiRunInfo) => void;
     notifyTestRoi: (roi: RoiInfo) => void;
     notifyWindow: (action: string, payload?: any) => void;
     notifyWindows: (action: string, payload?: any) => void;
     loadCacheRoiList: (tabId: string, account?: AccountPublic) => Promise<RoiInfo[]>;
-
+    onSelectPage: (page: string) => void;
+    switchIsPage: (v: boolean) => void;
+    isPage: boolean;
+    selectedPage: string;
     selectedRoiId: string;
     screenPushDelayMs: number;
     recognitionCatId: string;
@@ -25,11 +46,11 @@ interface AppContextType {
     showAccounts: boolean;
     updateScreenPushDelayMs: (n: number, skipNotify?: boolean) => void;
     onSelectRoi: (id: string) => void;
-    addRoiArea: (r: RoiInfo, cutImageUrl: string) => void;
+    addRoiArea: (r: RoiInfo, cutImageUrl: string, catId: string) => void;
     removeRoiArea: (r: RoiInfo) => void;
     updateRoiArea: (r: RoiInfo) => void;
     getScreenImg: (tabId: string) => void;
-    showRecognition: (currentCatId: string) => void;
+    showRecognition: (catId: string) => void;
     onStartRecognition: (v: boolean) => void;
     onShowSettings: (v: boolean) => void;
     onShowAccounts: (v: boolean) => void;
@@ -41,44 +62,62 @@ export interface MatchResult {
     duration: number;
     threshold: number;
 }
+
 export const MatchResults: Map<string, MatchResult> = new Map();
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function getServiceId(
-    {
-        tabId,
-        accountId,
-        accountIndex
-    }: {
-        tabId: string;
-        accountIndex: number;
-        accountId: string;
-    },
-    proInfoList: ProInfoProps[]
-) {
+export function parseRecognitionCatId(recognitionCatId: string) {
+    const t = recognitionCatId.split('-');
+    if (t.length < 3) {
+        throw new Error('parseRecognitionCatId error:' + recognitionCatId);
+    }
+    const tabId = t[0];
+
+    const accountIndex = Number(t[t.length - 1]); // Last part is the account index
+
+    const accountId = t.slice(1, t.length - 1).join('-'); // Join everything between tabId and accountIndex
+    // Validate parsed values
+    if (!tabId || !accountId || isNaN(accountIndex)) {
+        throw new Error('parseRecognitionCatId error: ' + recognitionCatId);
+    }
+
+    return { tabId, accountId, accountIndex };
+}
+
+export function getServiceId(recognitionCatId: string, proInfoList: ProInfoProps[]) {
+    const { accountId, accountIndex, tabId } = parseRecognitionCatId(recognitionCatId);
     const currentProPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
-    console.log('getServiceId', currentProPlan, tabId, accountId, accountIndex);
-    if (currentProPlan && (currentProPlan.isLoginProLevel || currentProPlan.plan)) {
+    // console.log('getServiceId', currentProPlan, tabId, accountId, accountIndex);
+    if (currentProPlan && (currentProPlan.isLongProLevel || currentProPlan.plan)) {
         return `${tabId}`;
     } else {
-        return `${tabId}_${accountId}_${accountIndex}`;
+        return `${tabId}-${accountId}-${accountIndex}`;
     }
 }
 export const RecognitionProvider = (props: { children: ReactNode }) => {
     const { proInfoList } = usePro();
 
     const { children } = props || {};
+    const [isPage, setIsPage] = useState<boolean>(true);
+
+    const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
+
     const [selectedRoiId, setSelectedRoiId] = useState<string>('');
     const { accounts, currentTabId, currentAccount } = usePlayground();
     const index = currentAccount?.index || 0;
 
     const [clickStopped, setClickStopped] = useState<boolean>(false);
 
-    const [recognitionCatId, setRecognitionCatId] = useLocalStorageState(
-        'recognitionCatId' + index,
+    const [recognitionCatId, setRecognitionCatId] = useSessionStorageState(
+        'recognitionCatId_' + index,
         ''
     );
+    const [selectedPage, setSelectedPage] = useSessionStorageState(
+        'selectedPage_' + index,
+        PAGE_ALL_ROI
+    );
+
     const [screenPushDelayMs, setScreenPushDelayMs] = useLocalStorageState(
         'pushDelayMs' + recognitionCatId,
         1000
@@ -100,16 +139,11 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         false
     );
 
-    useEffect(() => {
-        showRecognition(recognitionCatId);
-    }, [recognitionCatId]);
-
     const onSelectRoi = (id: string) => {
         setSelectedRoiId(i => {
-            console.log('onSelectRoi', { id, i, currentAccount, recognitionCatId });
-            if (id !== i) {
-                getScreenImg(recognitionCatId);
-            }
+            // if (id !== i && recognitionCatId) {
+            //     getScreenImg(parseRecognitionCatId(recognitionCatId).tabId);
+            // }
             return id;
         });
     };
@@ -133,9 +167,10 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const notifyWindow = (action: string, payload?: any) => {
-        if (currentAccount?.index !== undefined && recognitionCatId) {
+        if (recognitionCatId) {
+            const { accountIndex } = parseRecognitionCatId(recognitionCatId);
             const winId = WebviewMainEventService.getPlaygroundWinId({
-                index: currentAccount?.index,
+                index: accountIndex,
                 tabId: currentTabId
             });
             console.log('notifyWindow', action, winId);
@@ -151,102 +186,61 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         if (!isPlaygroundMaster()) {
             return;
         }
-        new WebviewMainEventService().notifyWindowAction({
-            accounts,
-            tabId: currentTabId,
-            currentAccount,
-            action,
-            payload: {
-                ...(payload || {}),
-                tabId: currentTabId
-            }
+        setRecognitionCatId((recognitionCatId: string) => {
+            new WebviewMainEventService().notifyWindowAction({
+                accounts,
+                tabId: currentTabId,
+                currentAccount,
+                action,
+                payload: {
+                    ...(payload || {}),
+                    tabId: currentTabId,
+                    recognitionCatId
+                }
+            });
+            return recognitionCatId;
         });
     };
-    const loadCacheRoiList = async (tabId: string, account?: AccountPublic) => {
-        console.log('loadCacheRoiList', tabId, currentAccount);
-        let currentAccount_ = account || currentAccount;
-        if (!currentAccount_) {
-            return [];
-        }
-        const rows = await new RoiService(
-            getServiceId(
-                {
-                    tabId,
-                    accountId: currentAccount_?.id,
-                    accountIndex: currentAccount_.index
-                },
-                proInfoList
-            )
-        ).getAll();
-        rows.sort((a, b) => b.ts - a.ts);
+
+    const loadCacheRoiList = async (recognitionCatId: string) => {
+        // console.log('loadCacheRoiList', recognitionCatId);
+        const rows = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getAll();
         setRoiAreaList(() => rows);
         return rows;
     };
-    const showRecognition = (tabId: string) => {
-        if (!tabId) {
+    const showRecognition = (recognitionCatId: string) => {
+        if (!recognitionCatId) {
             setStartRecognition(() => false);
         } else {
             onStopClick(false);
         }
+        setSelectedPage(PAGE_ALL_ROI);
         setRecognitionCatId(() => {
-            return tabId;
+            return recognitionCatId;
         });
         setTimeout(() => {
-            if (!tabId) {
+            if (!recognitionCatId) {
                 setRoiAreaList(() => []);
             } else {
-                console.log('loadCacheRoiList', { tabId });
-                loadCacheRoiList(tabId);
+                loadCacheRoiList(recognitionCatId);
             }
         }, 500);
     };
 
-    const addRoiArea = async (r: RoiInfo, cutImageUrl: string) => {
+    const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
         console.log('addRoiArea', { recognitionCatId, selectedRoiId });
-        const id = await new RoiService(
-            getServiceId(
-                {
-                    tabId: r.catId,
-                    accountId: r.accountId,
-                    accountIndex: r.accountIndex
-                },
-                proInfoList
-            )
-        ).getId();
-        const row: RoiInfo = { ...r, priority: 0, id };
-        await new RoiService(
-            getServiceId(
-                {
-                    tabId: r.catId,
-                    accountId: r.accountId,
-                    accountIndex: r.accountIndex
-                },
-                proInfoList
-            )
-        ).save(id, row, cutImageUrl);
+        switchIsPage(false);
+        const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
+        const row: RoiInfo = { ...r, priority: 1000, id };
+        CacheImage.set(`${recognitionCatId}_${row.id}`, cutImageUrl);
+        new RoiService(getServiceId(recognitionCatId, proInfoList)).save(id, row, cutImageUrl);
+        setRoiAreaList(prv => {
+            return [row, ...prv.filter(row => r.id !== row.id)];
+        });
 
-        if (!recognitionCatId) {
-            const rows = await new RoiService(
-                getServiceId(
-                    {
-                        tabId: r.catId,
-                        accountId: r.accountId,
-                        accountIndex: r.accountIndex
-                    },
-                    proInfoList
-                )
-            ).getAll();
-            setRoiAreaList(prv => {
-                return rows;
-            });
-            setRecognitionCatId(r.catId);
-            getScreenImg(r.catId);
-        } else {
-            setRoiAreaList(prv => {
-                return [row, ...prv];
-            });
-        }
-
+        setRecognitionCatId(r => {
+            return recognitionCatId;
+        });
         setTimeout(() => {
             onSelectRoi(id);
         }, 400);
@@ -255,38 +249,23 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const updateRoiArea = (r: RoiInfo) => {
-        new RoiService(
-            getServiceId(
-                {
-                    tabId: r.catId,
-                    accountId: r.accountId,
-                    accountIndex: r.accountIndex
-                },
-                proInfoList
-            )
-        ).update(r);
-        setRoiAreaList(prv => {
-            return prv.map(row => {
-                return row.id !== r.id ? row : r;
+        setRecognitionCatId(recognitionCatId => {
+            new RoiService(getServiceId(recognitionCatId, proInfoList)).update(r);
+            setRoiAreaList(prv => {
+                return prv.map(row => {
+                    return row.id !== r.id ? row : r;
+                });
             });
+            notifyWindows('onUpdateRoi');
+            return recognitionCatId;
         });
-        notifyWindows('onUpdateRoi');
     };
 
     const removeRoiArea = (r: RoiInfo) => {
         setSelectedRoiId(prev => {
             return r.id === prev ? '' : prev;
         });
-        new RoiService(
-            getServiceId(
-                {
-                    tabId: r.catId,
-                    accountId: r.accountId,
-                    accountIndex: r.accountIndex
-                },
-                proInfoList
-            )
-        ).remove(r.id);
+        new RoiService(getServiceId(recognitionCatId, proInfoList)).remove(r.id);
         setRoiAreaList(prv => {
             return prv.filter(row => row.id !== r.id);
         });
@@ -309,9 +288,27 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const onShowAccounts = (v: boolean) => {
         setShowAccounts(v);
     };
+
+    const onSelectPage = (v: string) => {
+        setSelectedPage(v);
+    };
+
+    const switchIsPage = (v: boolean) => {
+        setIsPage(v);
+    };
+
+    const onChangeRoiRunInfo = (v: RoiRunInfo) => {
+        setRoiRunInfo(v);
+    };
+
     return (
         <AppContext.Provider
             value={{
+                onChangeRoiRunInfo,
+                roiRunInfo,
+                switchIsPage,
+                isPage,
+                onSelectPage,
                 onStopClick,
                 clickStopped,
                 notifyTestRoi,
@@ -323,6 +320,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
                 onShowAccounts,
                 onShowSettings,
                 showSettings,
+                selectedPage,
                 startRecognition,
                 onStartRecognition,
                 updateScreenPushDelayMs,

@@ -35,6 +35,7 @@ import HighlightOff from '@mui/icons-material/HighlightOff';
 import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
 import HttpsIcon from '@mui/icons-material/Https';
+import Info from '@mui/icons-material/Info';
 import InputIcon from '@mui/icons-material/Input';
 import Insights from '@mui/icons-material/Insights';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
@@ -166,6 +167,7 @@ export type IconList =
     | 'ContentCopy'
     | 'ExpandMore'
     | 'Settings'
+    | 'Info'
     | 'KeyboardArrowDown'
     | 'KeyboardArrowUp'
     | 'FormatListBulleted'
@@ -179,6 +181,7 @@ export type IconList =
 export const IconsMap: Record<string, React.ElementType> = {
     ArrowDownward,
     ContentCut,
+    Info,
     Diamond,
     Remove,
     AutoFixHigh,

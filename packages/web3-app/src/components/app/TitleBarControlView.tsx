@@ -39,7 +39,7 @@ export function TitleBarControlView({ main }: { main?: boolean }) {
                     hide={!hover}
                     iconProps={{ sx: { width: size, height: size } }}
                     icon={'Close'}
-                ></View>
+                />
             </View>
             <View
                 mr={mr}
@@ -55,7 +55,7 @@ export function TitleBarControlView({ main }: { main?: boolean }) {
                 }}
                 rowVCenter
                 relative
-            ></View>
+            />
             <View
                 bgColor="green"
                 tips={t('Max')}
@@ -68,7 +68,7 @@ export function TitleBarControlView({ main }: { main?: boolean }) {
                     onAction('maxWin', { winId: getWinId() || 'main' });
                 }}
                 relative
-            ></View>
+            />
         </View>
     );
 }

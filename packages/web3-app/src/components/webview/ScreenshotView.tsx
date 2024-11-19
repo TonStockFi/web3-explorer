@@ -2,7 +2,7 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useRef, useState } from 'react';
 import { canvasToBlob, getRoiArea } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
-import { DEFAULT_THRESHOLD } from '../../constant';
+import { DEFAULT_THRESHOLD, PAGE_ALL_ROI } from '../../constant';
 
 import { useIAppContext } from '../../providers/IAppProvider';
 import { usePlayground } from '../../providers/PlaygroundProvider';
@@ -11,6 +11,7 @@ import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotPro
 import CutAreaService from '../../services/CutAreaService';
 import { RoiInfo } from '../../services/RoiService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
+import { SUB_WIN_ID } from '../../types';
 import CutAreaRectView from './CutAreaView';
 import { ScreenshotBar } from './ScreenshotBar';
 
@@ -41,11 +42,15 @@ export default function ScreenshotView({
 }) {
     const ref = useRef<HTMLDivElement>(null);
     const { onCutting } = useScreenshotContext();
-    const { addRoiArea } = useRecognition();
+    const { addRoiArea, recognitionCatId, selectedPage } = useRecognition();
     const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
     const { currentAccount, tab } = usePlayground();
     const { env } = useIAppContext();
-    const handleRecognition = async (tabId: string, cutAreaRect: CutAreaRect) => {
+    const handleRecognition = async (
+        tabId: string,
+        cutAreaRect: CutAreaRect,
+        selectedPage?: string
+    ) => {
         if (!currentAccount) {
             return;
         }
@@ -66,25 +71,40 @@ export default function ScreenshotView({
         }
 
         const ts = currentTs();
+        let pageBelongTo = '';
+        if (selectedPage && selectedPage !== PAGE_ALL_ROI) {
+            pageBelongTo = selectedPage;
+        }
+
+        //@ts-ignore
+        delete cutAreaRect.start;
+        //@ts-ignore
+        delete cutAreaRect.end;
         const roiInfo: RoiInfo = {
-            priority: 10,
-            accountIndex: currentAccount.index,
-            accountId: currentAccount.id,
+            priority: 0,
             id: '',
             ts,
             catId,
+            pageBelongTo,
             threshold: DEFAULT_THRESHOLD,
             cutAreaRect: cutAreaRect!
         };
         if (!inPlayground) {
-            await new WebviewMainEventService().openFeatureWindow(env, 'onAddRoiArea', {
+            const s = new WebviewMainEventService();
+            const isReady = await s.isWinReady(SUB_WIN_ID.PLAYGROUND);
+            const payload = {
                 account: currentAccount,
                 tab,
                 roiInfo,
                 cutImageUrl
-            });
+            };
+            if (!isReady) {
+                await new WebviewMainEventService().openFeatureWindow(env, 'onAddRoiArea', payload);
+            } else {
+                await s.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, 'onAddRoiArea', payload);
+            }
         } else {
-            addRoiArea(roiInfo, cutImageUrl);
+            addRoiArea(roiInfo, cutImageUrl, recognitionCatId);
         }
 
         onCutting(false);

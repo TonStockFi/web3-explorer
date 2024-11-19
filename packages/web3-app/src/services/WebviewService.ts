@@ -147,7 +147,7 @@ if(element){
             const res = await wv.executeJavaScript(`(()=>{${code}})()`);
             return res;
         } catch (e) {
-            console.error(e);
+            console.error(e,code);
             return null;
         }
     }
@@ -196,6 +196,19 @@ return {url:currentUrl + newHash}
     `;
         return this.execJs(code);
     }
+
+    async checkTgIframeUrl(): Promise<null | string> {
+        const code = `
+const element = document.querySelector("#portals iframe");
+if(element && element.src){
+    return element.src
+}else{
+    return null
+}
+    `;
+        return this.execJs(code);
+    }
+
     async waitForTgIframeUrl(): Promise<null | string> {
         const code = `
 const element = document.querySelector("#portals iframe");

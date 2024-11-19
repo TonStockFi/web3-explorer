@@ -46,14 +46,18 @@ export default class CutAreaService {
     async remove(id: string) {
         await this.indexedDb.delete(id);
     }
-
+    static getClickPosition(roi: RoiInfo){
+        const { cutAreaRect, clickOffsetX, clickOffsetY } = roi;
+        const { x, y, w, h } = cutAreaRect;
+        let OffsetX = clickOffsetX || 0;
+        let OffsetY = clickOffsetY || 0;
+        let clickX = x + OffsetX + w / 2;
+        let clickY = y + OffsetY + h / 2;
+        return {clickX,clickY}
+    }
     static clickCutArea(row: RoiInfo, tabId?: string, accountIndex?: number) {
-        const { start, end } = row.cutAreaRect;
-        const width = Math.abs(start.x - end.x) / 2;
-        const height = Math.abs(start.y - end.y) / 2;
-        const x = start.x < end.x ? start.x + width : end.x + width;
-        const y = start.y < end.y ? start.y + height : end.y + height;
-
+        const {clickX,clickY} = CutAreaService.getClickPosition(row)
+        
         if (tabId && accountIndex !== undefined) {
             const toWinId = WebviewMainEventService.getPlaygroundWinId({
                 index: accountIndex,
@@ -63,14 +67,14 @@ export default class CutAreaService {
                 action: 'sendClickEvent',
                 toWinId,
                 payload: {
-                    x,
-                    y,
+                    x: clickX,
+                    y: clickY,
                     tabId: tabId
                 }
             });
         } else {
             const ws = new WebviewService(row.catId);
-            ws.sendClickEvent(x, y);
+            ws.sendClickEvent(clickX, clickY);
         }
     }
 

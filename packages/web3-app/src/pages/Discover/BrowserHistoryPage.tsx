@@ -5,22 +5,12 @@ import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { formatTs } from '../../common/utils';
 import { SiteFavoricoView } from '../../components/app/SiteFavoricoView';
 import { Page } from '../../components/Page';
 import { DISCOVER_HOST } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import BrowserHistoryService, { BrowserHistoryProps } from '../../services/BrowserHistoryService';
-
-const formatTs = (timestamp: number) => {
-    const date = new Date(timestamp);
-    const options: Intl.DateTimeFormatOptions = {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    };
-    const formattedDate: string = date.toLocaleString('en-US', options);
-    return formattedDate;
-};
 
 export function BrowserHistoryPage() {
     const [rows, setRows] = useState<BrowserHistoryProps[]>([]);

@@ -1,6 +1,7 @@
 import { IndexedDbCache } from '@web3-explorer/utils';
 import { currentTs } from '../common/utils';
-import { CurrentPayPlan, ProInfoProps } from '../types';
+import { PRO_WHITE_LIST_LONG, PRO_WHITE_LIST_MONTH, PRO_WHITE_LIST_YEAR } from '../constant';
+import { AccountPublic, CurrentPayPlan, ProInfoProps } from '../types';
 
 export default class ProService {
     indexedDb: IndexedDbCache;
@@ -40,10 +41,22 @@ export default class ProService {
         await this.indexedDb.delete(`${index}`);
     }
 
+    static getAccluntCurrentPlan(proInfoList: ProInfoProps[], account?: AccountPublic | null) {
+        if(!account){
+            return null
+        }
+        return ProService.getCurrentPlan(proInfoList,account.id,account.index)
+    }
+
     static getCurrentPlan(proInfoList: ProInfoProps[], id: string, index: number) {
-        const isLoginProLevel = !!proInfoList.find(row => row.id === id && row.level === 'LONG');
+        const pro_white_list_long = PRO_WHITE_LIST_LONG.split("|")
+        const pro_white_list_month = PRO_WHITE_LIST_MONTH.split("|")
+        const pro_white_list_year = PRO_WHITE_LIST_YEAR.split("|")
+       
+        let isLongProLevel = !!proInfoList.find(row => row.id === id && row.level === 'LONG');
+        let isPayMmeber = isLongProLevel;
         let currentPlan: null | ProInfoProps = null;
-        if (!isLoginProLevel) {
+        if (!isLongProLevel) {
             const res = proInfoList.find(row => row.index === index);
             if (res) {
                 const { level, ts } = res;
@@ -53,9 +66,36 @@ export default class ProService {
                     currentPlan = null;
                 } else {
                     currentPlan = res;
+                    isPayMmeber = true;
                 }
             }
         }
-        return { isLoginProLevel, plan:currentPlan,plans:proInfoList } as CurrentPayPlan;
+        if(pro_white_list_long.indexOf(id) > -1){
+            isLongProLevel = true;
+            isPayMmeber = true;
+        }
+
+        if(pro_white_list_month.indexOf(`${id},${index}`) > -1){
+            currentPlan = {
+                id,
+                index,
+                level:"MONTH",
+                amount:1.99,
+                ts:currentTs()
+            };
+            isPayMmeber = true;
+        }
+
+        if(pro_white_list_year.indexOf(`${id},${index}`) > -1){
+            currentPlan = {
+                id,
+                index,
+                level:"YEAR",
+                amount:19.99,
+                ts:currentTs()
+            };
+            isPayMmeber = true;
+        }
+        return { isLongProLevel,isPayMmeber, plan:currentPlan,plans:proInfoList } as CurrentPayPlan;
     }
 }

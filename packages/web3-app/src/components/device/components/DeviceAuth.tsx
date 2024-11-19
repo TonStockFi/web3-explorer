@@ -157,7 +157,7 @@ export default function DeviceAuth({
                         w100p
                         button={t('ConnectDevice')}
                         onClick={onAuth}
-                    ></View>
+                    />
                 </View>
                 <View mt={16} center>
                     <View
@@ -168,7 +168,7 @@ export default function DeviceAuth({
                         w100p
                         button={t('AddServer')}
                         onClick={() => setShowAddServer(true)}
-                    ></View>
+                    />
                 </View>
             </View>
             <AddServerView

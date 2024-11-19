@@ -4,17 +4,16 @@ export function getPartitionKey(key: string) {
 
 export async function copyTextToClipboard(text: string) {
     try {
-
-        if(window.ClipboardItem){
+        if (window.ClipboardItem) {
             const clipboardItem = new ClipboardItem({
                 'text/plain': new Blob([text], { type: 'text/plain' })
             });
             await navigator.clipboard.write([clipboardItem]);
             return true;
-        }else if(window.__appApi){
-            await window.__appApi.writeText(text)
+        } else if (window.__appApi) {
+            await window.__appApi.writeText(text);
             return true;
-        }else{
+        } else {
             return false;
         }
     } catch (error) {
@@ -73,3 +72,58 @@ export function hexToRGBA(hex: string, alpha?: string | number): string {
         return 'rgb(' + r + ', ' + g + ', ' + b + ')';
     }
 }
+
+export function downloadFile(file: Blob, name: string) {
+    const data = URL.createObjectURL(file);
+
+    const link = document.createElement('a');
+    link.href = data;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(data);
+}
+
+/**
+ * Formats a timestamp into a human-readable string.
+ * 
+ * @param timestamp - The timestamp to format.
+ * @param options - Additional `Intl.DateTimeFormatOptions` for formatting.
+ * @returns The formatted date string, defaulting to `12/30/2024 12:30 PM`.
+ */
+export const formatTsToDate = (timestamp: number, options?: Intl.DateTimeFormatOptions) => {
+    const date = new Date(timestamp);
+    
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        ...options
+    };
+
+    const formattedDate = date.toLocaleString('en-US', defaultOptions);
+
+    // Replace the default separator if needed (e.g., MM/DD/YYYY format to YYYY-MM-DD)
+    return formattedDate.replace(',', '');
+};
+
+/**
+ * 
+ * @param timestamp 
+ * @returns default: 12:30 PM
+ */
+export const formatTs = (timestamp: number,options?:Intl.DateTimeFormatOptions) => {
+    const date = new Date(timestamp);
+    const options1: Intl.DateTimeFormatOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        ...options
+    };
+    const formattedDate: string = date.toLocaleString('en-US', options1);
+    return formattedDate;
+};

@@ -43,7 +43,7 @@ export function WebviewPage() {
                     zIdx={showDiscover ? 1 : -1}
                     opacity={showDiscover ? 1 : 0}
                 >
-                    <DiscoverView showDiscover={showDiscover} tabId={'assets_ana'} />
+                    <DiscoverView showDiscover={showDiscover} tabId={'discover_apps'} />
                 </View>
                 <View
                     absFull

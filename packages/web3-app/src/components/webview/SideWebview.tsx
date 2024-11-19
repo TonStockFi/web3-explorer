@@ -275,7 +275,7 @@ export function SideWebview() {
                 <View h100p rowVCenter jEnd mr={6}>
                     <PromptAction />
                     <View rowVCenter ml={6}>
-                        <MoreTopbarDropdown tabId={`side_${site}`} />
+                        <MoreTopbarDropdown tab={{ twa: false }} tabId={`side_${site}`} />
                     </View>
                 </View>
             </View>

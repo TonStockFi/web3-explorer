@@ -1,5 +1,10 @@
 import { MAIN_NAV_TYPE, ProPlan } from './types';
 export const PRO_RECV_ADDRESS="UQAonoXuQ_1WzZhwbuoIHYFwBqkVCmZSf-yr0DQ1uhnIz53g"
+
+export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdYGAl8I2,0"
+export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
+export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
+
 export const P2E_ChatId = '7363481027';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
 export const TELEGRAME_WEB_P2E = `${TELEGRAME_WEB}#${P2E_ChatId}`
@@ -47,8 +52,9 @@ export const AsideWidth = 360;
 export const WIN_TITLE_BAR_WIDTH = 0;
 export const MAC_TITLE_BAR_WIDTH = 88;
 export const PLAYGROUND_WEBVIEW_WIDTH = 360;
-export const PLAYGROUND_RIGHT_SIDE_WIDTH = 380;
+export const PLAYGROUND_RIGHT_SIDE_WIDTH = 320;
 export const PLAYGROUND_WEBVIEW_HEIGHT = 720;
+export const PLAYGROUND_WIN_HEIGHT = 772;
 export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;
 export const WEBVIEW_BORDERRADIUS = 8;
 
@@ -157,3 +163,21 @@ export const ProPlans: ProPlan[] = [
         amount: '1999900000'
     },
 ];
+
+export const DropDownMenuSx = {
+    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+    '&::before': {
+        content: '""',
+        display: 'block',
+        position: 'absolute',
+        width: 10,
+        height: 10,
+        transform: 'translateY(-50%) rotate(45deg)',
+        zIndex: 0,
+        top: 0,
+        left: 60
+    }
+};
+
+export const PAGE_ALL_ROI = "全部"
+export const PAGE_NULL_ROI = "无"

@@ -15,7 +15,11 @@ export function ScreenshotBar({
     inPlayground
 }: {
     inPlayground?: boolean;
-    handleRecognition: (tabId: string, cutAreaRect: CutAreaRect) => Promise<void>;
+    handleRecognition: (
+        tabId: string,
+        cutAreaRect: CutAreaRect,
+        selectedPage?: string
+    ) => Promise<void>;
     tabId: string;
     viewSize: ViewSize;
 }) {
@@ -23,7 +27,7 @@ export function ScreenshotBar({
     const { isCutting, cutAreaRect, changeCutAreaRect, onCut } = useScreenshotContext();
     const theme = useTheme();
 
-    if (isCutAreaExists(cutAreaRect) && !isCutting) {
+    if (isCutAreaExists(cutAreaRect) && !isCutting && !inPlayground) {
         return (
             <ScreenshotCutAreaBar
                 inPlayground={inPlayground}

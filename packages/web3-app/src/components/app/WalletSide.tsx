@@ -37,9 +37,17 @@ export const WalletSide = () => {
                 borderBox
                 px={8}
                 py={4}
+                overflowHidden
                 mb={4}
             >
-                <View text={accountEmoji} textFontSize="0.9rem" />
+                <View
+                    center
+                    overflowHidden
+                    w={16}
+                    h={16}
+                    text={accountEmoji.substring(0, 2)}
+                    textFontSize="0.9rem"
+                />
                 <View
                     mt={2}
                     ml={8}
@@ -53,7 +61,7 @@ export const WalletSide = () => {
 
             <View
                 drawer={{
-                    sx: { '& .MuiPaper-root': { top: 44 } },
+                    sx: { '& .MuiPaper-root': { top: 0 } },
                     open: walletAside,
                     anchor: 'right',
                     onClose: () => showWalletAside(false)

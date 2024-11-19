@@ -144,7 +144,10 @@ export const AccountWalletsList = () => {
                             button={activeAcount.name}
                             buttonVariant="text"
                             buttonStartIcon={
-                                <WalletEmoji containerSize="16px" emoji={activeAcount.emoji} />
+                                <WalletEmoji
+                                    containerSize="16px"
+                                    emoji={activeAcount.emoji.substring(0, 2)}
+                                />
                             }
                             buttonEndIcon={<ExpandMoreIcon />}
                             px={12}
@@ -155,31 +158,33 @@ export const AccountWalletsList = () => {
                             }}
                         />
                     </View>
-                    {network === Network.TESTNET && <View mr={8} chip={'Testnet'} />}
-                    <View
-                        hide
-                        mr={4}
-                        tips={t('close')}
-                        iconButton
-                        iconButtonSmall
-                        iconSmall
-                        iconProps={{ sx: { color: theme.textPrimary } }}
-                        icon={'Close'}
-                        onClick={() => showWalletAside(false)}
-                    />
-                    <View
-                        mr={4}
-                        tips={t('Settings')}
-                        iconButton
-                        iconButtonSmall
-                        iconSmall
-                        iconProps={{ sx: { width: 18, height: 18, color: theme.textPrimary } }}
-                        icon={'Settings'}
-                        onClick={() => {
-                            showWalletAside(false);
-                            openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
-                        }}
-                    />
+                    <View rowVCenter jEnd>
+                        {network === Network.TESTNET && <View mr={8} chip={'Testnet'} />}
+                        <View
+                            hide
+                            mr={4}
+                            tips={t('close')}
+                            iconButton
+                            iconButtonSmall
+                            iconSmall
+                            iconProps={{ sx: { color: theme.textPrimary } }}
+                            icon={'Close'}
+                            onClick={() => showWalletAside(false)}
+                        />
+                        <View
+                            mr={4}
+                            tips={t('Settings')}
+                            iconButton
+                            iconButtonSmall
+                            iconSmall
+                            iconProps={{ sx: { width: 18, height: 18, color: theme.textPrimary } }}
+                            icon={'Settings'}
+                            onClick={() => {
+                                showWalletAside(false);
+                                openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
+                            }}
+                        />
+                    </View>
                 </View>
                 <View divider />
                 <View mt={2} mb={2} borderBox pl12 row jSpaceBetween aCenter w100p>
@@ -257,7 +262,7 @@ export const AccountWalletsList = () => {
                                         <WalletEmoji
                                             emojiSize="16px"
                                             containerSize="16px"
-                                            emoji={wallet.emoji}
+                                            emoji={wallet.emoji.substring(0, 2)}
                                         />
                                         <View aCenter px={8}>
                                             <Label2>{wallet.name}</Label2>

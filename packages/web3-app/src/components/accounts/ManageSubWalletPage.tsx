@@ -64,6 +64,7 @@ export const ManageSubWalletPage = () => {
     const { allAvailableDerivations: derivations } = accountMAM;
     const total = derivations.length;
     const limit = 18;
+
     return (
         <DesktopViewPageLayoutStyled>
             <View borderBox w100p h={58} row aCenter jSpaceBetween mb12>

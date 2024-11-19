@@ -81,7 +81,11 @@ export const AccountsSelect: FC<{
                     style={{ backgroundColor: theme.backgroundHighlighted }}
                 >
                     <View center>
-                        <WalletEmoji emoji={account.emoji} emojiSize="18px" containerSize="18px" />
+                        <WalletEmoji
+                            emoji={account.emoji.substring(0, 2)}
+                            emojiSize="18px"
+                            containerSize="18px"
+                        />
                     </View>
                     {account.name}
                     <SwitchIcon />
@@ -102,7 +106,7 @@ const AccountSelectBody: FC<{ accounts: Account[]; onChange: (account: Account) 
                     <>
                         <Divider />
                         <MenuItem onClick={() => onChange(account)}>
-                            <View text={account.emoji} />
+                            <View text={account.emoji.substring(0, 2)} />
                             <MenuItemText>
                                 <Label2>{account.name}</Label2>
                             </MenuItemText>

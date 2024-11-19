@@ -10,6 +10,7 @@ import { useTheme } from 'styled-components';
 import { copyImageToClipboard } from '../../common/image';
 import { urlToDataUri } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
+import { BrowserTab } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
@@ -21,9 +22,11 @@ import { AccountPublic } from '../../types';
 export default function MoreTopbarDropdown({
     currentAccount,
     tabId,
+    tab,
     enableGeminiTransScreen,
     tgUrl
 }: {
+    tab: Partial<BrowserTab>;
     enableGeminiTransScreen?: boolean;
     tgUrl?: string;
     currentAccount?: null | AccountPublic;
@@ -115,6 +118,7 @@ export default function MoreTopbarDropdown({
                 TransitionComponent={Fade}
             >
                 <View
+                    hide={tab.twa}
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);

@@ -130,7 +130,6 @@ export function ScreenshotCutAreaBar({
                         icon="ContentCopy"
                     />
                     <View
-                        hide={!inPlayground}
                         onClick={async () => {
                             handleRecognition(tabId, cutAreaRect);
                             onCutting(false);
@@ -146,7 +145,7 @@ export function ScreenshotCutAreaBar({
                         }}
                         iconProps={{ sx: { width: 16, height: 16 } }}
                         sx={{ wordBreak: 'keep-all' }}
-                        tips={t('save')}
+                        tips={t('特征提取保存')}
                         iconButtonSmall
                         icon={<ImageIcon icon={'Save'} size={18} />}
                     />

@@ -17,7 +17,7 @@ export const WalletEmoji: FC<{
                 fontSize: emojiSize || '20px'
             }}
         >
-            {emoji}
+            {emoji?.substring(0, 2)}
         </View>
     );
 };

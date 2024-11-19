@@ -49,7 +49,7 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                         <View text={t('WalletAccounts')} />
                     </View>
                     {network === Network.TESTNET && (
-                        <View abs top={12} right={8} chip={'Testnet'} />
+                        <View abs top={12} right={44} chip={'Testnet'} />
                     )}
                 </View>
                 <View
@@ -105,7 +105,10 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                             <View aCenter jStart>
                                 <ToggleActiveAccount isActived={wallet.id === account.id} />
                                 <View h={32} center mr12>
-                                    <WalletEmoji containerSize="20px" emoji={wallet.emoji} />
+                                    <WalletEmoji
+                                        containerSize="20px"
+                                        emoji={wallet.emoji.substring(0, 2)}
+                                    />
                                 </View>
                                 <View text={wallet.name} textFontSize="0.8rem" />
                                 <View center ml12>

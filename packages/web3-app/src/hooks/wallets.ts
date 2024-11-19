@@ -219,14 +219,14 @@ export function useAccountWallet() {
 
 export function useAccountInfo() {
     const account = useActiveAccount();
-    let emoji = account.emoji;
+    let emoji = account.emoji.substring(0, 2);
     let name = `${account.name}`;
     let address = account.activeTonWallet.rawAddress;
     const { accountId } = useAccountWallet();
     let index = 0;
     if (account.type === 'mam') {
         name = account.activeDerivation.name;
-        emoji = account.activeDerivation.emoji;
+        emoji = account.activeDerivation.emoji.substring(0, 2);
         const { activeDerivationIndex, addedDerivationsIndexes } = account as AccountMAM;
         index = activeDerivationIndex;
         address = account.derivations[activeDerivationIndex].tonWallets[0].rawAddress;
@@ -255,7 +255,7 @@ export function usePublicAccountsInfo() {
                 address,
                 index,
                 name,
-                emoji,
+                emoji:emoji.substring(0, 2),
                 id: accountId,
                 isMam:true,
                 isActive:index === activeDerivationIndex,
@@ -263,7 +263,7 @@ export function usePublicAccountsInfo() {
             };
         });
     } else {
-        accounts = [{ emoji, id: accountId, name, index, address: formatAddress(address) }];
+        accounts = [{ emoji:emoji, id: accountId, name, index, address: formatAddress(address) }];
     }
     return accounts;
 }

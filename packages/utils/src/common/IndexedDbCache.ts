@@ -180,4 +180,22 @@ export default class IndexedDbCache {
             };
         });
     }
+    async deleteDatabase(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const deleteRequest = indexedDB.deleteDatabase(this.dbName);
+            deleteRequest.onsuccess = () => {
+                console.log(`Database ${this.dbName} deleted successfully.`);
+                resolve();
+            };
+    
+            deleteRequest.onerror = () => {
+                console.error(`Failed to delete database ${this.dbName}:`, deleteRequest.error);
+                reject(deleteRequest.error);
+            };
+    
+            deleteRequest.onblocked = () => {
+                console.warn(`Database deletion blocked for ${this.dbName}.`);
+            };
+        });
+    }
 }
