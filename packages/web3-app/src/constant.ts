@@ -13,6 +13,7 @@ export const SERVER_URL = 'https://desk.web3r.site/api';
 export const OPENCV_URL = 'http://192.168.43.244:3100/opencv.js?v=1';
 export const WS_URL = 'ws://192.168.43.244:6788/api';
 
+export const DISCOVER_API = "https://api-explorer.web3r.site/api"
 export const DISCOVER_HOST = 'https://explorer.web3r.site/';
 
 export const DISCOVER_HOST_DEV = 'http://192.168.43.244:3174/';
