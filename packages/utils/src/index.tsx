@@ -7,3 +7,5 @@ export { default as useSessionStorageState } from './hooks/useSessionStorageStat
 
 export { default as useInterval } from './hooks/useInterval';
 export { default as useTimeoutLoop } from './hooks/useTimeoutLoop';
+
+export { default as useOnce } from './hooks/useOnce';

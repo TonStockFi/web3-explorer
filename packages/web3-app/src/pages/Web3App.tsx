@@ -74,6 +74,7 @@ function Pages() {
 
 export function MainMessageDispatcher() {
     const { onShowProBuyDialog } = usePro();
+    const { openUrl } = useBrowserContext();
     const accounts = usePublicAccountsInfo();
     const { id: accountId } = useAccountInfo();
     const activeAcount = useActiveAccount();
@@ -96,6 +97,9 @@ export function MainMessageDispatcher() {
                     }
                 }
 
+                if (e.action === 'openTab') {
+                    openUrl(e.payload.url);
+                }
                 if (e.action === 'getProInfo') {
                     const proInfoList = await new ProService(accountId).getAll();
                     onAction('subWin', {

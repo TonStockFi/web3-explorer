@@ -11,9 +11,10 @@
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
     "sync-bg": "cp ../../apps/desktop/src/backgroud.d.ts ./src/backgroud.d.ts",
-    "fix": "yarn fix:rd3-type && yarn fix:rd3-js",
+    "fix": "yarn fix:rd3-type && yarn fix:rd3-node  && yarn fix:rd3-tree ",
+    "fix:rd3-tree": "cp patches/react-d3-tree/tree.js node_modules/react-d3-tree/lib/esm/Tree/index.js",
     "fix:rd3-type": "cp patches/react-d3-tree/common.d.ts node_modules/react-d3-tree/lib/types/types/common.d.ts",
-    "fix:rd3-js": "cp patches/react-d3-tree/node.js node_modules/react-d3-tree/lib/esm/Node/index.js"
+    "fix:rd3-node": "cp patches/react-d3-tree/node.js node_modules/react-d3-tree/lib/esm/Node/index.js"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",

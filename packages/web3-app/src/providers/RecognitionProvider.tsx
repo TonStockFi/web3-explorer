@@ -8,7 +8,7 @@ import DecisionRunInfoService from '../services/DecisionRunInfoService';
 import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { AccountPublic, ProInfoProps } from '../types';
+import { AccountPublic, ProInfoProps, SUB_WIN_ID } from '../types';
 import { usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
 
@@ -18,7 +18,7 @@ export interface RoiRunInfo {
     isOnline: boolean;
     ts: number;
     matchedId?: string;
-    matchPath?: string[];
+    matchPath?: string[][];
     duration: number;
     total: number;
     inspectTotal: number;
@@ -31,14 +31,6 @@ export interface RoiRunInfo {
 interface AppContextType {
     roiRunInfo: RoiRunInfo | null;
     roiAreaList: RoiInfo[];
-    onChangeRoiRunInfo: (id: number, roi: RoiRunInfo) => void;
-    notifyTestRoi: (roi: RoiInfo) => void;
-    notifyWindow: (action: string, payload?: any) => void;
-    notifyWindows: (action: string, payload?: any) => void;
-    loadCacheRoiList: (tabId: string, account?: AccountPublic) => Promise<RoiInfo[]>;
-    onSelectPage: (page: string) => void;
-    switchIsPage: (v: boolean) => void;
-    onShowScreenMirror: (v: boolean) => void;
     isPage: boolean;
     showScreenMirror: boolean;
     selectedPage: string;
@@ -49,6 +41,14 @@ interface AppContextType {
     showSettings: boolean;
     clickStopped: boolean;
     showAccounts: boolean;
+    onChangeRoiRunInfo: (id: number, roi: RoiRunInfo) => void;
+    notifyTestRoi: (roi: RoiInfo) => void;
+    notifyWindow: (action: string, payload?: any) => void;
+    notifyWindows: (action: string, payload?: any) => void;
+    loadCacheRoiList: (tabId: string, account?: AccountPublic) => Promise<RoiInfo[]>;
+    onSelectPage: (page: string) => void;
+    switchIsPage: (v: boolean) => void;
+    onShowScreenMirror: (v: boolean) => void;
     updateScreenPushDelayMs: (n: number, skipNotify?: boolean) => void;
     onSelectRoi: (id: string) => void;
     addRoiArea: (r: RoiInfo, cutImageUrl: string, catId: string) => void;
@@ -149,9 +149,6 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const onSelectRoi = (id: string) => {
         setSelectedRoiId(i => {
-            // if (id !== i && recognitionCatId) {
-            //     getScreenImg(parseRecognitionCatId(recognitionCatId).tabId);
-            // }
             return id;
         });
     };
@@ -171,15 +168,32 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     }
 
     const getScreenImg = (tabId: string) => {
-        notifyWindow('getScreenImage', { tabId });
+        setRecognitionCatId(recognitionCatId => {
+            if (recognitionCatId) {
+                const screenImgUrl = localStorage.getItem(`screen_${recognitionCatId}`);
+                if (screenImgUrl) {
+                    console.log(screenImgUrl);
+                    window.dispatchEvent(
+                        new CustomEvent('onUpdateScreenImgUrl', {
+                            detail: {
+                                screenImageUrl: screenImgUrl
+                            }
+                        })
+                    );
+                } else {
+                    notifyWindow('getScreenImage', { tabId, recognitionCatId });
+                }
+            }
+            return recognitionCatId;
+        });
     };
 
     const notifyWindow = (action: string, payload?: any) => {
-        if (recognitionCatId) {
-            const { accountIndex } = parseRecognitionCatId(recognitionCatId);
+        setRecognitionCatId(recognitionCatId => {
+            const { accountIndex, tabId } = parseRecognitionCatId(recognitionCatId);
             const winId = WebviewMainEventService.getPlaygroundWinId({
                 index: accountIndex,
-                tabId: currentTabId
+                tabId
             });
             console.log('notifyWindow', action, winId);
             onAction('subWin', {
@@ -187,7 +201,8 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
                 action,
                 payload: payload || {}
             });
-        }
+            return recognitionCatId;
+        });
     };
     const notifyWindows = (action: string, payload?: any) => {
         //console.log("notifyWindows",{ currentTabId });
@@ -222,8 +237,27 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         } else {
             onStopClick(false);
         }
+
         setSelectedPage(PAGE_ALL_ROI);
-        setRecognitionCatId(() => {
+        setRecognitionCatId(r => {
+            console.log({ r, recognitionCatId });
+            const rr = recognitionCatId ? recognitionCatId : r;
+            if (!isPlaygroundMaster()) {
+                if (!recognitionCatId) {
+                    localStorage.setItem(`screen_${r}`, '');
+                }
+
+                onAction('subWin', {
+                    toWinId: SUB_WIN_ID.PLAYGROUND,
+                    action: 'onChangeRecognitionCatId',
+                    payload: {
+                        account: currentAccount,
+                        flag: !!recognitionCatId,
+                        recognitionCatId: rr
+                    }
+                });
+            }
+            localStorage.setItem(rr, !!recognitionCatId ? '1' : '0');
             return recognitionCatId;
         });
         setTimeout(() => {
