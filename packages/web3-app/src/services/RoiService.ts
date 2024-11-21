@@ -11,6 +11,7 @@ export interface RoiInfo {
     pageBelongTo?: string;
     ts: number;
     page?: string;
+    isTry?: boolean;
     isMark?: boolean;
     clickOffsetX?: number;
     clickOffsetY?: number;
@@ -32,14 +33,14 @@ export default class RoiService {
         this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${catId}`);
     }
 
-    static async getProVersionId(catId:string): Promise<number> {
+    static async getProVersionId(catId:string): Promise<{free:number, pro:number}> {
         const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
-        return indexedDb.get(catId) || 0;
+        return indexedDb.get(catId) || {pro:0,free:0};
     }
 
-    static async saveProVersionId(catId: string,ts:number): Promise<void> {
+    static async saveProVersionId(catId: string,data:{free:number, pro:number}): Promise<void> {
         const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
-        await indexedDb.put(catId,ts);
+        await indexedDb.put(catId,data);
     }
 
     async getImage(id: string): Promise<string> {

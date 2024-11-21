@@ -31,7 +31,7 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
                         '&.MuiButtonBase-root': {
                             paddingTop: 0,
                             paddingBottom: 0,
-                            minHeight: '36px'
+                            minHeight: '30px'
                         }
                     }
                 }

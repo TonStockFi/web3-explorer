@@ -95,6 +95,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         iconButtonProps,
         ...props_
     } = props;
+
     if (hide) return null;
 
     if (_D !== undefined && _D0 === undefined) {
@@ -342,6 +343,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     if (empty) {
         return <>{props.children}</>;
     }
+
     // @ts-ignore
     return <Box {...handleProps(props_)} ref={ref} />;
 });

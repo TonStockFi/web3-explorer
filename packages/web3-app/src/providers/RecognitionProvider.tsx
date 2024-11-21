@@ -4,6 +4,7 @@ import { onAction } from '../common/electron';
 import { isPlaygroundMaster } from '../common/helpers';
 import { PAGE_ALL_ROI } from '../constant';
 
+import DecisionRunInfoService from '../services/DecisionRunInfoService';
 import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
@@ -14,6 +15,8 @@ import { usePro } from './ProProvider';
 export const CacheImage: Map<string, string> = new Map();
 
 export interface RoiRunInfo {
+    isOnline: boolean;
+    ts: number;
     matchedId?: string;
     matchPath?: string[];
     duration: number;
@@ -28,14 +31,16 @@ export interface RoiRunInfo {
 interface AppContextType {
     roiRunInfo: RoiRunInfo | null;
     roiAreaList: RoiInfo[];
-    onChangeRoiRunInfo: (roi: RoiRunInfo) => void;
+    onChangeRoiRunInfo: (id: number, roi: RoiRunInfo) => void;
     notifyTestRoi: (roi: RoiInfo) => void;
     notifyWindow: (action: string, payload?: any) => void;
     notifyWindows: (action: string, payload?: any) => void;
     loadCacheRoiList: (tabId: string, account?: AccountPublic) => Promise<RoiInfo[]>;
     onSelectPage: (page: string) => void;
     switchIsPage: (v: boolean) => void;
+    onShowScreenMirror: (v: boolean) => void;
     isPage: boolean;
+    showScreenMirror: boolean;
     selectedPage: string;
     selectedRoiId: string;
     screenPushDelayMs: number;
@@ -62,7 +67,7 @@ export interface MatchResult {
     duration: number;
     threshold: number;
 }
-
+const IdCache: Map<string, boolean> = new Map();
 export const MatchResults: Map<string, MatchResult> = new Map();
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -99,7 +104,10 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const { proInfoList } = usePro();
 
     const { children } = props || {};
-    const [isPage, setIsPage] = useState<boolean>(true);
+    //
+
+    const [showScreenMirror, setShowScreenMirror] = useState<boolean>(false);
+    const [isPage, setIsPage] = useState<boolean>(false);
 
     const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
 
@@ -228,12 +236,30 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
-        console.log('addRoiArea', { recognitionCatId, selectedRoiId });
-        switchIsPage(false);
+        console.log('addRoiArea', { recognitionCatId, selectedRoiId, selectedPage });
+
         const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
-        const row: RoiInfo = { ...r, priority: 1000, id };
+        if (IdCache.get(id)) {
+            return;
+        }
+        IdCache.set(id, true);
+        let page = '未设置页面';
+        let pageBelongTo = '';
+        if (selectedPage && selectedPage !== PAGE_ALL_ROI) {
+            pageBelongTo = selectedPage;
+            page = '';
+        }
+
+        const row: RoiInfo = {
+            ...r,
+            priority: 1000,
+            page,
+            pageBelongTo,
+            id
+        };
         CacheImage.set(`${recognitionCatId}_${row.id}`, cutImageUrl);
         new RoiService(getServiceId(recognitionCatId, proInfoList)).save(id, row, cutImageUrl);
+
         setRoiAreaList(prv => {
             return [row, ...prv.filter(row => r.id !== row.id)];
         });
@@ -297,13 +323,23 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         setIsPage(v);
     };
 
-    const onChangeRoiRunInfo = (v: RoiRunInfo) => {
+    const onChangeRoiRunInfo = (id: number, v: RoiRunInfo) => {
+        setRecognitionCatId(r => {
+            new DecisionRunInfoService(recognitionCatId).save(id, v);
+            return r;
+        });
         setRoiRunInfo(v);
+    };
+
+    const onShowScreenMirror = (v: boolean) => {
+        setShowScreenMirror(v);
     };
 
     return (
         <AppContext.Provider
             value={{
+                onShowScreenMirror,
+                showScreenMirror,
                 onChangeRoiRunInfo,
                 roiRunInfo,
                 switchIsPage,

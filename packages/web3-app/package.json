@@ -4,13 +4,16 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "yarn sync-bg && tsc -P tsconfig.build.json",
+    "build": "yarn fix && yarn sync-bg && tsc -P tsconfig.build.json",
     "start": "tsc -w  -P tsconfig.build.json",
     "build:pkg": "rm -fr dist && yarn build",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build",
-    "sync-bg": "cp ../../apps/desktop/src/backgroud.d.ts ./src/backgroud.d.ts"
+    "sync-bg": "cp ../../apps/desktop/src/backgroud.d.ts ./src/backgroud.d.ts",
+    "fix": "yarn fix:rd3-type && yarn fix:rd3-js",
+    "fix:rd3-type": "cp patches/react-d3-tree/common.d.ts node_modules/react-d3-tree/lib/types/types/common.d.ts",
+    "fix:rd3-js": "cp patches/react-d3-tree/node.js node_modules/react-d3-tree/lib/esm/Node/index.js"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -38,6 +41,7 @@
     "i18next-browser-languagedetector": "^8.0.0",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
+    "react-d3-tree": "^3.6.2",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",
     "react-hook-form": "^7.53.0",

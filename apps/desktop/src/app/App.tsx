@@ -1,1 +1,3 @@
-export { App } from '@web3-explorer/app/dist/src/desktop/App';
+export const App = () => {
+    return <div>App</div>;
+};

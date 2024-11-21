@@ -15,11 +15,7 @@ export function ScreenshotBar({
     inPlayground
 }: {
     inPlayground?: boolean;
-    handleRecognition: (
-        tabId: string,
-        cutAreaRect: CutAreaRect,
-        selectedPage?: string
-    ) => Promise<void>;
+    handleRecognition: (tabId: string, cutAreaRect: CutAreaRect) => Promise<void>;
     tabId: string;
     viewSize: ViewSize;
 }) {

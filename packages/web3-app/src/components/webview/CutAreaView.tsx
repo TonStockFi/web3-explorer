@@ -56,11 +56,7 @@ export default function CutAreaRectView({
     handleRecognition
 }: {
     tabId?: string;
-    handleRecognition: (
-        tabId: string,
-        cutAreaRect: CutAreaRect,
-        selectedPage?: string
-    ) => Promise<void>;
+    handleRecognition: (tabId: string, cutAreaRect: CutAreaRect) => Promise<void>;
     inPlayground?: boolean;
     viewSize: { width: number; height: number };
 }) {
@@ -129,7 +125,7 @@ export default function CutAreaRectView({
             changeCutAreaRect(t);
             if (inPlayground) {
                 if (tabId && recognitionCatId) {
-                    handleRecognition(tabId, t, selectedPage);
+                    handleRecognition(tabId, t);
                     onCutting(false);
                     setTimeout(() => {
                         onCut(false);

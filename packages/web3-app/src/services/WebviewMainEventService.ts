@@ -64,10 +64,10 @@ export default class WebviewMainEventService {
     async openFeatureWindow(env: AppEnv, action: string, payload?: any) {
         const { isDev } = env;
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.PLAYGROUND}`;
-        const width = 1160;
-        const height = 860;
+        const width = 1180;
+        const height = 870;
         const x = 24;
-        const y = 24;
+        const y = 8;
         await this.openWindow(
             SUB_WIN_ID.PLAYGROUND,
             url,

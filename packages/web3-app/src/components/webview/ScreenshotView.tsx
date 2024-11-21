@@ -2,7 +2,7 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useRef, useState } from 'react';
 import { canvasToBlob, getRoiArea } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
-import { DEFAULT_THRESHOLD, PAGE_ALL_ROI } from '../../constant';
+import { DEFAULT_THRESHOLD } from '../../constant';
 
 import { useIAppContext } from '../../providers/IAppProvider';
 import { usePlayground } from '../../providers/PlaygroundProvider';
@@ -42,15 +42,11 @@ export default function ScreenshotView({
 }) {
     const ref = useRef<HTMLDivElement>(null);
     const { onCutting } = useScreenshotContext();
-    const { addRoiArea, recognitionCatId, selectedPage } = useRecognition();
+    const { addRoiArea, recognitionCatId } = useRecognition();
     const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
     const { currentAccount, tab } = usePlayground();
     const { env } = useIAppContext();
-    const handleRecognition = async (
-        tabId: string,
-        cutAreaRect: CutAreaRect,
-        selectedPage?: string
-    ) => {
+    const handleRecognition = async (tabId: string, cutAreaRect: CutAreaRect) => {
         if (!currentAccount) {
             return;
         }
@@ -71,10 +67,6 @@ export default function ScreenshotView({
         }
 
         const ts = currentTs();
-        let pageBelongTo = '';
-        if (selectedPage && selectedPage !== PAGE_ALL_ROI) {
-            pageBelongTo = selectedPage;
-        }
 
         //@ts-ignore
         delete cutAreaRect.start;
@@ -85,7 +77,6 @@ export default function ScreenshotView({
             id: '',
             ts,
             catId,
-            pageBelongTo,
             threshold: DEFAULT_THRESHOLD,
             cutAreaRect: cutAreaRect!
         };

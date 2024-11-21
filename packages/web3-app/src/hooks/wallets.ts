@@ -227,9 +227,9 @@ export function useAccountInfo() {
     if (account.type === 'mam') {
         name = account.activeDerivation.name;
         emoji = account.activeDerivation.emoji.substring(0, 2);
-        const { activeDerivationIndex, addedDerivationsIndexes } = account as AccountMAM;
+        const { activeDerivationIndex } = account as AccountMAM;
         index = activeDerivationIndex;
-        address = account.derivations[activeDerivationIndex].tonWallets[0].rawAddress;
+        address = account.derivations.find(row=>row.index === activeDerivationIndex)!.tonWallets[0].rawAddress;
     }
     return { emoji, id: accountId, name, index, address: formatAddress(address) };
 }
