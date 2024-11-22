@@ -30,6 +30,7 @@ export interface RoiRunInfo {
 
 interface AppContextType {
     roiRunInfo: RoiRunInfo | null;
+    currentDecision: RoiRunInfo | null;
     roiAreaList: RoiInfo[];
     isPage: boolean;
     showScreenMirror: boolean;
@@ -41,6 +42,7 @@ interface AppContextType {
     showSettings: boolean;
     clickStopped: boolean;
     showAccounts: boolean;
+    onChangeCurrentDecisionn: (roi: RoiRunInfo | null) => void;
     onChangeRoiRunInfo: (id: number, roi: RoiRunInfo) => void;
     notifyTestRoi: (roi: RoiInfo) => void;
     notifyWindow: (action: string, payload?: any) => void;
@@ -104,7 +106,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const { proInfoList } = usePro();
 
     const { children } = props || {};
-    //
+    const [currentDecision, setCurrentDecision] = useState<RoiRunInfo | null>(null);
 
     const [showScreenMirror, setShowScreenMirror] = useState<boolean>(false);
     const [isPage, setIsPage] = useState<boolean>(false);
@@ -256,8 +258,8 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
                         recognitionCatId: rr
                     }
                 });
+                localStorage.setItem(rr, !!recognitionCatId ? '1' : '0');
             }
-            localStorage.setItem(rr, !!recognitionCatId ? '1' : '0');
             return recognitionCatId;
         });
         setTimeout(() => {
@@ -275,6 +277,15 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
         if (IdCache.get(id)) {
             return;
+        }
+        if (isPlaygroundMaster()) {
+            setTimeout(() => {
+                window.dispatchEvent(
+                    new CustomEvent('onNodeClick', {
+                        detail: { id: row.id.replace('#', '') }
+                    })
+                );
+            }, 1000);
         }
         IdCache.set(id, true);
         let page = '未设置页面';
@@ -358,10 +369,11 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const onChangeRoiRunInfo = (id: number, v: RoiRunInfo) => {
-        setRecognitionCatId(r => {
-            new DecisionRunInfoService(recognitionCatId).save(id, v);
-            return r;
-        });
+        !isPlaygroundMaster() &&
+            setRecognitionCatId(r => {
+                new DecisionRunInfoService(recognitionCatId).save(id, v);
+                return r;
+            });
         setRoiRunInfo(v);
     };
 
@@ -369,9 +381,15 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         setShowScreenMirror(v);
     };
 
+    const onChangeCurrentDecisionn = (v: RoiRunInfo | null) => {
+        setCurrentDecision(v);
+    };
+
     return (
         <AppContext.Provider
             value={{
+                onChangeCurrentDecisionn,
+                currentDecision,
                 onShowScreenMirror,
                 showScreenMirror,
                 onChangeRoiRunInfo,

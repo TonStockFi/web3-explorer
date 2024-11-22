@@ -130,6 +130,7 @@ export function ScreenshotCutAreaBar({
                         icon="ContentCopy"
                     />
                     <View
+                        hide
                         onClick={async () => {
                             handleRecognition(tabId, cutAreaRect);
                             onCutting(false);

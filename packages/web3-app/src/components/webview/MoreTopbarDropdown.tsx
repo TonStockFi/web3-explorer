@@ -118,7 +118,6 @@ export default function MoreTopbarDropdown({
                 TransitionComponent={Fade}
             >
                 <View
-                    hide={tab.twa}
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);

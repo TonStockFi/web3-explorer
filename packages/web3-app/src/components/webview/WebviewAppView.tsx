@@ -2,7 +2,6 @@ import { View } from '@web3-explorer/uikit-view';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
-import { openWindow } from '../../common/electron';
 import { START_URL } from '../../constant';
 import { useAccountInfo, useAccountWallePartitionId } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
@@ -72,9 +71,6 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
         payload?: Record<string, any> | undefined;
     }) => {
         console.log('_ET', action, payload);
-        if (action === 'openWindow') {
-            openWindow(payload as any);
-        }
 
         if (action === 'onOpenTab') {
             onOpenTab({ _tabId, payload, editTab, openTab, closeTab, newTab, browserTabs });
