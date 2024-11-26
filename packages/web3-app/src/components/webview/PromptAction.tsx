@@ -9,7 +9,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { onPromptChatGpt, onPromptGemini } from './SideWebview';
+
+import { onPromptChatGpt, onPromptGemini } from './SideWeb/SideWebviewInner';
 import { getFocusWebviewByTabId } from './WebViewBrowser';
 
 export function PromptAction({}: {}) {

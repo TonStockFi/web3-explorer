@@ -4,6 +4,11 @@ import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotPro
 
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { isPlaygroundMaster } from '../../common/helpers';
+import { downloadImage } from '../../common/image';
+import { urlToBlob } from '../../common/opencv';
+import { currentTs } from '../../common/utils';
+import WebviewService from '../../services/WebviewService';
 import { ViewSize } from '../../types';
 import { DefaultCutRect, isCutAreaExists } from './CutAreaView';
 import { ScreenshotCutAreaBar } from './ScreenshotCutAreaBar';
@@ -54,12 +59,39 @@ export function ScreenshotBar({
                     <View
                         mr={4}
                         buttonVariant="outlined"
-                        onClick={() => {}}
                         button={t('CutArea')}
                         sx={{ wordBreak: 'keep-all' }}
                         buttonStartIcon={
                             <View iconProps={{ sx: { width: '0.8rem' } }} icon="Screenshot" />
                         }
+                    />
+                    <View
+                        hide={isPlaygroundMaster()}
+                        mr={4}
+                        buttonVariant="outlined"
+                        onClick={async () => {
+                            const ws = new WebviewService(tabId);
+                            if (ws.webviewIsReady()) {
+                                try {
+                                    const size = ws.getWebViewSize();
+                                    if (!size) {
+                                        return;
+                                    }
+                                    const screenImgUrl = await ws.getScreenImageUrl(size);
+                                    if (screenImgUrl) {
+                                        const blob = await urlToBlob(screenImgUrl);
+                                        if (blob) {
+                                            downloadImage(blob, `${tabId}_${currentTs()}.png`);
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error(error);
+                                }
+                            }
+                            onCut(false);
+                        }}
+                        button={t('全屏截图')}
+                        sx={{ wordBreak: 'keep-all' }}
                     />
 
                     <View divider={{ orientation: 'vertical' }} borderBox />

@@ -56,6 +56,7 @@ export interface ContextMenuProps {
     };
 }
 export type WebveiwEventType =
+    | 'console-message'
     | 'new-window'
     | 'context-menu'
     | 'found-in-page'
@@ -90,7 +91,7 @@ export interface WebviewProps {
     onEvent?: (
         webview: WebviewTag,
         eventType: WebveiwEventType,
-        paylaod: any,
+        payload: any,
         webContentsId: number
     ) => Promise<void>;
     insertCss?: string;

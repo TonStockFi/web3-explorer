@@ -10,6 +10,14 @@ export function getDiscoverHost(isDev: boolean) {
         return `${DISCOVER_HOST}?`
     }
 }
+ 
+export function showAlertMessage(message:string) {
+    window.dispatchEvent(new CustomEvent("showAlertMessage",{
+        detail:{
+            message
+        }
+    }))
+}
 
 export function getWinId() {
     return location.hash.replace('#', '');

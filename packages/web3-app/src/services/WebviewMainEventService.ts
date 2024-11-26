@@ -64,10 +64,10 @@ export default class WebviewMainEventService {
     async openFeatureWindow(env: AppEnv, action: string, payload?: any) {
         const { isDev } = env;
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.PLAYGROUND}`;
-        const width = 1180;
+        const width = 1400;
         const height = 870;
-        const x = 24;
-        const y = 8;
+        const x = 4;
+        const y = 0;
         await this.openWindow(
             SUB_WIN_ID.PLAYGROUND,
             url,
@@ -94,13 +94,17 @@ export default class WebviewMainEventService {
             await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, action, payload || {});
         }
     }
-    async openLLMWindow(env: AppEnv, sideWeb?: SideWebProps) {
-        const { isDev } = env;
+    async openLLMWindow(env: Partial<AppEnv>, sideWeb?: SideWebProps) {
+        let { isDev } = env
+        if(!isDev){
+            isDev = false
+        }
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.LLM}`;
         const width = 420;
         const height = 860;
         const x = window.screen.width - width - 12;
         const y = 12;
+        
         await this.openWindow(
             SUB_WIN_ID.LLM,
             url,
@@ -120,7 +124,7 @@ export default class WebviewMainEventService {
                     partition: getPartitionKey(DISCOVER_PID)
                 }
             },
-            isDev
+            true
         );
         await this.waitForIsWinReady(SUB_WIN_ID.LLM);
         await this.sendMessageToSubWin(

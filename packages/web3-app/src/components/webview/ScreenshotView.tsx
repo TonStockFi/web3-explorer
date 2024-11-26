@@ -15,13 +15,13 @@ import { SUB_WIN_ID } from '../../types';
 import CutAreaRectView from './CutAreaView';
 import { ScreenshotBar } from './ScreenshotBar';
 
-export const getPlaygroundCutImag = async (catId: string, cutAreaRect: CutAreaRect) => {
-    const img = document.querySelector(`#screen_img_copy_${catId}`) as HTMLImageElement;
+export const getPlaygroundCutImag = async (tabId: string, cutAreaRect: CutAreaRect) => {
+    const img = document.querySelector(`#screen_img_copy_${tabId}`) as HTMLImageElement;
     if (!img) {
         return;
     }
 
-    const r = await getRoiArea(cutAreaRect, 'tmp', catId);
+    const r = await getRoiArea(cutAreaRect, 'tmp', tabId);
     if (!r) {
         return;
     }
@@ -51,10 +51,9 @@ export default function ScreenshotView({
             return;
         }
         let cutImageUrl;
-        const catId = tabId;
 
         if (inPlayground) {
-            cutImageUrl = await getPlaygroundCutImag(catId, cutAreaRect);
+            cutImageUrl = await getPlaygroundCutImag(tabId, cutAreaRect);
             if (!cutImageUrl) {
                 return;
             }
@@ -76,7 +75,7 @@ export default function ScreenshotView({
             priority: 0,
             id: '',
             ts,
-            catId,
+            tabId,
             threshold: DEFAULT_THRESHOLD,
             cutAreaRect: cutAreaRect!
         };

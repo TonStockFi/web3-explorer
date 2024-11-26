@@ -47,13 +47,32 @@ export default class CutAreaService {
         await this.indexedDb.delete(id);
     }
     static getClickPosition(roi: RoiInfo){
-        const { cutAreaRect, clickOffsetX, clickOffsetY } = roi;
+        const { cutAreaRect } = roi;
         const { x, y, w, h } = cutAreaRect;
-        let OffsetX = clickOffsetX || 0;
-        let OffsetY = clickOffsetY || 0;
-        let clickX = x + OffsetX + w / 2;
-        let clickY = y + OffsetY + h / 2;
+        
+        let clickX = x + w / 2;
+        let clickY = y + h / 2;
         return {clickX,clickY}
+    }
+
+    static async sendDragEvent(row: RoiInfo, start:{x:number,y:number},end:{x:number,y:number},steps:number,tabId?: string, accountIndex?: number) {
+        if (tabId && accountIndex !== undefined) {
+            const toWinId = WebviewMainEventService.getPlaygroundWinId({
+                index: accountIndex,
+                tabId
+            });
+            onAction('subWin', {
+                action: 'sendDragEvent',
+                toWinId,
+                payload: {
+                    start, end,steps,
+                    tabId: tabId
+                }
+            });
+        } else {
+            const ws = new WebviewService(row.tabId);
+            await ws.sendDragEvent(start, end,steps);
+        }
     }
     static clickCutArea(row: RoiInfo, tabId?: string, accountIndex?: number) {
         const {clickX,clickY} = CutAreaService.getClickPosition(row)
@@ -73,7 +92,7 @@ export default class CutAreaService {
                 }
             });
         } else {
-            const ws = new WebviewService(row.catId);
+            const ws = new WebviewService(row.tabId);
             ws.sendClickEvent(clickX, clickY);
         }
     }

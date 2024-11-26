@@ -104,7 +104,7 @@ export default function ContextMenu({
                         pb: '0px',
                         pl: '12px',
                         pr: '32px',
-                        minHeight: '30px'
+                        minHeight: '26px'
                     }
                 }}
             >

@@ -4,43 +4,47 @@ import { CutAreaRect } from '../providers/ScreenshotProvider';
 
 export interface RoiInfo {
     id: string;
-    catId: string;
+    tabId: string;
     threshold: number;
     name?: string;
     priority: number;
     pageBelongTo?: string;
     ts: number;
     page?: string;
+    ocrPrompt?:string;
+    ocrReplyFormat?:string;
+    jsCode?:string;
+    testJsCode?:string;
     isTry?: boolean;
     isMark?: boolean;
-    clickOffsetX?: number;
-    clickOffsetY?: number;
+    action?:"click" | "callOcr" | "invokeCode" | string;
+    mergeArea?: boolean;
+    isOcr?: boolean;
     cutAreaRect: CutAreaRect;
-    clickOnVisible?: boolean;
-    clickIdOnVisible?: string;
+    ocrId?: string;
 }
 
 export default class RoiService {
     indexedDb: IndexedDbCache;
     indexedDbImg: IndexedDbCache;
     indexedDbIds: IndexedDbCache;
-    catId: string;
+    tabId: string;
 
-    constructor(catId: string) {
-        this.catId = catId;
-        this.indexedDb = new IndexedDbCache().init(`roi-Info/${catId}`);
-        this.indexedDbImg = new IndexedDbCache().init(`roi-Img/${catId}`);
-        this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${catId}`);
+    constructor(tabId: string) {
+        this.tabId = tabId;
+        this.indexedDb = new IndexedDbCache().init(`roi-Info/${tabId}`);
+        this.indexedDbImg = new IndexedDbCache().init(`roi-Img/${tabId}`);
+        this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${tabId}`);
     }
 
-    static async getProVersionId(catId:string): Promise<{free:number, pro:number}> {
+    static async getProVersionId(tabId:string): Promise<{free:number, pro:number}> {
         const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
-        return indexedDb.get(catId) || {pro:0,free:0};
+        return indexedDb.get(tabId) || {pro:0,free:0};
     }
 
-    static async saveProVersionId(catId: string,data:{free:number, pro:number}): Promise<void> {
+    static async saveProVersionId(tabId: string,data:{free:number, pro:number}): Promise<void> {
         const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
-        await indexedDb.put(catId,data);
+        await indexedDb.put(tabId,data);
     }
 
     async getImage(id: string): Promise<string> {
@@ -60,7 +64,7 @@ export default class RoiService {
     }
 
     async getId() {
-        let id = await this.indexedDbIds.get(this.catId);
+        let id = await this.indexedDbIds.get(this.tabId);
         if (!id) {
             id = `#1`;
         } else {
@@ -70,7 +74,7 @@ export default class RoiService {
         return id;
     }
     async saveId(id:number) {
-        await this.indexedDbIds.put(this.catId, id);
+        await this.indexedDbIds.put(this.tabId, id);
         return id;
     }
     
@@ -97,6 +101,6 @@ export default class RoiService {
             const {id} = rows[index];
             await this.remove(id)
         }
-        this.indexedDbIds.delete(this.catId)
+        this.indexedDbIds.delete(this.tabId)
     }
 }

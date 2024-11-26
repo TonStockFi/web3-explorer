@@ -7,8 +7,8 @@ import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewService from '../../services/WebviewService';
+import { WebviewTopBarSideActions } from './SideWeb/WebviewTopBarSideActions';
 import { UrlInput } from './UrlInput';
-import { WebviewTopBarSideActions } from './WebviewTopBarSideActions';
 
 export function WebviewTopBar({
     hideOpenInNew,

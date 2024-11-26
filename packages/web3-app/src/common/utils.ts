@@ -2,6 +2,40 @@ export function getPartitionKey(key: string) {
     return `persist:${key}`;
 }
 
+export function waitForResult(
+    cb: () => any | Promise<any>,
+    timeout: number = -1,
+    interval: number = 1000
+): Promise<any | null> {
+    const startTime = Date.now();
+
+    return new Promise((resolve) => {
+        const checkReply = async () => {
+            try {
+                const res = await Promise.resolve(cb()); // Ensure cb result is a Promise
+                if (res) {
+                    resolve(res);
+                    return;
+                }
+
+                // Check for timeout
+                if (timeout > -1 && Date.now() - startTime > timeout) {
+                    resolve(false);
+                    return;
+                }
+
+                // Retry after interval
+                setTimeout(checkReply, interval);
+            } catch (error) {
+                console.error("Error in waitForResult callback:", error);
+                resolve(false); // Resolve with null on error
+            }
+        };
+
+        checkReply();
+    });
+}
+
 export async function copyTextToClipboard(text: string) {
     try {
         if (window.ClipboardItem) {

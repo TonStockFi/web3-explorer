@@ -3,18 +3,12 @@ import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
 import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view';
-import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import { copyImageToClipboard } from '../../common/image';
-import { urlToDataUri } from '../../common/opencv';
-import { currentTs } from '../../common/utils';
 import { BrowserTab } from '../../providers/BrowserProvider';
-import { useIAppContext } from '../../providers/IAppProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
-import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
 import { AccountPublic } from '../../types';
@@ -22,8 +16,6 @@ import { AccountPublic } from '../../types';
 export default function MoreTopbarDropdown({
     currentAccount,
     tabId,
-    tab,
-    enableGeminiTransScreen,
     tgUrl
 }: {
     tab: Partial<BrowserTab>;
@@ -34,7 +26,7 @@ export default function MoreTopbarDropdown({
 }) {
     const [isMute, setIsMute] = React.useState(false);
     const { isCutEnable, onCut } = useScreenshotContext();
-    const { showBackdrop, showSnackbar, env } = useIAppContext();
+
     const { t } = useTranslation();
     const theme = useTheme();
 
@@ -66,13 +58,18 @@ export default function MoreTopbarDropdown({
                 overflow: 'visible',
                 filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                 mt: 2.5,
-                ml: 1.6,
+                ml: 0,
+                '& li': {
+                    paddingTop: '0px!important',
+                    paddingBottom: '0px!important',
+                    minHeight: '36px'
+                },
                 '&::before': {
                     content: '""',
                     display: 'block',
                     position: 'absolute',
                     top: 0,
-                    right: 10,
+                    right: 8,
                     width: 10,
                     height: 10,
                     bgcolor: theme.backgroundContentAttention,
@@ -127,9 +124,9 @@ export default function MoreTopbarDropdown({
                     <ListItemIcon>
                         <View icon={'ContentCut'} iconSmall />
                     </ListItemIcon>
-                    <View text={t(`区域截图`)} textFontSize="0.9rem" />
+                    <View text={t(`屏幕截图`)} textFontSize="0.9rem" />
                 </View>
-                <View
+                {/* <View
                     hide={!enableGeminiTransScreen}
                     menuItem
                     onClick={async () => {
@@ -173,7 +170,7 @@ export default function MoreTopbarDropdown({
                         />
                     </ListItemIcon>
                     <View text={t(`用Gemini识别并翻译屏幕`)} textFontSize="0.9rem" />
-                </View>
+                </View> */}
 
                 <View
                     menuItem
@@ -190,7 +187,7 @@ export default function MoreTopbarDropdown({
                     <ListItemIcon>
                         <View icon={'Logout'} iconSmall />
                     </ListItemIcon>
-                    <View text={t(`从Telegram重新登录`)} textFontSize="0.9rem" />
+                    <View text={t(`从Telegram加载`)} textFontSize="0.9rem" />
                 </View>
                 <View
                     menuItem

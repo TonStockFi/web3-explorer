@@ -1,34 +1,53 @@
 import { deepDiff, useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
+import { onAction } from '../common/electron';
+import { getWinId } from '../common/helpers';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { AccountPublic } from '../types';
 import { BrowserTab, useBrowserContext } from './BrowserProvider';
+import { useIAppContext } from './IAppProvider';
 
 interface AppContextType {
     currentTabId: string;
+    showCodeDrawer: boolean;
     showGameListDrawer: boolean;
-    onShowGameListDrawer: (v: boolean) => void;
     tab: BrowserTab | undefined;
     windowStatus: Map<number, boolean>;
+    currentAccount: AccountPublic | null;
+    screenCopyVisible: boolean;
+    currentExtension: ExtensionType;
+    accounts: AccountPublic[];
+    onShowCodeDrawer: (v: boolean) => void;
+    onShowGameListDrawer: (v: boolean) => void;
     getWindowStatus: (
         accounts: AccountPublic[],
         delay?: number
     ) => Promise<null | Map<number, boolean>>;
     onChangeWindowStatus: (status: Map<number, boolean>) => void;
-    currentAccount: AccountPublic | null;
-    screenCopyVisible: boolean;
+    onChangeCurrentExtension: (v: ExtensionType) => void;
     showScreenCopy: (v: boolean) => void;
-
-    accounts: AccountPublic[];
     saveAccounts: (accounts: AccountPublic[]) => void;
     switchCurrentAccount: (account: AccountPublic) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+export function getRecoId(tab: BrowserTab, account: AccountPublic) {
+    return `${tab.tabId}-${account?.id}-${account?.index}`;
+}
+
+export enum ExtensionType {
+    CODE = 'CODE',
+    GEMINI = 'GEMINI',
+    NULL = 'NULL',
+    EXT_CENTER = 'EXT_CENTER',
+    DECISION = 'DECISION'
+}
+
 export const PlaygroundProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
+    const { env } = useIAppContext();
     const [windowStatus, setWindowStatus] = useState<Map<number, boolean>>(new Map());
     const { currentTabId, newTab, browserTabs } = useBrowserContext();
     const uri = new URL(location.href);
@@ -42,6 +61,12 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
             account = res.account;
         }
     }
+
+    const [currentExtension, setCurrentExtension] = useLocalStorageState<ExtensionType>(
+        'currentExtension_' + (account?.id || '1') + '' + (account?.index || '1'),
+        ExtensionType.NULL
+    );
+
     useEffect(() => {
         if (tabInit) {
             newTab(tabInit);
@@ -49,6 +74,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     }, []);
 
     const [showGameListDrawer, setShowGameListDrawer] = useState<boolean>(false);
+    const [showCodeDrawer, setShowCodeDrawer] = useState<boolean>(false);
 
     const [accounts, setAccounts] = useLocalStorageState<AccountPublic[]>('accounts', []);
     const [screenCopyVisible, setScreenCopyVisible] = useState(false);
@@ -56,6 +82,9 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         'currentAccount',
         account
     );
+    function onShowCodeDrawer(v: boolean) {
+        setShowCodeDrawer(v);
+    }
     function getWindowStatus(accounts: AccountPublic[], delay?: number) {
         return new Promise<null | Map<number, boolean>>(resolve => {
             setTimeout(() => {
@@ -94,6 +123,25 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         setShowGameListDrawer(v);
     };
 
+    const onChangeCurrentExtension = (v: ExtensionType) => {
+        onAction('getBounds', { winId: getWinId() })?.then(r => {
+            let { x } = r as { x: number };
+            const { workArea } = env;
+            const width = v === ExtensionType.NULL ? 368 : 368 * 2;
+            if (workArea.width < x + width) {
+                x = workArea.width - width;
+            }
+            onAction('setBounds', {
+                winId: getWinId(),
+                bounds: {
+                    width,
+                    x
+                },
+                animate: false
+            });
+        });
+        setCurrentExtension(v);
+    };
     const tab = tabInit || browserTabs.get(currentTabId);
     // console.log({ tab, tabInit });
     // console.log(
@@ -108,10 +156,13 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     //     },
     //     browserTabs.size
     // );
-
     return (
         <AppContext.Provider
             value={{
+                onChangeCurrentExtension,
+                currentExtension,
+                onShowCodeDrawer,
+                showCodeDrawer,
                 onShowGameListDrawer,
                 showGameListDrawer,
                 getWindowStatus,

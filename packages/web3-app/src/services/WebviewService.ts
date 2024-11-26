@@ -1,4 +1,6 @@
+import { WebviewTag } from 'electron';
 import { resizeImage } from '../common/image';
+import { sleep } from '../common/utils';
 import {
     getAccountIndexByTabId,
     getFocusWebviewByTabId,
@@ -16,11 +18,11 @@ export default class WebviewService {
     constructor(tabId: string) {
         this.tabId = tabId;
     }
-    getTabId(){
-        return this.tabId
+    getTabId() {
+        return this.tabId;
     }
-    getAccountIndex(){
-        return getAccountIndexByTabId(this.getTabId()) || 0
+    getAccountIndex() {
+        return getAccountIndexByTabId(this.getTabId()) || 0;
     }
     static getServiceByWebContentsId(id: number) {
         const tabId = getTabIdByWebviewContentsId(id);
@@ -38,6 +40,35 @@ export default class WebviewService {
         return getFocusWebviewIsReadyByTabId(this.tabId);
     }
 
+    async waitwebviewIsReady(timeout: number = -1, interval: number = 100): Promise<WebviewTag|null|undefined> {
+        const startTime = Date.now();
+    
+        return new Promise((resolve, reject) => {
+            const checkWebviewReady = async () => {
+                try {
+                    const isReady = this.webviewIsReady(); // Call the existing `webviewIsReady` method
+                    if (isReady) {
+                        const webview = this.getWebview()
+                        resolve(webview!); // Webview is ready
+                        return;
+                    }
+    
+                    // Check if the timeout has been reached
+                    if (Date.now() - startTime > timeout && timeout !== -1) {
+                        resolve(null); // Timeout, webview is not ready
+                        return;
+                    }
+    
+                    // Retry after the interval
+                    setTimeout(checkWebviewReady, interval);
+                } catch (error) {
+                    reject(null); // Handle any errors
+                }
+            };
+    
+            checkWebviewReady(); // Start polling
+        });
+    }
     getWebviewContentsId() {
         return getWebviewContentsIdByTabId(this.tabId);
     }
@@ -49,7 +80,7 @@ export default class WebviewService {
         }
         return webview?.getWebContentsId();
     }
-    goBack(){
+    goBack() {
         const webview = this.getWebview();
         return webview ? webview.goBack() : '';
     }
@@ -59,16 +90,16 @@ export default class WebviewService {
     }
 
     getWebviewUrl() {
-        const url = getUrlByTabId(this.tabId) || ""
-        return url
+        const url = getUrlByTabId(this.tabId) || '';
+        return url;
     }
 
     getWebviewUrlUri() {
-        const url = this.getWebviewUrl()
-        const uri = url ? new URL(url) :{host:"", hash:"",pathname:""}
+        const url = this.getWebviewUrl();
+        const uri = url ? new URL(url) : { host: '', hash: '', pathname: '' };
         return { uri, url };
     }
-    
+
     goToTelegramWebChatId(chatId: string) {
         const webview = this.getWebview();
         if (!webview) {
@@ -82,7 +113,7 @@ export default class WebviewService {
     location.reload()
     return {url:currentUrl + newHash}
     `;
-        return this.execJs(code)
+        return this.execJs(code);
     }
     async goTo(url: string) {
         const webview = this.getWebview();
@@ -90,8 +121,8 @@ export default class WebviewService {
             console.warn('webview is null when goTo ');
             return;
         }
-        if(url){
-            await webview.executeJavaScript(`location.href="${url}";`)
+        if (url) {
+            await webview.executeJavaScript(`location.href="${url}";`);
         }
     }
 
@@ -144,16 +175,15 @@ if(element){
             return null;
         }
         try {
-            const res = await wv.executeJavaScript(`(()=>{${code}})()`);
+            const res = await wv.executeJavaScript(`(async ()=>{${code}})()`);
             return res;
         } catch (e) {
-            console.error(e,code);
+            console.error(e, code);
             return null;
         }
     }
-    async waitForExecJsResult(code: string, timeout: number = 0): Promise<any | null> {
+    async waitForExecJsResult(code: string, timeout: number = 0,delayMs:number = 800): Promise<any | null> {
         let startTs = 0;
-        let delayMs = 800;
         return new Promise(resolve => {
             const interval = setInterval(async () => {
                 try {
@@ -278,7 +308,14 @@ if(element && element.src){
         await this.sendClickEvent(left + width / 2, top + height / 2);
     }
 
-    async sendInputEvent(tabId: StringConstructor, type: 'mouseDown' | 'mouseUp', x: number, y: number, button: 'left', clickCount: number = 1) {
+    async sendInputEvent(
+        tabId: StringConstructor,
+        type: 'mouseDown' | 'mouseUp',
+        x: number,
+        y: number,
+        button: 'left',
+        clickCount: number = 1
+    ) {
         const wv = this.getWebview();
         if (!wv) {
             console.warn('webview is null when sendClick ');
@@ -291,9 +328,53 @@ if(element && element.src){
             button,
             clickCount
         });
-    };
-    
-    
+    }
+
+    async sendDragEvent(
+        start: { x: number; y: number },
+        end: { x: number; y: number },
+        steps: number = 10
+    ) {
+        const wv = this.getWebview();
+        if (!wv) {
+            console.warn('webview is null when sendClick ');
+            return null;
+        }
+        await wv.sendInputEvent({
+            type: 'mouseDown',
+            x: start.x,
+            y: start.y,
+            button: 'left',
+            clickCount: 1
+        });
+        await sleep(100);
+
+    // Calculate intermediate steps for smooth dragging
+    const deltaX = (end.x - start.x) / steps;
+    const deltaY = (end.y - start.y) / steps;
+
+    for (let i = 1; i <= steps; i++) {
+        const intermediateX = start.x + deltaX * i;
+        const intermediateY = start.y + deltaY * i;
+
+        await wv.sendInputEvent({
+            type: 'mouseMove',
+            x: Math.round(intermediateX),
+            y: Math.round(intermediateY),
+            button: 'left', // Keep the left button pressed during the drag
+        });
+
+        // Optional sleep for smoother visual drag simulation
+        await sleep(50);
+    }
+        await wv.sendInputEvent({
+            type: 'mouseUp',
+            x: end.x,
+            y: end.y,
+            button: 'left',
+            clickCount: 1
+        });
+    }
     async sendClickEvent(x: number, y: number) {
         const wv = this.getWebview();
         if (!wv) {
@@ -331,43 +412,44 @@ if(element && element.src){
         }
     }
     getWebViewSize() {
-        return TabIdWebveiwSizedMap.get(this.tabId) || null
+        return TabIdWebveiwSizedMap.get(this.tabId) || null;
     }
 
-    async captureScreenToDataURL(x:number,y:number,width:number,height:number){
+    async captureScreenToDataURL(x: number, y: number, width: number, height: number) {
         const webview = this.getWebview();
         if (!webview) {
             return null;
         }
         const screenImage = await webview.capturePage({
-            height, width,
+            height,
+            width,
             x,
             y
         });
         return screenImage.toDataURL();
     }
 
-    async captureScreenToBlob(x:number,y:number,width:number,height:number){
-        const image = await this.captureScreenToDataURL(x,y,width,height)
-        if(!image){
+    async captureScreenToBlob(x: number, y: number, width: number, height: number) {
+        const image = await this.captureScreenToDataURL(x, y, width, height);
+        if (!image) {
             return null;
         }
         const blob = await resizeImage(image, width, height);
         return blob;
     }
-    async getScreenImageBlob(size?:{width:number;height:number}) {
-        if(!size){
-            const s = this.getWebViewSize()
-            if(!s){
+    async getScreenImageBlob(size?: { width: number; height: number }) {
+        if (!size) {
+            const s = this.getWebViewSize();
+            if (!s) {
                 return null;
             }
-            size = s
+            size = s;
         }
-       
-        return this.captureScreenToBlob(0,0,size.width,size.height)
+
+        return this.captureScreenToBlob(0, 0, size.width, size.height);
     }
 
-    async getScreenImageUrl(size?:{width:number;height:number}) {
+    async getScreenImageUrl(size?: { width: number; height: number }) {
         const blob = await this.getScreenImageBlob(size);
         if (blob) {
             return URL.createObjectURL(blob);
@@ -375,5 +457,4 @@ if(element && element.src){
             return null;
         }
     }
-    
 }

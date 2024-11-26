@@ -178,7 +178,7 @@ const WebViewBrowser = ({
             detail: {
                 message: {
                     action: string;
-                    paylaod?: Record<string, any>;
+                    payload?: Record<string, any>;
                 };
             };
         }) => {
@@ -230,6 +230,10 @@ const WebViewBrowser = ({
                     }
                 }
             },
+            'console-message': (e: any) => {
+                onEvent('console-message', e);
+            },
+
             'page-title-updated': async ({
                 title,
                 explicitSet
@@ -344,6 +348,7 @@ const WebViewBrowser = ({
                 siteLoading(false);
                 webviewProps?.onStopLoading && webviewProps?.onStopLoading();
                 onEvent('did-stop-loading');
+                TabIdWebviewReadyMap.set(tabId, true);
             },
             'did-fail-load': async ({
                 errorCode,
@@ -374,52 +379,58 @@ const WebViewBrowser = ({
             },
 
             'dom-ready': async () => {
-                const url = webview.getURL();
+                try {
+                    const url = webview.getURL();
 
-                if (!webContentsId) {
-                    webContentsId = webview.getWebContentsId();
-                    console.log('>> _ET dom-ready webContentsId', webContentsId);
-                    WebveiwContentsIdTabIdMap.set(webContentsId, tabId);
-                    TabIdWebveiwContentsIddMap.set(tabId, webContentsId);
-                    if (webviewProps?.onSiteMessage) {
-                        //@ts-ignore
-                        window.addEventListener(
-                            `onSiteMessage_${webContentsId}`,
-                            handleOnSiteMessage
-                        );
+                    if (!webContentsId) {
+                        webContentsId = webview.getWebContentsId();
+                        console.log('>> _ET dom-ready webContentsId', webContentsId);
+                        WebveiwContentsIdTabIdMap.set(webContentsId, tabId);
+                        TabIdWebveiwContentsIddMap.set(tabId, webContentsId);
+                        if (webviewProps?.onSiteMessage) {
+                            //@ts-ignore
+                            window.addEventListener(
+                                `onSiteMessage_${webContentsId}`,
+                                handleOnSiteMessage
+                            );
+                        }
+                    } else {
+                        if (url === 'about:blank') {
+                            return;
+                        }
                     }
-                } else {
-                    if (url === 'about:blank') {
+
+                    if (loadFailed) {
+                        console.error('Skipping dom-ready due to load failure.');
+                        siteLoading(false);
                         return;
                     }
-                }
 
-                if (loadFailed) {
-                    console.error('Skipping dom-ready due to load failure.');
-                    return;
-                }
+                    await webview.insertCSS(GLOBAL_CSS);
 
-                await webview.insertCSS(GLOBAL_CSS);
+                    if (url.indexOf('mail.proton.me') > -1) {
+                        await webview.insertCSS(
+                            `body > div.app-root > div.flex.flex-row.flex-nowrap.h-full > div > div.flex.flex-nowrap.flex-row.p-4.items-center.border-bottom.border-weak{display:none}`
+                        );
+                    }
+                    if (url.indexOf('web.telegram.org/a') > -1) {
+                        await webview.insertCSS(`.MessageSelectToolbar{display: none!important;}`);
+                    }
+                    if (webviewProps?.insertCss) {
+                        await webview.insertCSS(webviewProps?.insertCss);
+                    }
+                    if (webviewProps?.insertJs) {
+                        webview.executeJavaScript(webviewProps?.insertJs);
+                    }
 
-                if (url.indexOf('mail.proton.me') > -1) {
-                    await webview.insertCSS(
-                        `body > div.app-root > div.flex.flex-row.flex-nowrap.h-full > div > div.flex.flex-nowrap.flex-row.p-4.items-center.border-bottom.border-weak{display:none}`
-                    );
+                    console.log('onReady >> ', url);
+                    setError(null);
+                    onEvent('dom-ready');
+                    TabIdWebviewReadyMap.set(tabId, true);
+                    webviewProps?.onReady && (await webviewProps.onReady(webview));
+                } catch (e) {
+                    console.error(tabId, e);
                 }
-                if (url.indexOf('web.telegram.org/a') > -1) {
-                    await webview.insertCSS(`.MessageSelectToolbar{display: none!important;}`);
-                }
-                if (webviewProps?.insertCss) {
-                    await webview.insertCSS(webviewProps?.insertCss);
-                }
-                if (webviewProps?.insertJs) {
-                    webview.executeJavaScript(webviewProps?.insertJs);
-                }
-                console.log('onReady >> ', url);
-                setError(null);
-                onEvent('dom-ready');
-                TabIdWebviewReadyMap.set(tabId, true);
-                webviewProps?.onReady && (await webviewProps.onReady(webview));
             },
 
             'enter-html-full-screen': () => {

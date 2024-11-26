@@ -1,35 +1,16 @@
-import { deepPurple } from '@mui/material/colors';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { sleep } from '../../common/utils';
+import { sleep } from '../../../common/utils';
 
-import { MAC_TITLE_BAR_WIDTH } from '../../constant';
-import { SideWebType, useBrowserContext } from '../../providers/BrowserProvider';
-import { useIAppContext } from '../../providers/IAppProvider';
-import WebviewService from '../../services/WebviewService';
-import { WebveiwEventType } from '../../types';
-import { TitleBarControlView } from '../app/TitleBarControlView';
-import { ControlsView } from './ControlsView';
-import MoreTopbarDropdown from './MoreTopbarDropdown';
-import { PromptAction } from './PromptAction';
-import WebViewBrowser from './WebViewBrowser';
-import { WebviewTopBarSideActions } from './WebviewTopBarSideActions';
+import { copyImageToClipboard } from '../../../common/image';
+import { base64ToBlob, urlToBlob } from '../../../common/opencv';
+import { SideWebType, useBrowserContext } from '../../../providers/BrowserProvider';
+import WebviewService from '../../../services/WebviewService';
+import { WebveiwEventType } from '../../../types';
+import WebViewBrowser from '../WebViewBrowser';
 const CachedMessage: Map<number, boolean> = new Map();
-const getUrlInfo = (site: string) => {
-    switch (site) {
-        case 'ChatGpt':
-            return 'https://chatgpt.com';
-        case 'Gemini':
-            return 'https://gemini.google.com/app';
-        case 'Telegram':
-            return 'https://web.telegram.org/a/';
-        case 'Twitter':
-            return 'https://x.com/';
-    }
-    return '';
-};
 
 export const onPromptChatGpt = async (tabId: string, prompt: string) => {
     const ws = new WebviewService(tabId);
@@ -50,24 +31,43 @@ export const onPromptChatGpt = async (tabId: string, prompt: string) => {
     await sleep(500);
     await ws.sendClickEvent(rect!.left + rect.width + 16, rect!.top + rect.height / 2);
 };
-
-export const onPromptGemini = async (tabId: string, prompt: string) => {
+export async function isGeminiIsReady(tabId: string, timeOut: number = -1) {
     const ws = new WebviewService(tabId);
-    const webview = ws.getWebview();
-    if (!webview) {
-        return;
-    }
+    const webview = await ws.waitwebviewIsReady()!;
     const rect = (await ws.waitForExecJsResult(
         `const textarea = document.querySelector("rich-textarea");
                 if (!textarea) return null;
                 const rect = textarea.getBoundingClientRect()
                 return {top:rect.top,left:rect.left,width:rect.width,height:rect.height};`,
-        0
+        timeOut
     )) as any;
+    return rect;
+}
+export const onPromptGemini = async (tabId: string, prompt: string, image?: string) => {
+    const ws = new WebviewService(tabId);
+    const webview = await ws.waitwebviewIsReady()!;
+    const rect = await isGeminiIsReady(tabId);
     await ws.sendClickEvent(rect!.left + rect.width / 2, rect!.top + rect.height / 2);
-    await sleep(500);
-    await webview.insertText(prompt);
-    await sleep(500);
+
+    if (image) {
+        if (image.startsWith('http') || image.startsWith('blob:http') || image.startsWith('data')) {
+            let imgBlob;
+            if (image.startsWith('data')) {
+                imgBlob = base64ToBlob(image);
+            } else {
+                imgBlob = await urlToBlob(image);
+            }
+            if (imgBlob) {
+                await copyImageToClipboard(imgBlob);
+                await sleep(200);
+                webview!.paste();
+            }
+        }
+    }
+
+    await sleep(200);
+    await webview!.insertText(prompt);
+    await sleep(200);
 
     const rect1 = (await ws.waitForExecJsResult(
         `const textarea = document.querySelector(".send-button")
@@ -82,6 +82,7 @@ export const onPromptGemini = async (tabId: string, prompt: string) => {
     console.log('send-button', rect1);
 
     await ws.sendClickEvent(rect1!.left + rect1.width / 2, rect1!.top + rect1.height / 2);
+    return true;
 };
 
 export function SideWebviewInner({ url, site }: { url: string; site: string }) {
@@ -240,65 +241,6 @@ export function SideWebviewInner({ url, site }: { url: string; site: string }) {
                     }
                 }}
             />
-        </View>
-    );
-}
-
-export function SideWebview() {
-    const { theme } = useBrowserContext();
-    const { env, isMacNotFullScreen } = useIAppContext();
-    const { isMac } = env;
-    const { sideWeb } = useBrowserContext();
-    const site = sideWeb?.site || 'ChatGpt';
-
-    return (
-        <View wh100p relative>
-            <View
-                abs
-                top0
-                right0
-                left0
-                h={44}
-                flx
-                borderBox
-                borderBottom={`1px solid ${theme.separatorCommon}`}
-                bgColor={deepPurple[700]}
-                sx={{
-                    borderTop: `1px solid ${theme.separatorCommon}`
-                }}
-            >
-                <View h100p rowVCenter pl={isMacNotFullScreen ? MAC_TITLE_BAR_WIDTH : 0}>
-                    <TitleBarControlView />
-                    <WebviewTopBarSideActions selected={site} isSideWeb={false} />
-                </View>
-                <View flex1 appRegionDrag />
-                <View h100p rowVCenter jEnd mr={6}>
-                    <PromptAction />
-                    <View rowVCenter ml={6}>
-                        <MoreTopbarDropdown tab={{ twa: false }} tabId={`side_${site}`} />
-                    </View>
-                </View>
-            </View>
-            <View h={36} top={44} abs left0 right0 rowVCenter>
-                <View bgColor={theme.backgroundBrowserActive} w100p h100p rowVCenter px={8}>
-                    <View sx={{ color: 'green' }} rowVCenter>
-                        <View iconFontSize="1rem" icon={'Https'} />
-                    </View>
-                    <View
-                        ml={6}
-                        userSelectNone
-                        text={sideWeb?.site ? getUrlInfo(sideWeb?.site) : ''}
-                    />
-                </View>
-            </View>
-            <View abs left0 right0 top={44 + 40} bottom={0} py={2} px={2} flx>
-                <View flex1 h100p borderRadius={2} borderBox overflowHidden relative>
-                    {['Gemini', 'ChatGpt'].map(site => {
-                        return <SideWebviewInner key={site} site={site} url={getUrlInfo(site)} />;
-                    })}
-                </View>
-            </View>
-            <ControlsView findInPageTop={72} tabId={`side_${sideWeb?.site || 'ChatGpt'}`} />
         </View>
     );
 }

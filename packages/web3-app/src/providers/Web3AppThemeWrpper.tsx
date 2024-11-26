@@ -2,6 +2,7 @@ import { IThemeProvider } from '@web3-explorer/uikit-mui';
 import { createTheme } from '@web3-explorer/uikit-mui/dist/mui/styles';
 import { ReactNode } from 'react';
 import { useTheme } from 'styled-components';
+import { hexToRGBA } from '../common/utils';
 
 export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
     const theme = useTheme();
@@ -17,6 +18,14 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
             }
         },
         components: {
+            MuiAlert: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: hexToRGBA(theme.backgroundPage, 0.1),
+                        letterSpacing: '1px'
+                    }
+                }
+            },
             MuiDialog: {
                 styleOverrides: {
                     paper: {
@@ -31,7 +40,7 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
                         '&.MuiButtonBase-root': {
                             paddingTop: 0,
                             paddingBottom: 0,
-                            minHeight: '36px'
+                            minHeight: '36px!important'
                         }
                     }
                 }

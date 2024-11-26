@@ -1,9 +1,9 @@
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { View } from '@web3-explorer/uikit-view/dist/View';
-import { SideWebSite, useBrowserContext } from '../../providers/BrowserProvider';
-import { useIAppContext } from '../../providers/IAppProvider';
-import WebviewMainEventService from '../../services/WebviewMainEventService';
-import { SUB_WIN_ID } from '../../types';
+import { SideWebSite, useBrowserContext } from '../../../providers/BrowserProvider';
+import { useIAppContext } from '../../../providers/IAppProvider';
+import WebviewMainEventService from '../../../services/WebviewMainEventService';
+import { SUB_WIN_ID } from '../../../types';
 
 export function WebviewTopBarSideActions({
     selected,

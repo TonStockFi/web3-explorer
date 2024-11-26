@@ -2,12 +2,21 @@ import Backdrop from '@web3-explorer/uikit-mui/dist/mui/Backdrop';
 import CircularProgress from '@web3-explorer/uikit-mui/dist/mui/CircularProgress';
 import Snackbar from '@web3-explorer/uikit-mui/dist/mui/Snackbar';
 import { View } from '@web3-explorer/uikit-view/dist/View';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIAppContext } from '../providers/IAppProvider';
 
 export function GlobalUi() {
     const { alert, showAlert, confirm, backdrop, snackbar, showSnackbar } = useIAppContext();
     const { t } = useTranslation();
+    useEffect(() => {
+        function showAlertMessage(e: any) {
+            const { message } = e.detail;
+            showSnackbar({ message });
+        }
+        window.addEventListener('showAlertMessage', showAlertMessage);
+        return () => window.removeEventListener('showAlertMessage', showAlertMessage);
+    }, []);
     return (
         <View empty>
             <Backdrop

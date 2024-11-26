@@ -8,7 +8,7 @@ import DecisionRunInfoService from '../services/DecisionRunInfoService';
 import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { AccountPublic, ProInfoProps, SUB_WIN_ID } from '../types';
+import { ProInfoProps, SUB_WIN_ID } from '../types';
 import { usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
 
@@ -47,17 +47,17 @@ interface AppContextType {
     notifyTestRoi: (roi: RoiInfo) => void;
     notifyWindow: (action: string, payload?: any) => void;
     notifyWindows: (action: string, payload?: any) => void;
-    loadCacheRoiList: (tabId: string, account?: AccountPublic) => Promise<RoiInfo[]>;
+    loadCacheRoiList: (tabId: string, skipSet?: boolean) => Promise<RoiInfo[]>;
     onSelectPage: (page: string) => void;
     switchIsPage: (v: boolean) => void;
     onShowScreenMirror: (v: boolean) => void;
     updateScreenPushDelayMs: (n: number, skipNotify?: boolean) => void;
     onSelectRoi: (id: string) => void;
-    addRoiArea: (r: RoiInfo, cutImageUrl: string, catId: string) => void;
+    addRoiArea: (r: RoiInfo, cutImageUrl: string, tabId: string) => void;
     removeRoiArea: (r: RoiInfo) => void;
     updateRoiArea: (r: RoiInfo) => void;
     getScreenImg: (tabId: string) => void;
-    showRecognition: (catId: string) => void;
+    showRecognition: (tabId: string) => void;
     onStartRecognition: (v: boolean) => void;
     onShowSettings: (v: boolean) => void;
     onShowAccounts: (v: boolean) => void;
@@ -72,6 +72,27 @@ export interface MatchResult {
 const IdCache: Map<string, boolean> = new Map();
 export const MatchResults: Map<string, MatchResult> = new Map();
 
+export const fixRow = (roi: RoiInfo) => {
+    //@ts-ignore
+    delete roi.pageName;
+    //@ts-ignore
+    delete roi.cutAreaRect.start;
+    //@ts-ignore
+    delete roi.cutAreaRect.end;
+    //@ts-ignore
+    delete roi.clickOffsetX;
+    //@ts-ignore
+    delete roi.clickOffsetY;
+
+    //@ts-ignore
+    delete roi.clickOnVisible;
+    //@ts-ignore
+    delete roi.clickIdOnVisible;
+    //@ts-ignore
+    roi.tabId = roi.tabId || roi.catId;
+    //@ts-ignore
+    delete roi.catId;
+};
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function parseRecognitionCatId(recognitionCatId: string) {
@@ -108,7 +129,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
     const [currentDecision, setCurrentDecision] = useState<RoiRunInfo | null>(null);
 
-    const [showScreenMirror, setShowScreenMirror] = useState<boolean>(false);
+    const [showScreenMirror, setShowScreenMirror] = useState<boolean>(true);
     const [isPage, setIsPage] = useState<boolean>(false);
 
     const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
@@ -174,7 +195,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             if (recognitionCatId) {
                 const screenImgUrl = localStorage.getItem(`screen_${recognitionCatId}`);
                 if (screenImgUrl) {
-                    console.log(screenImgUrl);
+                    // console.log(screenImgUrl);
                     window.dispatchEvent(
                         new CustomEvent('onUpdateScreenImgUrl', {
                             detail: {
@@ -227,10 +248,18 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         });
     };
 
-    const loadCacheRoiList = async (recognitionCatId: string) => {
+    const loadCacheRoiList = async (recognitionCatId: string, skipSet?: boolean) => {
         // console.log('loadCacheRoiList', recognitionCatId);
         const rows = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getAll();
-        setRoiAreaList(() => rows);
+        setRoiAreaList(() =>
+            rows.map(row => {
+                fixRow(row);
+                return {
+                    ...row,
+                    tabId: row.tabId || row.catId
+                };
+            })
+        );
         return rows;
     };
     const showRecognition = (recognitionCatId: string) => {
@@ -242,7 +271,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
         setSelectedPage(PAGE_ALL_ROI);
         setRecognitionCatId(r => {
-            console.log({ r, recognitionCatId });
+            // console.log({ r, recognitionCatId });
             const rr = recognitionCatId ? recognitionCatId : r;
             if (!isPlaygroundMaster()) {
                 if (!recognitionCatId) {
@@ -272,7 +301,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
-        console.log('addRoiArea', { recognitionCatId, selectedRoiId, selectedPage });
+        // console.log('addRoiArea', { recognitionCatId, selectedRoiId, selectedPage });
 
         const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
         if (IdCache.get(id)) {
@@ -288,7 +317,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             }, 1000);
         }
         IdCache.set(id, true);
-        let page = '未设置页面';
+        let page = '未设置';
         let pageBelongTo = '';
         if (selectedPage && selectedPage !== PAGE_ALL_ROI) {
             pageBelongTo = selectedPage;

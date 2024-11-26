@@ -24,6 +24,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import EmojiEvents from '@mui/icons-material/EmojiEvents';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExploreIcon from '@mui/icons-material/Explore';
+import Extension from '@mui/icons-material/Extension';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -119,6 +120,7 @@ export type IconList =
     | 'TG'
     | 'Insights'
     | 'Stop'
+    | 'Extension'
     | 'NotificationImportant'
     | 'Https'
     | 'Remove'
@@ -190,6 +192,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     GiClick,
     Stop: StopIcon,
     WifiTetheringError,
+    Extension,
     Insights,
     TabUnselected,
     Fullscreen,

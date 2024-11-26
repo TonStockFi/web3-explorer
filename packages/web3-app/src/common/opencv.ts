@@ -53,6 +53,7 @@ export function matchSimpleTemplate(
     //console.log('matchSimpleTemplate', { maxLoc, maxVal, matchThreshold });
     if (maxVal < matchThreshold && matchThreshold > 0) {
         src.delete();
+        templ.delete()
         dst.delete();
         mask.delete();
         return null;
@@ -66,6 +67,7 @@ export function matchSimpleTemplate(
     // 释放内存
     src.delete();
     dst.delete();
+    templ.delete()
     mask.delete();
     return {
         maxVal,
@@ -155,6 +157,21 @@ export function canvasToBlob(id: string, type: string = 'image/jpeg') {
     });
 }
 
+export function base64ToBlob(base64: string): Blob {
+    // Extract the data portion and MIME type from the Base64 URL
+    const parts = base64.split(',');
+    const mime = parts[0].match(/:(.*?);/)?.[1] || '';
+    const data = atob(parts[1]); // Decode the Base64 string
+
+    // Convert the binary data to an array of 8-bit unsigned integers
+    const uint8Array = new Uint8Array(data.length);
+    for (let i = 0; i < data.length; i++) {
+        uint8Array[i] = data.charCodeAt(i);
+    }
+
+    // Create a Blob from the array
+    return new Blob([uint8Array], { type: mime });
+}
 export async function urlToBlob(url: string) {
     const response = await fetch(url);
     return await response.blob();
@@ -173,7 +190,7 @@ export async function urlToDataUri(url: string): Promise<string> {
 }
 
 
-export const getRoiArea = async (cutAreaRect: CutAreaRect, outputId: string, catId: string) => {
+export const getRoiArea = async (cutAreaRect: CutAreaRect, outputId: string, tabId: string) => {
     //@ts-ignore
     const { cv } = window;
     try {
@@ -187,7 +204,7 @@ export const getRoiArea = async (cutAreaRect: CutAreaRect, outputId: string, cat
             return {};
         }
 
-        let src = cv.imread(`screen_img_copy_${catId.replace('#', '')}`);
+        let src = cv.imread(`screen_img_copy_${tabId.replace('#', '')}`);
         let dst = new cv.Mat();
         const { x, y, w, h } = cutAreaRect;
         let rect = new cv.Rect(x, y, w, h);
