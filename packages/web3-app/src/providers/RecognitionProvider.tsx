@@ -18,7 +18,7 @@ export interface RoiRunInfo {
     isOnline: boolean;
     ts: number;
     matchedId?: string;
-    matchPath?: string[][];
+    matchPath?: string[];
     duration: number;
     total: number;
     inspectTotal: number;

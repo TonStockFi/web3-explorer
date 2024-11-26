@@ -7,7 +7,7 @@ import { showAlertMessage } from '../../common/helpers';
 import { copyImageToClipboard } from '../../common/image';
 import { copyTextToClipboard, currentTs } from '../../common/utils';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { ExtensionType, getRecoId, usePlayground } from '../../providers/PlaygroundProvider';
+import { getRecoId, LLM_TAB, usePlayground } from '../../providers/PlaygroundProvider';
 import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
 import CutAreaService from '../../services/CutAreaService';
 import LLMGeminiService from '../../services/LLMGeminiService';
@@ -25,7 +25,14 @@ export function ScreenshotCutAreaBar({
     viewSize: ViewSize;
 }) {
     const { cutAreaRect, onCutting, onCut } = useScreenshotContext();
-    const { currentExtension, currentAccount, tab, onChangeCurrentExtension } = usePlayground();
+    const {
+        currentExtension,
+        currentLLM,
+        onChangeCurrentLLMTab,
+        currentAccount,
+        tab,
+        onChangeCurrentExtension
+    } = usePlayground();
     const { t, i18n } = useTranslation();
 
     const { width, height } = viewSize;
@@ -59,8 +66,8 @@ export function ScreenshotCutAreaBar({
                     <View wh100p rowVCenter jSpaceBetween>
                         <View
                             onClick={async () => {
-                                if (currentExtension !== ExtensionType.GEMINI) {
-                                    onChangeCurrentExtension(ExtensionType.GEMINI);
+                                if (currentLLM !== LLM_TAB.GEMINI) {
+                                    onChangeCurrentLLMTab(LLM_TAB.GEMINI);
                                 }
                                 const ls = new LLMGeminiService(
                                     LLMGeminiService.getTabIdFromRecoId(
@@ -153,7 +160,9 @@ export function ScreenshotCutAreaBar({
                             hide={!!inPlayground}
                             onClick={async () => {
                                 await copyTextToClipboard(`{x:${x}, y:${y}, h:${h}, w:${w}}`);
-                                showSnackbar({ message: `x:${x}, y:${y}, h:${h}, w:${w} copied!` });
+                                showSnackbar({
+                                    message: `{x:${x}, y:${y}, h:${h}, w:${w}} copied!`
+                                });
                             }}
                             iconButton={{
                                 sx: {

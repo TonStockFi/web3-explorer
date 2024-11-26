@@ -3,10 +3,12 @@ import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
 import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view';
+import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { BrowserTab } from '../../providers/BrowserProvider';
+import { LLM_TAB, usePlayground } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
 import WebviewMuteService from '../../services/WebviewMuteService';
@@ -26,7 +28,7 @@ export default function MoreTopbarDropdown({
 }) {
     const [isMute, setIsMute] = React.useState(false);
     const { isCutEnable, onCut } = useScreenshotContext();
-
+    const { onChangeCurrentExtension, onChangeCurrentLLMTab } = usePlayground();
     const { t } = useTranslation();
     const theme = useTheme();
 
@@ -58,7 +60,7 @@ export default function MoreTopbarDropdown({
                 overflow: 'visible',
                 filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                 mt: 2.5,
-                ml: 0,
+                ml: -0.5,
                 '& li': {
                     paddingTop: '0px!important',
                     paddingBottom: '0px!important',
@@ -84,7 +86,7 @@ export default function MoreTopbarDropdown({
         <View empty>
             <IconButton
                 size={'small'}
-                sx={{ width: 28, height: 28 }}
+                sx={{ width: 28, height: 28, mr: 1 }}
                 onClick={handleClick}
                 edge="start"
                 color="inherit"
@@ -171,7 +173,19 @@ export default function MoreTopbarDropdown({
                     </ListItemIcon>
                     <View text={t(`用Gemini识别并翻译屏幕`)} textFontSize="0.9rem" />
                 </View> */}
-
+                <View
+                    menuItem
+                    hide={!tgUrl || !currentAccount}
+                    onClick={async () => {
+                        setAnchorEl(null);
+                        onChangeCurrentLLMTab(LLM_TAB.GEMINI);
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={<ImageIcon icon={'icon_gemini'} size={18} />} iconSmall />
+                    </ListItemIcon>
+                    <View text={t(`Gemini`)} textFontSize="0.9rem" />
+                </View>
                 <View
                     menuItem
                     hide={!tgUrl || !currentAccount}

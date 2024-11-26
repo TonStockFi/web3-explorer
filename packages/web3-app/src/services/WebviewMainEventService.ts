@@ -160,7 +160,7 @@ export default class WebviewMainEventService {
         const topColor = getTopColor(index);
 
         let height = PLAYGROUND_WIN_HEIGHT;
-        let resizable_ = resizable || false;
+        let resizable_ = resizable || true;
         const minWidth = 368;
         let y = 12;
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
