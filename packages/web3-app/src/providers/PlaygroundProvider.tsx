@@ -127,7 +127,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         onAction('getBounds', { winId: getWinId() })?.then(r => {
             let { x } = r as { x: number };
             const { workArea } = env;
-            const width = v === ExtensionType.NULL ? 368 : 368 * 2;
+            const width = v === ExtensionType.NULL ? 368 : 368 * 3;
             if (workArea.width < x + width) {
                 x = workArea.width - width;
             }

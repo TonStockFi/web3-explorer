@@ -1,6 +1,7 @@
 import { View } from '@web3-explorer/uikit-view';
 import { useLocalStorageState } from '@web3-explorer/utils';
 import { createRef, useEffect } from 'react';
+import { AsideWidth } from '../../constant';
 import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
@@ -13,8 +14,9 @@ export const TopBar = () => {
     const ref = createRef<HTMLDivElement>();
     const { onCut } = useScreenshotContext();
     const { updateAt, currentTabId, tabs, addTab, closeTab, t, openTab } = useBrowserContext();
-    const { env } = useIAppContext();
+
     const [minTabBar, setMinTabBar] = useLocalStorageState('minTabBar', false);
+    const { walletAside } = useIAppContext();
 
     useEffect(() => {
         const handleKeyDown = (event: any) => {
@@ -72,9 +74,17 @@ export const TopBar = () => {
             />
         );
     };
+
     return (
         <View borderBox relative flx rowVCenter m={8} borderRadius={8} mr={0}>
-            <View flex1 rowVCenter overflowXAuto ref={ref} mr={140} miniScrollBar>
+            <View
+                flex1
+                rowVCenter
+                overflowXAuto
+                ref={ref}
+                mr={walletAside ? AsideWidth : 180}
+                miniScrollBar
+            >
                 <TabBar
                     tabId={MAIN_NAV_TYPE.GAME_FI}
                     minTabBar={minTabBar}
