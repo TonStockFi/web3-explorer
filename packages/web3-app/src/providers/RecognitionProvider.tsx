@@ -9,7 +9,7 @@ import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { ProInfoProps, SUB_WIN_ID } from '../types';
-import { usePlayground } from './PlaygroundProvider';
+import { getRecoId, usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
 
 export const CacheImage: Map<string, string> = new Map();
@@ -135,11 +135,11 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
 
     const [selectedRoiId, setSelectedRoiId] = useState<string>('');
-    const { accounts, currentTabId, currentAccount } = usePlayground();
+    const { accounts, tab, currentTabId, currentAccount } = usePlayground();
     const index = currentAccount?.index || 0;
 
     const [clickStopped, setClickStopped] = useState<boolean>(false);
-
+    const recoId = getRecoId(tab||{tabId:currentTabId}, currentAccount!);
     const [recognitionCatId, setRecognitionCatId] = useSessionStorageState(
         'recognitionCatId_' + index,
         ''
@@ -150,25 +150,19 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     );
 
     const [screenPushDelayMs, setScreenPushDelayMs] = useLocalStorageState(
-        'pushDelayMs' + recognitionCatId,
+        'pushDelayMs' + recoId,
         1000
     );
     const [roiAreaList, setRoiAreaList] = useState<RoiInfo[]>([]);
 
     const [startRecognition, setStartRecognition] = useLocalStorageState(
-        'startRecognition_' + recognitionCatId + index,
+        'startRecognition_' + recoId,
         false
     );
 
-    const [showAccounts, setShowAccounts] = useLocalStorageState(
-        'showAccounts_' + recognitionCatId + index,
-        false
-    );
+    const [showAccounts, setShowAccounts] = useLocalStorageState('showAccounts_' + recoId, false);
 
-    const [showSettings, setShowSettings] = useLocalStorageState(
-        'showSettings_' + recognitionCatId + index,
-        false
-    );
+    const [showSettings, setShowSettings] = useLocalStorageState('showSettings_' + recoId, false);
 
     const onSelectRoi = (id: string) => {
         setSelectedRoiId(i => {

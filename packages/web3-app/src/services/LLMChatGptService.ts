@@ -4,25 +4,32 @@ import { sleep } from '../common/utils';
 import LLMService from './LLMService';
 import WebviewService from './WebviewService';
 
-export default class LLMGeminiService extends LLMService {
+export default class LLMChatGptService extends LLMService {
     
     constructor(tabId:string) {
         super(tabId)
     }
     static getTabIdFromRecoId(recoId:string){
-        return `${recoId}_gemini`
+        return `${recoId}_chatgpt`
     }
+
     async getPromptInputRect(timeOut:number = -1){
         const ws = new WebviewService(this.tabId);
         await ws.waitwebviewIsReady()!;
         const rect = (await ws.waitForExecJsResult(
-            `const textarea = document.querySelector("rich-textarea");
-                    if (!textarea) return null;
-                    const rect = textarea.getBoundingClientRect()
-                    return {top:rect.top,left:rect.left,width:rect.width,height:rect.height};`,
+            `const textarea = document.querySelector("textarea")
+        const parentDiv = textarea.parentElement;
+        const rect = parentDiv.getBoundingClientRect();
+        return {top:rect.top,left:rect.left,width:rect.width,height:rect.height}`,
             timeOut
         )) as any;
         return rect;
+    }
+
+    async getSendButtonRect(timeOut:number = -1){
+        const ws = new WebviewService(this.tabId);
+        await ws.waitwebviewIsReady()!;
+        return ws.waitForElemenBoundingClientRect("[data-testid='send-button']",timeOut);
     }
     
     async onPrompt(prompt: string, image?: string) {
@@ -46,29 +53,26 @@ export default class LLMGeminiService extends LLMService {
                 }
             }
         }
-    
-        await sleep(200);
+        
+        await ws.execJs(`document.getElementById("prompt-textarea").innerText = ""`)
+        await sleep(100);
         await webview!.insertText(prompt);
-        await sleep(200);
-    
-        const rect1 = (await ws.waitForExecJsResult(
-            `const textarea = document.querySelector(".send-button")
-            const isDisabled = textarea.getAttribute("aria-disabled") === "true";
-    
-            const rect = textarea.getBoundingClientRect();
-            if(!isDisabled){
-                return {top:rect.top,left:rect.left,width:rect.width,height:rect.height,isDisabled}
-            }`,
-            0
-        )) as any;
-        console.log('send-button', rect1);
-        await ws.sendClickEvent(rect1!.left + rect1.width / 2, rect1!.top + rect1.height / 2);
-        return true;
+        await sleep(100);
+        
+        const rect1 = await ws.waitForElemenBoundingClientRect(`[data-testid='send-button']`)
+        if(rect1){
+            await ws.sendClickEvent(rect1!.left + rect1.width/2, rect1!.top + rect1.height / 2);
+            return true;
+        }else{
+            return false
+        }
     };
 
     override async checkWebviewIsReady() {
+        const rect1 = this.getSendButtonRect(15000)
         const rect= this.getPromptInputRect(15000)
-        this.setIsReady(!!rect);
-        return !!rect;
+        const res = !!rect && !!rect1
+        this.setIsReady(res);
+        return res;
     }
 }

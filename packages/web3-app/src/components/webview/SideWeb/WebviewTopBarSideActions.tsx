@@ -19,11 +19,10 @@ export function WebviewTopBarSideActions({
     const onClick = (site: SideWebSite) => {
         if (location.href.indexOf(SUB_WIN_ID.LLM) > -1) {
             openSideWeb({
-                type: 'COMMON',
                 site
             });
         } else {
-            new WebviewMainEventService().openLLMWindow(env, { type: 'COMMON', site });
+            new WebviewMainEventService().openLLMWindow(env, { site });
         }
     };
     return (

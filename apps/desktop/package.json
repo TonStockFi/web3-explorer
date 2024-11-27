@@ -1,7 +1,7 @@
 {
     "name": "@web3-explorer/desktop",
     "license": "Apache-2.0",
-    "version": "1.0.31",
+    "version": "1.0.32",
     "description": "web3-explorer desktop",
     "main": ".webpack/main",
     "repository": {
@@ -10,16 +10,17 @@
     },
     "scripts": {
         "locales": "ts-node ./task/locales",
-        "start": " BUILD=false electron-forge start",
-        "start1": " BUILD=false electron-forge start",
+        "start": "yarn fix1&& BUILD=false electron-forge start",
         "package": "electron-forge package",
-        "make": "electron-forge make",
+        "make": "yarn fix2 && electron-forge make",
         "make:mac": "DEBUG='electron-forge:*' electron-forge make --platform=darwin",
         "make:arm": "electron-forge make --arch=arm64",
         "make:intel": "electron-forge make --arch=x64",
         "make:universal": "electron-forge make --arch=universal",
         "lint": "eslint --ext .ts,.tsx .",
-        "build": " yarn make",
+        "fix1": "echo \"export const App = () => { return <div>App</div>;};\" > ./src/app/App.tsx",
+        "fix2": "echo \"export { App } from '@web3-explorer/app/dist/src/desktop/App';\" > ./src/app/App.tsx",
+        "build": "yarn make",
         "build:desktop": "yarn build",
         "proxyTonConsole": "lcp --proxyUrl https://dev.tonconsole.com"
     },

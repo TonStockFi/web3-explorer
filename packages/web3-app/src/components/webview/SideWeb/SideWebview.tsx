@@ -1,11 +1,9 @@
 import { deepPurple } from '@mui/material/colors';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 
-import { useRef } from 'react';
 import { MAC_TITLE_BAR_WIDTH } from '../../../constant';
 import { useBrowserContext } from '../../../providers/BrowserProvider';
 import { useIAppContext } from '../../../providers/IAppProvider';
-import { MessageLLM } from '../../../services/LLMGeminiService';
 import { TitleBarControlView } from '../../app/TitleBarControlView';
 import { ControlsView } from '../ControlsView';
 import MoreTopbarDropdown from '../MoreTopbarDropdown';
@@ -29,9 +27,9 @@ const getUrlInfo = (site: string) => {
 
 export function SideWebview() {
     const { theme } = useBrowserContext();
-    const { env, isMacNotFullScreen } = useIAppContext();
-    const { sideWeb, openSideWeb } = useBrowserContext();
-    const currentMessage = useRef<null | MessageLLM>(null);
+    const { isMacNotFullScreen } = useIAppContext();
+    const { sideWeb } = useBrowserContext();
+
     const site = sideWeb?.site || 'Gemini';
 
     return (
@@ -74,10 +72,10 @@ export function SideWebview() {
                     />
                 </View>
             </View>
-            <View abs left0 right0 top={44 + 40} bottom={0} py={2} px={2} flx>
-                <View flex1 h100p borderRadius={2} borderBox overflowHidden relative>
-                    {['Gemini', 'ChatGpt'].map(site => {
-                        return <SideWebviewInner key={site} site={site} url={getUrlInfo(site)} />;
+            <View abs left0 right0 top={44 + 36} bottom={0} py={2} px={2} flx>
+                <View flex1 h100p borderRadius={0} borderBox overflowHidden relative>
+                    {['Gemini', 'ChatGpt'].map(site1 => {
+                        return <SideWebviewInner currentSite={site} key={site1} site={site1} />;
                     })}
                 </View>
             </View>

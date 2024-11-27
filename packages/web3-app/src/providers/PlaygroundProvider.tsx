@@ -35,7 +35,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function getRecoId(tab: BrowserTab, account: AccountPublic) {
+export function getRecoId(tab: Partial<BrowserTab>, account: AccountPublic) {
     return `${tab.tabId}-${account?.id}-${account?.index}`;
 }
 

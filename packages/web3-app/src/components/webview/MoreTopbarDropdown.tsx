@@ -128,51 +128,7 @@ export default function MoreTopbarDropdown({
                     </ListItemIcon>
                     <View text={t(`屏幕截图`)} textFontSize="0.9rem" />
                 </View>
-                {/* <View
-                    hide={!enableGeminiTransScreen}
-                    menuItem
-                    onClick={async () => {
-                        setAnchorEl(null);
-                        const ws = new WebviewService(tabId);
-                        if (!ws.webviewIsReady()) {
-                            showSnackbar({ message: '截取屏幕失败，请等等网页加载完成再试' });
-                            new WebviewMainEventService().openLLMWindow(env, {
-                                type: 'COMMON',
-                                site: 'Gemini'
-                            });
-                        } else {
-                            showBackdrop(true);
-                            try {
-                                const screenBlob = await ws.getScreenImageBlob();
-                                if (screenBlob) {
-                                    await copyImageToClipboard(screenBlob);
-                                    const imgData = await urlToDataUri(
-                                        URL.createObjectURL(screenBlob)
-                                    );
-                                    new WebviewMainEventService().openLLMWindow(env, {
-                                        site: 'Gemini',
-                                        type: 'TRANS_IMG_GEMINI',
-                                        ts: currentTs(),
-                                        imgData
-                                    });
-                                }
-                            } catch (error) {
-                                console.error(error);
-                            } finally {
-                                showBackdrop(false);
-                            }
-                        }
-                    }}
-                >
-                    <ListItemIcon>
-                        <View
-                            iconColor="red"
-                            icon={<ImageIcon icon={'icon_gemini'} size={18} />}
-                            iconSmall
-                        />
-                    </ListItemIcon>
-                    <View text={t(`用Gemini识别并翻译屏幕`)} textFontSize="0.9rem" />
-                </View> */}
+
                 <View
                     menuItem
                     hide={!tgUrl || !currentAccount}

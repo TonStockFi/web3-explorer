@@ -3,14 +3,26 @@ import { WebviewTag } from 'electron';
 import { useState } from 'react';
 
 import { START_URL } from '../../../constant';
+import { useScreenshotContext } from '../../../providers/ScreenshotProvider';
 import LLMGeminiService from '../../../services/LLMGeminiService';
 import LogService from '../../../services/LogService';
 import WebviewService from '../../../services/WebviewService';
 import { WebveiwEventType } from '../../../types';
 import { LoadingView } from '../../LoadingView';
+import ScreenshotView from '../ScreenshotView';
 import WebViewBrowser from '../WebViewBrowser';
 
-export function LLmWebview({ url, tabId, pid }: { pid: string; url: string; tabId: string }) {
+export function LLmWebview({
+    currentTabId,
+    url,
+    tabId,
+    pid
+}: {
+    currentTabId?: string;
+    pid: string;
+    url: string;
+    tabId: string;
+}) {
     const [loading, setLoading] = useState<boolean>(true);
 
     const onEvent = async (
@@ -43,22 +55,27 @@ export function LLmWebview({ url, tabId, pid }: { pid: string; url: string; tabI
             ws.goTo(url);
         }
     };
+    const { isCutEnable } = useScreenshotContext();
 
     return (
         <View flex1 h100p borderBox>
+            {Boolean(isCutEnable) && <ScreenshotView tabId={tabId} />}
             <WebViewBrowser
                 hideBoxShadow
+                borderRadius={0}
                 url={START_URL}
                 tabId={tabId}
                 partitionId={pid}
                 webviewProps={{
                     onContextMenu: (e: { params: any; webContentsId: number; tabId: string }) => {
-                        console.log('onContextMenu', e);
-                        window.dispatchEvent(
-                            new CustomEvent('onWebviewContextMenu', {
-                                detail: e
-                            })
-                        );
+                        console.log('onContextMenu', e, { currentTabId });
+                        if (currentTabId === e.tabId) {
+                            window.dispatchEvent(
+                                new CustomEvent('onWebviewContextMenu', {
+                                    detail: e
+                                })
+                            );
+                        }
                     },
 
                     onError: error => {
@@ -76,7 +93,7 @@ export function LLmWebview({ url, tabId, pid }: { pid: string; url: string; tabI
                 }}
             />
             <LoadingView
-                borderRadius={8}
+                borderRadius={0}
                 onRefresh={async () => {
                     const ws = new WebviewService(tabId);
                     if (ws.getWebview()) {

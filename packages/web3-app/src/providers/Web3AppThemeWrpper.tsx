@@ -26,6 +26,13 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
                     }
                 }
             },
+            MuiSvgIcon: {
+                styleOverrides: {
+                    root: {
+                        color: theme.textPrimary
+                    }
+                }
+            },
             MuiDialog: {
                 styleOverrides: {
                     paper: {
@@ -40,7 +47,7 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
                         '&.MuiButtonBase-root': {
                             paddingTop: 0,
                             paddingBottom: 0,
-                            minHeight: '36px!important'
+                            minHeight: '30px!important'
                         }
                     }
                 }

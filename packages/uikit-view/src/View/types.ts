@@ -3,6 +3,7 @@ import type { BoxProps } from '@web3-explorer/uikit-mui/dist/mui/Box';
 import type { ButtonProps } from '@web3-explorer/uikit-mui/dist/mui/Button';
 import type { CardProps } from '@web3-explorer/uikit-mui/dist/mui/Card';
 import type { ChipProps } from '@web3-explorer/uikit-mui/dist/mui/Chip';
+import type { CircularProgressProps } from '@web3-explorer/uikit-mui/dist/mui/CircularProgress';
 import type { DialogProps } from '@web3-explorer/uikit-mui/dist/mui/Dialog';
 import type { DividerProps } from '@web3-explorer/uikit-mui/dist/mui/Divider';
 import type { DrawerProps } from '@web3-explorer/uikit-mui/dist/mui/Drawer';
@@ -26,6 +27,7 @@ export interface UtilsProps {
     transitionTransXEase?:number;
     transitionTransYEase?:number;
     loading?:boolean;
+    loadingProps?:CircularProgressProps;
     list?:boolean,
     listItemText?:string;
     listSelected?:boolean;

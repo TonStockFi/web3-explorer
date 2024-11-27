@@ -36,16 +36,7 @@ export default class RoiService {
         this.indexedDbImg = new IndexedDbCache().init(`roi-Img/${tabId}`);
         this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${tabId}`);
     }
-
-    static async getProVersionId(tabId:string): Promise<{free:number, pro:number}> {
-        const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
-        return indexedDb.get(tabId) || {pro:0,free:0};
-    }
-
-    static async saveProVersionId(tabId: string,data:{free:number, pro:number}): Promise<void> {
-        const indexedDb = new IndexedDbCache().init(`roi-Ids/versions`);
-        await indexedDb.put(tabId,data);
-    }
+    
 
     async getImage(id: string): Promise<string> {
         return await this.indexedDbImg.get(id);

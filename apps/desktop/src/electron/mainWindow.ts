@@ -404,25 +404,50 @@ export class MainWindow {
             });
         });
     }
-    static handleShotcuts(win: BrowserWindow) {
-        const { shortcutKeys } = this;
-        win.on('blur', () => {
-            let flag = false;
-            [
-                ...Array.from(this.windows)
-                    .filter(row => !row[0].startsWith('PLAYGROUND_'))
-                    .map(row => row[1]),
-                this.mainWindow
-            ].forEach(win => {
-                if (win && win.isFocused()) {
-                    flag = true;
-                }
-            });
-            if (!flag) {
-                shortcutKeys.forEach(key => {
-                    globalShortcut.unregister(key);
-                });
+    static onBlur(win: BrowserWindow){
+        const {shortcutKeys} = this;
+        let isAnyWindowFocused = false;
+
+        [
+            ...Array.from(this.windows)
+                .map(row => row[1]),
+            this.mainWindow
+        ].forEach(window => {
+            if (window && window.isFocused()) {
+                isAnyWindowFocused = true;
             }
+        });
+
+        if (!isAnyWindowFocused) {
+            shortcutKeys.forEach(key => {
+                globalShortcut.unregister(key);
+            });
+        }
+
+    }
+    static onFocus(win: BrowserWindow){
+        const {shortcutKeys} = this;
+        shortcutKeys.forEach(key => {
+            globalShortcut.register(key, () => {
+                [
+                    ...Array.from(this.windows)
+                        .map(row => row[1]),
+                    this.mainWindow
+                ].forEach(window => {
+                    if (window && window.isFocused()) {
+                        window.webContents.send('onMainMessage', {
+                            action: 'onShortcut',
+                            payload: { key }
+                        });
+                    }
+                });
+            });
+        });
+
+    }
+    static handleShotcuts(win: BrowserWindow) {
+        win.on('blur', () => {
+            this.onBlur(win)
 
             win.webContents.send('onMainMessage', {
                 action: 'onBlur',
@@ -435,23 +460,8 @@ export class MainWindow {
                 action: 'onFocus',
                 payload: {}
             });
-            shortcutKeys.forEach(key => {
-                globalShortcut.register(key, () => {
-                    [
-                        ...Array.from(this.windows)
-                            .filter(row => !row[0].startsWith('PLAYGROUND_'))
-                            .map(row => row[1]),
-                        this.mainWindow
-                    ].forEach(win => {
-                        if (win && win.isFocused()) {
-                            win.webContents.send('onMainMessage', {
-                                action: 'onShortcut',
-                                payload: { key }
-                            });
-                        }
-                    });
-                });
-            });
+            this.onFocus(win)
+            
         });
     }
     static onSiteMessage(message: { action: string; payload: any }, senderId: number) {

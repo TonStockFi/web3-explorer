@@ -8,15 +8,15 @@ import { useLocalStorageState } from '@web3-explorer/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBrowserContext } from '../../providers/BrowserProvider';
-import { useIAppContext } from '../../providers/IAppProvider';
 
-import { onPromptChatGpt, onPromptGemini } from './SideWeb/SideWebviewInner';
+import LLMChatGptService from '../../services/LLMChatGptService';
+import LLMGeminiService from '../../services/LLMGeminiService';
 import { getFocusWebviewByTabId } from './WebViewBrowser';
 
 export function PromptAction({}: {}) {
     const { theme, sideWeb } = useBrowserContext();
     const { t } = useTranslation();
-    const { env } = useIAppContext();
+
     const [prompts, setPrompts] = useLocalStorageState('prompts_9', '');
 
     const [showConfig, setShowConfig] = useState<boolean>(false);
@@ -140,10 +140,10 @@ ${t('PleaseTranslateTo').replace(`%{lang}`, t('zh_CN'))}`;
                                     const tabId = `side_${sideWeb!.site}`;
                                     const webview = getFocusWebviewByTabId(tabId);
                                     if (webview && sideWeb?.site === 'ChatGpt') {
-                                        await onPromptChatGpt(tabId, prompt.trim());
+                                        new LLMChatGptService(tabId).onPrompt(prompt.trim());
                                     }
                                     if (webview && sideWeb?.site === 'Gemini') {
-                                        await onPromptGemini(tabId, prompt.trim());
+                                        new LLMGeminiService(tabId).onPrompt(prompt.trim());
                                     }
                                 }}
                                 listItemText={prompt}

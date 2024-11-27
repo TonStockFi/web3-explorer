@@ -3,15 +3,17 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import { showAlertMessage } from '../../common/helpers';
+import { getWinId, showAlertMessage } from '../../common/helpers';
 import { copyImageToClipboard } from '../../common/image';
+import { urlToDataUri } from '../../common/opencv';
 import { copyTextToClipboard, currentTs } from '../../common/utils';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { getRecoId, LLM_TAB, usePlayground } from '../../providers/PlaygroundProvider';
 import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
 import CutAreaService from '../../services/CutAreaService';
 import LLMGeminiService from '../../services/LLMGeminiService';
-import { ViewSize } from '../../types';
+import WebviewMainEventService from '../../services/WebviewMainEventService';
+import { SUB_WIN_ID, ViewSize } from '../../types';
 
 export function ScreenshotCutAreaBar({
     handleRecognition,
@@ -25,14 +27,7 @@ export function ScreenshotCutAreaBar({
     viewSize: ViewSize;
 }) {
     const { cutAreaRect, onCutting, onCut } = useScreenshotContext();
-    const {
-        currentExtension,
-        currentLLM,
-        onChangeCurrentLLMTab,
-        currentAccount,
-        tab,
-        onChangeCurrentExtension
-    } = usePlayground();
+    const { currentLLM, onChangeCurrentLLMTab, currentAccount, tab } = usePlayground();
     const { t, i18n } = useTranslation();
 
     const { width, height } = viewSize;
@@ -48,7 +43,7 @@ export function ScreenshotCutAreaBar({
     if (top + barHeight > height) {
         top = y - 4 - barHeight;
     }
-    const { showSnackbar } = useIAppContext();
+    const { showSnackbar, env } = useIAppContext();
     const theme = useTheme();
     return (
         <>
@@ -66,30 +61,55 @@ export function ScreenshotCutAreaBar({
                     <View wh100p rowVCenter jSpaceBetween>
                         <View
                             onClick={async () => {
-                                if (currentLLM !== LLM_TAB.GEMINI) {
-                                    onChangeCurrentLLMTab(LLM_TAB.GEMINI);
-                                }
-                                const ls = new LLMGeminiService(
-                                    LLMGeminiService.getTabIdFromRecoId(
-                                        getRecoId(tab!, currentAccount!)
-                                    )
-                                );
-                                const ready = await ls.checkGeminiWebviewIsReady();
-                                if (!ready) {
-                                    return showAlertMessage('Genimi 加载失败，请重试');
-                                }
                                 const prompt = `${t('RecognitionImageTransTo').replace(
                                     '%{lang}',
                                     t(i18n.language)
                                 )}`;
-                                ls.sendMessageOnce({
+                                const message = {
                                     id: LLMGeminiService.genId(),
                                     tabId: tab?.tabId!,
                                     ts: currentTs(),
-                                    prompt,
-                                    cutArea: cutAreaRect
-                                });
+                                    prompt
+                                };
 
+                                if (!getWinId()) {
+                                    const imgBlob = await CutAreaService.getCutBlob(
+                                        tabId,
+                                        cutAreaRect
+                                    );
+
+                                    if (!imgBlob) {
+                                        return showAlertMessage('截图失败');
+                                    }
+
+                                    const url = URL.createObjectURL(imgBlob);
+                                    const imageUrl = await urlToDataUri(url);
+                                    new WebviewMainEventService().openLLMWindow(env, {
+                                        site: 'Gemini',
+                                        message: {
+                                            ...message,
+                                            imageUrl
+                                        }
+                                    });
+                                } else {
+                                    if (currentLLM !== LLM_TAB.GEMINI) {
+                                        onChangeCurrentLLMTab(LLM_TAB.GEMINI);
+                                    }
+                                    const ls = new LLMGeminiService(
+                                        LLMGeminiService.getTabIdFromRecoId(
+                                            getRecoId(tab!, currentAccount!)
+                                        )
+                                    );
+                                    const ready = await ls.checkWebviewIsReady();
+                                    if (!ready) {
+                                        return showAlertMessage('Genimi 加载失败，请重试');
+                                    }
+
+                                    ls.sendMessageOnce({
+                                        ...message,
+                                        cutArea: cutAreaRect
+                                    });
+                                }
                                 onCut(false);
                             }}
                             iconButton={{
@@ -98,6 +118,7 @@ export function ScreenshotCutAreaBar({
                                     height: 24
                                 }
                             }}
+                            hide={getWinId() === SUB_WIN_ID.LLM}
                             iconProps={{ sx: { width: 16, height: 16 } }}
                             tips={t('TranslateInGemini')}
                             iconButtonSmall

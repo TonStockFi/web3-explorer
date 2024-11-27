@@ -133,7 +133,6 @@ export default class WebviewMainEventService {
             sideWeb
                 ? sideWeb
                 : {
-                      type: 'COMMON',
                       site: 'ChatGpt'
                   }
         );

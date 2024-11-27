@@ -35,6 +35,7 @@ declare const IS_DEV: string;
 export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     const {
         loading,
+        loadingProps,
         card,
         cardProps,
         list,
@@ -112,7 +113,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     if (loading) {
         return (
             <Box {...handleProps(props_)}>
-                <Loading />
+                <Loading circularProgressProps={loadingProps!} />
             </Box>
         );
     }

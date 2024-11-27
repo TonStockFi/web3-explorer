@@ -3,6 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import { DefaultTheme, useTheme } from 'styled-components';
 import { currentTs } from '../common/utils';
+import LLMService, { MessageLLM } from '../services/LLMService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { MAIN_NAV_TYPE } from '../types';
 import { useIAppContext } from './IAppProvider';
@@ -32,11 +33,12 @@ export type SideWebType =
 export type SideWebSite = 'ChatGpt' | 'Gemini' | 'Telegram' | 'Twitter' | 'Discord';
 
 export interface SideWebProps {
+    site: SideWebSite;
+    message?: MessageLLM;
+    type?: SideWebType;
     value?: string;
     imgData?: string;
     ts?: number;
-    site: SideWebSite;
-    type: SideWebType;
 }
 
 interface BrowserContextType {
@@ -70,12 +72,13 @@ export const useBrowserContext = () => {
 
 export const BrowserTabs: Map<string, BrowserTab> = new Map();
 let Tabs: BrowserTab[] = [];
+
 export const IBrowserProvider = (props: { children: ReactNode }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const theme = useTheme();
     const { children } = props || {};
     const { showWalletAside } = useIAppContext();
-    const [sideWeb, setSideWeb] = useState<null | SideWebProps>(null);
+    const [sideWeb, setSideWeb] = useSessionStorageState<null | SideWebProps>('sideWeb', null);
     const [updateAt, setUpdateAt] = useState(currentTs());
 
     const [currentTabId, setCurentTabId] = useSessionStorageState<string>(
@@ -98,12 +101,21 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
                     );
                     if (event.message.action === 'onTgSiteSelectText') {
                         const { text } = event.message.payload as { text: string };
-                        // console.log('onTgSiteSelectText', { text });
+
+                        const prompt = `${t('PleaseTranslateTo').replace(
+                            '%{lang}',
+                            t(i18n.language)
+                        )}: ${text}`;
+
+                        const message = {
+                            id: LLMService.genId(),
+                            tabId: currentTabId,
+                            ts: currentTs(),
+                            prompt
+                        };
                         new WebviewMainEventService().openLLMWindow(env, {
                             site: 'ChatGpt',
-                            value: text,
-                            type: 'TRANS_CHATGPT',
-                            ts: currentTs()
+                            message
                         });
                     } else {
                         window.dispatchEvent(

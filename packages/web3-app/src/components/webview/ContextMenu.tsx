@@ -5,8 +5,10 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import React, { createRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { currentTs } from '../../common/utils';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
+import LLMGeminiService from '../../services/LLMGeminiService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
@@ -31,7 +33,7 @@ export default function ContextMenu({
 
     const { x, y, selectionText } = contextMenu.params;
     const theme = useTheme();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const webview = getFocusWebview(webContentsId);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -58,7 +60,7 @@ export default function ContextMenu({
             }
         }
     };
-    console.log('contextMenu >>', contextMenu, tabId, selectionText);
+    // console.log('contextMenu >>', contextMenu, tabId, selectionText);
     if (!env.isDev) {
         if (!tabId) {
             return null;
@@ -142,11 +144,20 @@ export default function ContextMenu({
                     menuItem
                     onClick={() => {
                         handleClose();
+                        const prompt = `${t('PleaseTranslateTo').replace(
+                            '%{lang}',
+                            t(i18n.language)
+                        )}: ${selectionText}`;
 
+                        const message = {
+                            id: LLMGeminiService.genId(),
+                            tabId: tabId,
+                            ts: currentTs(),
+                            prompt
+                        };
                         new WebviewMainEventService().openLLMWindow(env, {
                             site: 'ChatGpt',
-                            type: 'TRANS_CHATGPT',
-                            value: selectionText
+                            message
                         });
                     }}
                 >

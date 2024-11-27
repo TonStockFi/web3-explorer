@@ -5,13 +5,13 @@ import { useState } from 'react';
 import { useTheme } from 'styled-components';
 import { sleep } from '../../../common/utils';
 import { usePlayground } from '../../../providers/PlaygroundProvider';
-import LLMGeminiService from '../../../services/LLMGeminiService';
+import LLMChatGptService from '../../../services/LLMChatGptService';
 import WebviewService from '../../../services/WebviewService';
 import { LoopView } from '../../common/LoopView';
 import { ControlsView } from '../ControlsView';
 import { LLmWebview } from './LLmWebview';
 
-export function LLmGeminiWebview({
+export function LLmChatGptWebview({
     currentTabId,
     pid,
     tabId
@@ -20,14 +20,14 @@ export function LLmGeminiWebview({
     pid?: string;
     tabId: string;
 }) {
-    const url = 'https://gemini.google.com/app';
+    const url = 'https://chatgpt.com';
     const [reply, setReply] = useState('');
     const { currentAccount } = usePlayground();
 
     const pid1 = pid || `p_llm_${currentAccount!.id}_${currentAccount!.index || 0}`;
 
     useOnce(() => {
-        const ls = new LLMGeminiService(tabId);
+        const ls = new LLMChatGptService(tabId);
         ls.setIsReady(false);
         ls.getAll().then(rows => {
             rows.forEach(element => {
@@ -36,19 +36,19 @@ export function LLmGeminiWebview({
         });
     });
 
-    const checkGeminiCb = async () => {
-        await new LLMGeminiService(tabId).checkWebviewIsReady();
+    const checkChatGptCb = async () => {
+        await new LLMChatGptService(tabId).checkWebviewIsReady();
     };
 
     const pullMessageCb = async () => {
-        const ls = new LLMGeminiService(tabId);
+        const ls = new LLMChatGptService(tabId);
         if (!ls.getIsReady()) {
             return;
         }
         const message = await ls.pullMessage();
 
         if (message) {
-            console.debug('llm gemini pullMessage', message);
+            console.debug('llm ChatGpt pullMessage', message);
             const prompt = message.prompt.replace(/MESSAGE_ID/g, message.id);
             let { imageUrl, cutArea } = message;
             if (cutArea) {
@@ -67,11 +67,11 @@ export function LLmGeminiWebview({
                 }
             }
             let res = '';
-            console.debug('llm gemini onPromptGemini');
+            console.debug('llm ChatGpt onPromptChatGpt');
             await ls.onPrompt(prompt, imageUrl);
             if (message.formatResult) {
                 res = await ls.waitWebviewMessageReply(message);
-                console.debug('llm gemini waitWebviewMessageReply', res);
+                console.debug('llm ChatGpt waitWebviewMessageReply', res);
                 setReply(res || '');
             }
             ls.fisnishMessage(message.id, res);
@@ -95,7 +95,7 @@ export function LLmGeminiWebview({
                     <View json={[reply]}></View>
                 </View>
             </View>
-            <LoopView callback={checkGeminiCb} delay={1000}></LoopView>
+            <LoopView callback={checkChatGptCb} delay={1000}></LoopView>
             <LoopView callback={pullMessageCb} delay={100}></LoopView>
             <View abs left0 right0 top={0} bottom={0} flx>
                 <View flex1 h100p borderBox overflowHidden relative>
