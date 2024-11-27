@@ -21,7 +21,7 @@ export function Corner({
     isSelected: boolean;
     hover: boolean;
 }) {
-    const { theme, t } = useBrowserContext();
+    const { theme } = useBrowserContext();
     if (!isSelected) return null;
     return (
         <View w={width} h100p aEnd jEnd relative overflowHidden>
