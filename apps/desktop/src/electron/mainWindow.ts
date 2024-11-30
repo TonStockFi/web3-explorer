@@ -623,8 +623,20 @@ export class MainWindow {
                     toWinId?: string;
                 }
             );
-        } else if ('mainOpenDevTools' === messageAction) {
-            this.mainWindow.webContents.openDevTools();
+        } else if ('openDevTools' === messageAction) {
+            const { webContentsId,webContentsIdDevTools,title,mode } = messageValue;
+            const wc = webContents.fromId(webContentsId)
+            if(webContentsIdDevTools){
+                const wcDevTools = webContents.fromId(webContentsIdDevTools)
+                wc.setDevToolsWebContents(wcDevTools)
+                wc.openDevTools()
+            }else{
+                wc.openDevTools({
+                    activate:true,
+                    title: title ||undefined,
+                    mode:mode|| "undocked"
+                })
+            }
         } else if ('openWindow' === messageAction) {
             await MainWindow.createWindow(messageValue);
         } else if ('getOpenCvData' === messageAction) {

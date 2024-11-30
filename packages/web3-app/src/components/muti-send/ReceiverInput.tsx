@@ -156,7 +156,7 @@ export const ReceiverInput: FC<{
                     }}
                     type={'number'}
                     sx={{ width: 80, mr: 1 }}
-                ></InputBlock>
+                />
             )}
 
             <InputBlockStyled valid={!fieldState.invalid} focus={false}>

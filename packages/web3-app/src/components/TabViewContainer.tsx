@@ -36,6 +36,7 @@ export function a11yProps(index: number) {
 }
 
 export interface TabItem {
+    id?: string | number;
     title: string;
     icon?: React.ReactElement<unknown>;
     props?: any;
@@ -50,9 +51,11 @@ export default function ({
     isVertical,
     currentTabIndex,
     scrollable,
+    tabsSx,
     onChangeTabIndex
 }: {
     scrollable?: boolean;
+    tabsSx?: any;
     isVertical?: boolean;
     panelStyle?: CSSProperties;
     topTabStyle?: CSSProperties;
@@ -76,7 +79,8 @@ export default function ({
                     sx={{
                         borderBottom: !isVertical ? 1 : 0,
                         borderRight: isVertical ? 1 : 0,
-                        borderColor: 'divider'
+                        borderColor: 'divider',
+                        ...tabsSx
                     }}
                 >
                     {tabs.map((tab: TabItem, index: number) => (

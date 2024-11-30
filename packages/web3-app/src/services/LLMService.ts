@@ -101,7 +101,7 @@ export default class LLMService {
             }
         },timeout)
     }
-    async getAll() {
+    async getAll():Promise<MessageLLM[]> {
         try {
             return await this.indexedDb.getAll();
         } catch (e) {
@@ -127,6 +127,15 @@ export default class LLMService {
 
     async remove(id: string) {
         await this.indexedDb.delete(`${id}`);
+    }
+
+
+    async emptyQueue() {
+        const rows = await this.getAll();
+        for (let index = 0; index < rows.length; index++) {
+            const row = rows[index];
+            await this.remove(row.id)
+        }
     }
 
     async checkWebviewIsReady() {

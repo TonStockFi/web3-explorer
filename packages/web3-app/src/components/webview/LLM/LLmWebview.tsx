@@ -16,8 +16,10 @@ export function LLmWebview({
     currentTabId,
     url,
     tabId,
-    pid
+    pid,
+    noCut
 }: {
+    noCut?: boolean;
     currentTabId?: string;
     pid: string;
     url: string;
@@ -38,7 +40,7 @@ export function LLmWebview({
         if (eventType === 'console-message') {
             const res = LLMGeminiService.parseMasterTabIdFromTabId(tabId);
             if (res && res.tabId) {
-                LogService.handleConsoleLogMessage(res.tabId, payload);
+                new LogService(res.tabId).addLog(payload);
             }
         }
     };
@@ -59,7 +61,7 @@ export function LLmWebview({
 
     return (
         <View flex1 h100p borderBox>
-            {Boolean(isCutEnable) && <ScreenshotView tabId={tabId} />}
+            {Boolean(isCutEnable && !noCut) && <ScreenshotView tabId={tabId} />}
             <WebViewBrowser
                 hideBoxShadow
                 borderRadius={0}

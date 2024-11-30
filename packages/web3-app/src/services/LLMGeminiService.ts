@@ -25,6 +25,20 @@ export default class LLMGeminiService extends LLMService {
         return rect;
     }
     
+    async inputPrompt(prompt: string) {
+        const ws = new WebviewService(this.tabId);
+        const webview = await ws.waitwebviewIsReady();
+        const rect = await this.getPromptInputRect();
+        await ws.sendClickEvent(rect!.left + rect.width / 2, rect!.top + rect.height / 2);
+    
+        await ws.execJs(
+            `document.querySelector("rich-textarea p").innerText="";`
+        )
+
+        await sleep(200);
+        await webview!.insertText(prompt);
+        
+    }
     async onPrompt(prompt: string, image?: string) {
         const ws = new WebviewService(this.tabId);
         const webview = await ws.waitwebviewIsReady();
@@ -47,15 +61,18 @@ export default class LLMGeminiService extends LLMService {
             }
         }
     
+        await ws.execJs(
+            `document.querySelector("rich-textarea p").innerText="";`
+        )
         await sleep(200);
         await webview!.insertText(prompt);
         await sleep(200);
     
         const rect1 = (await ws.waitForExecJsResult(
-            `const textarea = document.querySelector(".send-button")
-            const isDisabled = textarea.getAttribute("aria-disabled") === "true";
+            `const sendBtn = document.querySelector(".send-button")
+            const isDisabled = sendBtn.getAttribute("aria-disabled") === "true";
     
-            const rect = textarea.getBoundingClientRect();
+            const rect = sendBtn.getBoundingClientRect();
             if(!isDisabled){
                 return {top:rect.top,left:rect.left,width:rect.width,height:rect.height,isDisabled}
             }`,
@@ -67,7 +84,7 @@ export default class LLMGeminiService extends LLMService {
     };
 
     override async checkWebviewIsReady() {
-        const rect= this.getPromptInputRect(15000)
+        const rect= await this.getPromptInputRect(15000)
         this.setIsReady(!!rect);
         return !!rect;
     }

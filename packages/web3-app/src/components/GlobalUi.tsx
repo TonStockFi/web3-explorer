@@ -7,15 +7,24 @@ import { useTranslation } from 'react-i18next';
 import { useIAppContext } from '../providers/IAppProvider';
 
 export function GlobalUi() {
-    const { alert, showAlert, confirm, backdrop, snackbar, showSnackbar } = useIAppContext();
+    const { alert,showBackdrop, showAlert, confirm, backdrop, snackbar, showSnackbar } = useIAppContext();
     const { t } = useTranslation();
     useEffect(() => {
         function showAlertMessage(e: any) {
             const { message } = e.detail;
             showSnackbar({ message });
         }
+
+        function showGlobalLoading(e: any) {
+            const { visible } = e.detail;
+            showBackdrop(visible);
+        }
+        window.addEventListener('showGlobalLoading', showGlobalLoading);
         window.addEventListener('showAlertMessage', showAlertMessage);
-        return () => window.removeEventListener('showAlertMessage', showAlertMessage);
+        return () => {
+            window.removeEventListener('showAlertMessage', showAlertMessage);
+            window.removeEventListener('showGlobalLoading', showGlobalLoading);
+        }
     }, []);
     return (
         <View empty>

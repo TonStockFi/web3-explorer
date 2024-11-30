@@ -33,7 +33,7 @@ export function EmptyView({
                 onClick={onReload}
                 button={reloadTitle || '刷新'}
                 buttonVariant="outlined"
-            ></View>
+            />
         </View>
     );
 }

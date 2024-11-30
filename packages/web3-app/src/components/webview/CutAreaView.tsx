@@ -127,9 +127,6 @@ export default function CutAreaRectView({
                 if (tabId && recognitionCatId) {
                     handleRecognition(tabId, t);
                     onCutting(false);
-                    setTimeout(() => {
-                        onCut(false);
-                    }, 200);
                 } else {
                     onCutting(false);
                 }

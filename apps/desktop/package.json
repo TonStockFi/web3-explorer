@@ -1,7 +1,7 @@
 {
     "name": "@web3-explorer/desktop",
     "license": "Apache-2.0",
-    "version": "1.0.32",
+    "version": "1.0.34",
     "description": "web3-explorer desktop",
     "main": ".webpack/main",
     "repository": {
@@ -10,7 +10,7 @@
     },
     "scripts": {
         "locales": "ts-node ./task/locales",
-        "start": "yarn fix1&& BUILD=false electron-forge start",
+        "start": "yarn fix2 && BUILD=false electron-forge start",
         "package": "electron-forge package",
         "make": "yarn fix2 && electron-forge make",
         "make:mac": "DEBUG='electron-forge:*' electron-forge make --platform=darwin",

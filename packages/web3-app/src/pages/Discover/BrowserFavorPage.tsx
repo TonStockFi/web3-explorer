@@ -246,7 +246,7 @@ export function BrowserFavorPage() {
                 }}
                 id={editFavorId}
                 onClose={() => setEditFavorId('')}
-            ></EditFavor>
+            />
         </Page>
     );
 }

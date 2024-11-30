@@ -180,7 +180,7 @@ export default function DeviceAuth({
                 setAddServer={(v: boolean) => {
                     setShowAddServer(v);
                 }}
-            ></AddServerView>
+            />
         </View>
     );
 }

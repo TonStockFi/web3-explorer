@@ -69,8 +69,8 @@ export default class LLMChatGptService extends LLMService {
     };
 
     override async checkWebviewIsReady() {
-        const rect1 = this.getSendButtonRect(15000)
-        const rect= this.getPromptInputRect(15000)
+        const rect1 = await this.getSendButtonRect(15000)
+        const rect= await this.getPromptInputRect(15000)
         const res = !!rect && !!rect1
         this.setIsReady(res);
         return res;

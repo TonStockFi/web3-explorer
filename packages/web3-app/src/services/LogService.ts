@@ -1,23 +1,51 @@
-let CacheMessageList: { message: string }[] = [];
+let CacheMessageList: Map<string,{ message: string }[]> = new Map();
 
 export default class LogService {
-    static handleConsoleLogMessage(tabId: string, { message }: { message: string }) {
-        if (message.startsWith(' > ')) {
-            const max = 100;
+    tabId: string;
+    prefix: string;
 
-            CacheMessageList =
-                CacheMessageList.length > max
-                    ? [{ message }, ...CacheMessageList.slice(0, 100)]
-                    : [{ message }, ...CacheMessageList];
-            localStorage.setItem(`console_${tabId}`, JSON.stringify(CacheMessageList));
+    constructor(tabId:string,prefix?:string){
+        this.tabId = tabId
+        this.prefix = `[${prefix}]` || "[>>>]"
+    }
+    getStorageKey(){
+        const key = `console_${this.tabId}_${this.prefix}`
+        return key;
+    }
+    addLog({message}:{message:string}){
+        if (message.indexOf(`[${this.prefix}]`) > -1) {
+            const max = 1000;
+            const messageList = this.getLogs()
+            CacheMessageList.set(this.getStorageKey(),messageList.length > max ? 
+            [
+                {message},
+                ...messageList.slice(0,max)
+            ]:
+            [
+                {message},
+                ...messageList
+            ])
         }
+        
     }
-    static getConsoleLogMessage(tabId: string) {
-        const res = localStorage.getItem(`console_${tabId}`);
-        return res ? JSON.parse(res) : []
+    getLogs(){
+        return CacheMessageList.get(this.getStorageKey()) || [];
     }
 
-    static clearConsoleLogMessage(tabId: string) {
-        localStorage.removeItem(`console_${tabId}`);
+    clearLogs(){
+        CacheMessageList.delete(this.getStorageKey())
     }
+    
+
+    static getConsoleLogMessage(tabId: string, suffix?: string) {
+        const key = `console_${tabId}${suffix ? '_' + suffix : ''}`;
+        const res = localStorage.getItem(key);
+        return res ? JSON.parse(res) : [];
+    }
+
+    static clearConsoleLogMessage(tabId: string, suffix?: string) {
+        const key = `console_${tabId}${suffix ? '_' + suffix : ''}`;
+        localStorage.removeItem(key);
+    }
+
 }

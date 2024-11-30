@@ -139,7 +139,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const index = currentAccount?.index || 0;
 
     const [clickStopped, setClickStopped] = useState<boolean>(false);
-    const recoId = getRecoId(tab||{tabId:currentTabId}, currentAccount!);
+    const recoId = getRecoId(tab || { tabId: currentTabId }, currentAccount!);
     const [recognitionCatId, setRecognitionCatId] = useSessionStorageState(
         'recognitionCatId_' + index,
         ''

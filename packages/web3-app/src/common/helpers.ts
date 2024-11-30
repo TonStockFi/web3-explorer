@@ -11,10 +11,21 @@ export function getDiscoverHost(isDev: boolean) {
     }
 }
  
-export function showAlertMessage(message:string) {
+export function showAlertMessage(message:string,hideGlobalLoading?:boolean) {
+    if(hideGlobalLoading){
+        showGlobalLoading(false);   
+    }
     window.dispatchEvent(new CustomEvent("showAlertMessage",{
         detail:{
             message
+        }
+    }))
+}
+
+export function showGlobalLoading(visible:boolean) {
+    window.dispatchEvent(new CustomEvent("showGlobalLoading",{
+        detail:{
+            visible
         }
     }))
 }

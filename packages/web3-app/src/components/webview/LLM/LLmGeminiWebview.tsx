@@ -14,8 +14,12 @@ import { LLmWebview } from './LLmWebview';
 export function LLmGeminiWebview({
     currentTabId,
     pid,
-    tabId
+    tabId,
+    noCut,
+    loop
 }: {
+    noCut?: boolean;
+    loop?: (reply: string) => Promise<void>;
     currentTabId?: string;
     pid?: string;
     tabId: string;
@@ -37,6 +41,7 @@ export function LLmGeminiWebview({
     });
 
     const checkGeminiCb = async () => {
+        loop && (await loop(reply));
         await new LLMGeminiService(tabId).checkWebviewIsReady();
     };
 
@@ -48,23 +53,26 @@ export function LLmGeminiWebview({
         const message = await ls.pullMessage();
 
         if (message) {
+            setReply('');
             console.debug('llm gemini pullMessage', message);
             const prompt = message.prompt.replace(/MESSAGE_ID/g, message.id);
             let { imageUrl, cutArea } = message;
+            let imageUrl1;
             if (cutArea) {
                 const ws = new WebviewService(message.tabId);
                 await ws.sendClickEvent(cutArea.x + cutArea.w / 2, cutArea.y + cutArea.h / 2);
                 await sleep(200);
-                imageUrl = await ws.captureScreenToDataURL(
+                imageUrl1 = await ws.captureScreenToDataURL(
                     cutArea.x,
                     cutArea.y,
                     cutArea.w,
                     cutArea.h
                 );
-                if (!imageUrl) {
+                if (!imageUrl1) {
                     ls.fisnishMessage(message.id, '');
                     return;
                 }
+                imageUrl = imageUrl1;
             }
             let res = '';
             console.debug('llm gemini onPromptGemini');
@@ -73,36 +81,59 @@ export function LLmGeminiWebview({
                 res = await ls.waitWebviewMessageReply(message);
                 console.debug('llm gemini waitWebviewMessageReply', res);
                 setReply(res || '');
+                ls.fisnishMessage(message.id, res);
+            } else {
+                ls.remove(message.id);
             }
-            ls.fisnishMessage(message.id, res);
         }
     };
     const theme = useTheme();
+    let showControl = tabId === currentTabId;
+
     return (
         <View wh100p relative>
-            <View hide zIdx={11} absFull bgColor={theme.backgroundBrowserActive}>
+            <View
+                zIdx={11}
+                abs
+                opacity={0.8}
+                hide
+                bgColor={theme.backgroundBrowserActive}
+                left={8}
+                right={8}
+                px12
+                borderRadius={8}
+                bottom={110}
+                h={120}
+            >
+                <View absFull mx12 py12 overflowYAuto>
+                    <View text={JSON.stringify(reply)} />
+                </View>
                 <View
+                    zIdx={100}
                     icon={'Close'}
                     iconButtonSmall
                     abs
-                    top={12}
+                    top={6}
                     onClick={() => {
                         setReply('');
                     }}
-                    right={12}
-                ></View>
-                <View absFull top={44}>
-                    <View json={[reply]}></View>
-                </View>
+                    right={6}
+                />
             </View>
-            <LoopView callback={checkGeminiCb} delay={1000}></LoopView>
-            <LoopView callback={pullMessageCb} delay={100}></LoopView>
+            <LoopView callback={checkGeminiCb} delay={1000} />
+            <LoopView callback={pullMessageCb} delay={100} />
             <View abs left0 right0 top={0} bottom={0} flx>
                 <View flex1 h100p borderBox overflowHidden relative>
-                    <LLmWebview currentTabId={currentTabId} pid={pid1} tabId={tabId} url={url} />
+                    <LLmWebview
+                        noCut
+                        currentTabId={currentTabId}
+                        pid={pid1}
+                        tabId={tabId}
+                        url={url}
+                    />
                 </View>
             </View>
-            {tabId === currentTabId && <ControlsView findInPageTop={72} tabId={tabId} />}
+            {showControl && <ControlsView findInPageTop={72} tabId={tabId} />}
         </View>
     );
 }

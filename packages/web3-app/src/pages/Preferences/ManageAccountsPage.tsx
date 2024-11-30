@@ -23,7 +23,7 @@ export const ManageAccountsPage = () => {
         <Page full>
             <View wh100p borderBox px={12} pt={12} overflowYAuto>
                 <View h100p sx={{ margin: '0 auto', maxWidth: '768px' }}>
-                    <ManageSubWalletPage></ManageSubWalletPage>
+                    <ManageSubWalletPage />
                     {/* <TabViewContainer
                         panelStyle={{
                             height: '100%',

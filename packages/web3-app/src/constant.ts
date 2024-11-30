@@ -16,7 +16,8 @@ export const WS_URL = 'ws://192.168.43.244:6788/api';
 export const DISCOVER_API = "https://api-explorer.web3r.site/api"
 export const DISCOVER_HOST = 'https://explorer.web3r.site/';
 
-export const DISCOVER_HOST_DEV = 'http://192.168.43.244:3174/';
+// export const DISCOVER_HOST_DEV = 'http://192.168.43.244:3174/';
+export const DISCOVER_HOST_DEV = 'http://127.0.0.1:3174/';
 export const DEFAULT_THRESHOLD = -100
 export const IS_DEV =
     location.href.indexOf('192.168') > 0 || location.href.indexOf('localhost') > 0;
@@ -53,7 +54,7 @@ export const AsideWidth = 360;
 export const WIN_TITLE_BAR_WIDTH = 0;
 export const MAC_TITLE_BAR_WIDTH = 88;
 export const PLAYGROUND_WEBVIEW_WIDTH = 360;
-export const PLAYGROUND_RIGHT_SIDE_WIDTH = 360;
+export const PLAYGROUND_RIGHT_SIDE_WIDTH = 280;
 export const PLAYGROUND_WEBVIEW_HEIGHT = 720;
 export const PLAYGROUND_WIN_HEIGHT = 772;
 export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;

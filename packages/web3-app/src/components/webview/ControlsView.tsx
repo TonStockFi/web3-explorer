@@ -136,7 +136,7 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                     hideSearch={() => {
                         setFindInPage(null);
                     }}
-                ></FindInPage>
+                />
             </View>
             <View hide={!contextMenu}>
                 <ContextMenu
@@ -144,7 +144,7 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                     setIsMute={(v: boolean) => setIsMute(v)}
                     contextMenu={contextMenu!}
                     onHide={() => setContextMenu(null)}
-                ></ContextMenu>
+                />
             </View>
         </>
     );

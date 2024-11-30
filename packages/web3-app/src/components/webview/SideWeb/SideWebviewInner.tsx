@@ -23,14 +23,10 @@ export function SideWebviewInner({ site, currentSite }: { site: string; currentS
                     currentTabId={current_tabId}
                     pid={'side_webview'}
                     tabId={tabId}
-                ></LLmChatGptWebview>
+                />
             )}
             {site === 'Gemini' && (
-                <LLmGeminiWebview
-                    currentTabId={current_tabId}
-                    pid={'side_webview'}
-                    tabId={tabId}
-                ></LLmGeminiWebview>
+                <LLmGeminiWebview currentTabId={current_tabId} pid={'side_webview'} tabId={tabId} />
             )}
         </View>
     );

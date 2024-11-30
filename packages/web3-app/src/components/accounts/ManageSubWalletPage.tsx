@@ -95,7 +95,7 @@ export const ManageSubWalletPage = () => {
                         accounts={accountsMAM}
                         onChange={(val: Account) => setSelectAccount(val)}
                         account={selectAccount}
-                    ></AccountsSelect>
+                    />
                     <View ml12 center mr={16}>
                         <AccountsMoreView />
                     </View>

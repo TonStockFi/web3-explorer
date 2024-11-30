@@ -3,17 +3,19 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import { getWinId, showAlertMessage } from '../../common/helpers';
+import { getWinId, showAlertMessage, showGlobalLoading } from '../../common/helpers';
 import { copyImageToClipboard } from '../../common/image';
 import { urlToDataUri } from '../../common/opencv';
 import { copyTextToClipboard, currentTs } from '../../common/utils';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { getRecoId, LLM_TAB, usePlayground } from '../../providers/PlaygroundProvider';
+import { ExtensionType, getRecoId, usePlayground } from '../../providers/PlaygroundProvider';
 import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
 import CutAreaService from '../../services/CutAreaService';
 import LLMGeminiService from '../../services/LLMGeminiService';
+import LLMService from '../../services/LLMService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import { SUB_WIN_ID, ViewSize } from '../../types';
+import { getPlaygroundCutImag } from './ScreenshotView';
 
 export function ScreenshotCutAreaBar({
     handleRecognition,
@@ -27,7 +29,13 @@ export function ScreenshotCutAreaBar({
     viewSize: ViewSize;
 }) {
     const { cutAreaRect, onCutting, onCut } = useScreenshotContext();
-    const { currentLLM, onChangeCurrentLLMTab, currentAccount, tab } = usePlayground();
+    const {
+        currentExtension,
+        onChangeCurrentExtension,
+        onChangeCurrentRecoAreaImage,
+        currentAccount,
+        tab
+    } = usePlayground();
     const { t, i18n } = useTranslation();
 
     const { width, height } = viewSize;
@@ -43,7 +51,7 @@ export function ScreenshotCutAreaBar({
     if (top + barHeight > height) {
         top = y - 4 - barHeight;
     }
-    const { showSnackbar, env } = useIAppContext();
+    const { showSnackbar, showBackdrop, env } = useIAppContext();
     const theme = useTheme();
     return (
         <>
@@ -61,29 +69,44 @@ export function ScreenshotCutAreaBar({
                     <View wh100p rowVCenter jSpaceBetween>
                         <View
                             onClick={async () => {
+                                showGlobalLoading(true);
                                 const prompt = `${t('RecognitionImageTransTo').replace(
                                     '%{lang}',
                                     t(i18n.language)
                                 )}`;
                                 const message = {
-                                    id: LLMGeminiService.genId(),
+                                    id: LLMService.genId(),
                                     tabId: tab?.tabId!,
                                     ts: currentTs(),
                                     prompt
                                 };
 
-                                if (!getWinId()) {
-                                    const imgBlob = await CutAreaService.getCutBlob(
-                                        tabId,
-                                        cutAreaRect
-                                    );
+                                if (!getWinId() || getWinId() === SUB_WIN_ID.PLAYGROUND) {
+                                    let imageUrl;
+                                    if (getWinId() === SUB_WIN_ID.PLAYGROUND) {
+                                        imageUrl = await getPlaygroundCutImag(tabId, cutAreaRect);
+                                        if (!imageUrl) {
+                                            return showAlertMessage('截图失败', true);
+                                        }
+                                        imageUrl = await urlToDataUri(imageUrl);
+                                        if (!imageUrl) {
+                                            return showAlertMessage('截图失败', true);
+                                        }
+                                    } else {
+                                        const imgBlob = await CutAreaService.getCutBlob(
+                                            tabId,
+                                            cutAreaRect
+                                        );
 
-                                    if (!imgBlob) {
-                                        return showAlertMessage('截图失败');
+                                        if (!imgBlob) {
+                                            showSnackbar(false);
+                                            return showAlertMessage('截图失败', true);
+                                        }
+
+                                        const url = URL.createObjectURL(imgBlob);
+                                        imageUrl = await urlToDataUri(url);
                                     }
 
-                                    const url = URL.createObjectURL(imgBlob);
-                                    const imageUrl = await urlToDataUri(url);
                                     new WebviewMainEventService().openLLMWindow(env, {
                                         site: 'Gemini',
                                         message: {
@@ -92,8 +115,8 @@ export function ScreenshotCutAreaBar({
                                         }
                                     });
                                 } else {
-                                    if (currentLLM !== LLM_TAB.GEMINI) {
-                                        onChangeCurrentLLMTab(LLM_TAB.GEMINI);
+                                    if (currentExtension !== ExtensionType.GEMINI) {
+                                        onChangeCurrentExtension(ExtensionType.GEMINI);
                                     }
                                     const ls = new LLMGeminiService(
                                         LLMGeminiService.getTabIdFromRecoId(
@@ -102,7 +125,8 @@ export function ScreenshotCutAreaBar({
                                     );
                                     const ready = await ls.checkWebviewIsReady();
                                     if (!ready) {
-                                        return showAlertMessage('Genimi 加载失败，请重试');
+                                        showSnackbar(false);
+                                        return showAlertMessage('Genimi 加载失败，请重试', true);
                                     }
 
                                     ls.sendMessageOnce({
@@ -110,7 +134,10 @@ export function ScreenshotCutAreaBar({
                                         cutArea: cutAreaRect
                                     });
                                 }
-                                onCut(false);
+                                setTimeout(() => {
+                                    showGlobalLoading(false);
+                                    onCut(false);
+                                }, 1000);
                             }}
                             iconButton={{
                                 sx: {
@@ -124,22 +151,20 @@ export function ScreenshotCutAreaBar({
                             iconButtonSmall
                             icon="Translate"
                         />
-                        {/* <View
-                            hide={!!inPlayground}
+                        <View
+                            hide={getWinId() === SUB_WIN_ID.LLM || !getWinId()}
                             onClick={async () => {
                                 onCut(false);
+                                if (currentExtension !== ExtensionType.GEMINI) {
+                                    onChangeCurrentExtension(ExtensionType.GEMINI);
+                                }
+
                                 const imgBlob = await CutAreaService.getCutBlob(tabId, cutAreaRect);
                                 if (imgBlob) {
-                                    await copyImageToClipboard(imgBlob);
-                                    const imgData = await urlToDataUri(
-                                        URL.createObjectURL(imgBlob)
-                                    );
-                                    new WebviewMainEventService().openLLMWindow(env, {
-                                        site: 'Gemini',
-                                        type: 'RECO_IMG_GEMINI',
-                                        ts: currentTs(),
-                                        imgData
-                                    });
+                                    const url = URL.createObjectURL(imgBlob);
+                                    onChangeCurrentRecoAreaImage(url);
+                                } else {
+                                    showAlertMessage('截图失败');
                                 }
                             }}
                             iconButton={{
@@ -151,8 +176,8 @@ export function ScreenshotCutAreaBar({
                             iconProps={{ sx: { width: 16, height: 16 } }}
                             tips={t('RecognitionInGemini')}
                             iconButtonSmall
-                            icon="AutoFixHigh"
-                        /> */}
+                            icon={<ImageIcon size={16} icon={'icon_gemini'} />}
+                        />
                         <View
                             hide={!!inPlayground}
                             onClick={async () => {
@@ -178,11 +203,10 @@ export function ScreenshotCutAreaBar({
                             icon="ContentCopy"
                         />
                         <View
-                            hide={!!inPlayground}
                             onClick={async () => {
-                                await copyTextToClipboard(`{x:${x}, y:${y}, h:${h}, w:${w}}`);
+                                await copyTextToClipboard(`{x:${x}, y:${y}, w:${w}, h:${h}}`);
                                 showSnackbar({
-                                    message: `{x:${x}, y:${y}, h:${h}, w:${w}} copied!`
+                                    message: `{x:${x}, y:${y}, w:${w}, h:${h}} copied!`
                                 });
                             }}
                             iconButton={{
@@ -192,7 +216,7 @@ export function ScreenshotCutAreaBar({
                                 }
                             }}
                             iconProps={{ sx: { width: 16, height: 16 } }}
-                            tips={`点击复制: {x:${x}, y:${y}, h:${h}, w:${w}}`}
+                            tips={`点击复制: {x:${x}, y:${y}, w:${w}, h:${h}}`}
                             iconButtonSmall
                             icon="AdsClick"
                         />

@@ -10,7 +10,6 @@ import { useIAppContext } from './IAppProvider';
 
 interface AppContextType {
     currentTabId: string;
-    currentLLM: LLM_TAB;
     showCodeDrawer: boolean;
     showGameListDrawer: boolean;
     tab: BrowserTab | undefined;
@@ -18,7 +17,9 @@ interface AppContextType {
     currentAccount: AccountPublic | null;
     screenCopyVisible: boolean;
     currentExtension: ExtensionType;
+    currentRecoAreaImage: string;
     accounts: AccountPublic[];
+    onChangeCurrentRecoAreaImage: (v: string) => void;
     onShowCodeDrawer: (v: boolean) => void;
     onShowGameListDrawer: (v: boolean) => void;
     getWindowStatus: (
@@ -27,7 +28,6 @@ interface AppContextType {
     ) => Promise<null | Map<number, boolean>>;
     onChangeWindowStatus: (status: Map<number, boolean>) => void;
     onChangeCurrentExtension: (v: ExtensionType) => void;
-    onChangeCurrentLLMTab: (v: LLM_TAB) => void;
     showScreenCopy: (v: boolean) => void;
     saveAccounts: (accounts: AccountPublic[]) => void;
     switchCurrentAccount: (account: AccountPublic) => void;
@@ -40,15 +40,10 @@ export function getRecoId(tab: Partial<BrowserTab>, account: AccountPublic) {
 }
 
 export enum ExtensionType {
-    CODE = 'CODE',
     NULL = 'NULL',
-    EXT_CENTER = 'EXT_CENTER',
-    DECISION = 'DECISION'
-}
-
-export enum LLM_TAB {
     GEMINI = 'GEMINI',
-    NULL = 'NULL'
+    JS_CODE = 'JS_CODE',
+    DECISION = 'DECISION'
 }
 
 export const PlaygroundProvider = (props: { children: ReactNode }) => {
@@ -73,10 +68,6 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         ExtensionType.NULL
     );
 
-    const [currentLLM, setCurrentLLM] = useLocalStorageState<LLM_TAB>(
-        'currentLLM_' + (account?.id || '1') + '' + (account?.index || '1'),
-        LLM_TAB.NULL
-    );
     useEffect(() => {
         if (tabInit) {
             newTab(tabInit);
@@ -92,6 +83,11 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         'currentAccount',
         account
     );
+    const [currentRecoAreaImage, setCurrentRecoAreaImage] = useState('');
+
+    function onChangeCurrentRecoAreaImage(v: string) {
+        setCurrentRecoAreaImage(v);
+    }
     function onShowCodeDrawer(v: boolean) {
         setShowCodeDrawer(v);
     }
@@ -153,12 +149,6 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         setCurrentExtension(v);
     };
 
-    const onChangeCurrentLLMTab = (v: LLM_TAB) => {
-        if (v !== LLM_TAB.NULL) {
-            onChangeCurrentExtension(ExtensionType.DECISION);
-        }
-        setCurrentLLM(v);
-    };
     const tab = tabInit || browserTabs.get(currentTabId);
     // console.log({ tab, tabInit });
     // console.log(
@@ -176,8 +166,8 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
-                currentLLM,
-                onChangeCurrentLLMTab,
+                currentRecoAreaImage,
+                onChangeCurrentRecoAreaImage,
                 onChangeCurrentExtension,
                 currentExtension,
                 onShowCodeDrawer,

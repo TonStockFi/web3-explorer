@@ -51,7 +51,6 @@ app.on('web-contents-created', (_event, contents) => {
     //     console.log('will-attach-webview');
     //     console.log({ webPreferences, _params, __dirname });
     // });
-    
 
     const session = contents.session
     // session.setProxy()

@@ -183,7 +183,7 @@ export const ProSettings: FC<{
                     textFontSize="0.8rem"
                     textColor={theme.textSecondary}
                     text={`${accountId},${accountIndex}`}
-                ></View>
+                />
             </View>
             <View>
                 <Block>

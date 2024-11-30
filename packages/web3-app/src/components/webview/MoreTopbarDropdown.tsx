@@ -3,12 +3,10 @@ import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
 import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view';
-import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { BrowserTab } from '../../providers/BrowserProvider';
-import { LLM_TAB, usePlayground } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
 import WebviewMuteService from '../../services/WebviewMuteService';
@@ -28,7 +26,6 @@ export default function MoreTopbarDropdown({
 }) {
     const [isMute, setIsMute] = React.useState(false);
     const { isCutEnable, onCut } = useScreenshotContext();
-    const { onChangeCurrentExtension, onChangeCurrentLLMTab } = usePlayground();
     const { t } = useTranslation();
     const theme = useTheme();
 
@@ -117,6 +114,7 @@ export default function MoreTopbarDropdown({
                 TransitionComponent={Fade}
             >
                 <View
+                    hide
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);
@@ -129,19 +127,6 @@ export default function MoreTopbarDropdown({
                     <View text={t(`屏幕截图`)} textFontSize="0.9rem" />
                 </View>
 
-                <View
-                    menuItem
-                    hide={!tgUrl || !currentAccount}
-                    onClick={async () => {
-                        setAnchorEl(null);
-                        onChangeCurrentLLMTab(LLM_TAB.GEMINI);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon={<ImageIcon icon={'icon_gemini'} size={18} />} iconSmall />
-                    </ListItemIcon>
-                    <View text={t(`Gemini`)} textFontSize="0.9rem" />
-                </View>
                 <View
                     menuItem
                     hide={!tgUrl || !currentAccount}

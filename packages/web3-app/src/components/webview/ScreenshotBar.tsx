@@ -28,7 +28,7 @@ export function ScreenshotBar({
     const { isCutting, cutAreaRect, changeCutAreaRect, onCut } = useScreenshotContext();
     const theme = useTheme();
 
-    if (isCutAreaExists(cutAreaRect) && !isCutting && !inPlayground) {
+    if (isCutAreaExists(cutAreaRect) && !isCutting) {
         return (
             <ScreenshotCutAreaBar
                 inPlayground={inPlayground}

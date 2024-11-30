@@ -62,12 +62,13 @@ export default class WebviewMainEventService {
         }
     }
     async openFeatureWindow(env: AppEnv, action: string, payload?: any) {
-        const { isDev } = env;
+        const { isDev,workArea } = env;
+
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.PLAYGROUND}`;
-        const width = 1400;
-        const height = 870;
-        const x = 4;
-        const y = 0;
+        const width = 910;
+        const height = workArea.height / 2;
+        const x = workArea.x;
+        const y = workArea.height ;
         await this.openWindow(
             SUB_WIN_ID.PLAYGROUND,
             url,
@@ -75,9 +76,9 @@ export default class WebviewMainEventService {
                 x,
                 y,
                 width,
-                minWidth: width,
-                height: height,
-                minHeight: height,
+                height,
+                minWidth: 200,
+                minHeight: 200,
                 titleBarStyle: 'hiddenInset',
                 titleBarOverlay: false,
                 trafficLightPosition: { x: 18, y: 14 },

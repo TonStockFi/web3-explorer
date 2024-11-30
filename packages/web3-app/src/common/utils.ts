@@ -47,7 +47,10 @@ export async function copyTextToClipboard(text: string) {
         } else if (window.__appApi) {
             await window.__appApi.writeText(text);
             return true;
-        } else {
+        }else if (window.backgroundApi) {
+            await window.backgroundApi.writeText(text);
+            return true;
+        }  else {
             return false;
         }
     } catch (error) {

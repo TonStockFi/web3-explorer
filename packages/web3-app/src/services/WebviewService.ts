@@ -1,4 +1,5 @@
 import { WebviewTag } from 'electron';
+import { onAction } from '../common/electron';
 import { resizeImage } from '../common/image';
 import { sleep } from '../common/utils';
 import {
@@ -13,6 +14,20 @@ import {
 import { BoundingClientRect } from '../types';
 
 export default class WebviewService {
+    
+    openDevTools() {
+        const webview = this.getWebview()
+        if(!webview){
+            return;
+        }
+        if (!webview.isDevToolsOpened()) {
+            webview.openDevTools();
+        }
+        const webContentsId = this.getWebviewContentsId()
+        onAction("openDevTools",{
+            webContentsId,
+        })
+    }
     private tabId: string;
 
     constructor(tabId: string) {

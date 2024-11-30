@@ -55,12 +55,12 @@ export function LLmChatGptWebview({
                 const ws = new WebviewService(message.tabId);
                 await ws.sendClickEvent(cutArea.x + cutArea.w / 2, cutArea.y + cutArea.h / 2);
                 await sleep(200);
-                imageUrl = await ws.captureScreenToDataURL(
+                imageUrl = (await ws.captureScreenToDataURL(
                     cutArea.x,
                     cutArea.y,
                     cutArea.w,
                     cutArea.h
-                );
+                )) as string;
                 if (!imageUrl) {
                     ls.fisnishMessage(message.id, '');
                     return;
@@ -90,13 +90,13 @@ export function LLmChatGptWebview({
                         setReply('');
                     }}
                     right={12}
-                ></View>
+                />
                 <View absFull top={44}>
-                    <View json={[reply]}></View>
+                    <View json={[reply]} />
                 </View>
             </View>
-            <LoopView callback={checkChatGptCb} delay={1000}></LoopView>
-            <LoopView callback={pullMessageCb} delay={100}></LoopView>
+            <LoopView callback={checkChatGptCb} delay={1000} />
+            <LoopView callback={pullMessageCb} delay={100} />
             <View abs left0 right0 top={0} bottom={0} flx>
                 <View flex1 h100p borderBox overflowHidden relative>
                     <LLmWebview currentTabId={currentTabId} pid={pid1} tabId={tabId} url={url} />

@@ -1,5 +1,5 @@
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
-import { ImageIcon } from '@web3-explorer/uikit-view/dist/Icons/ImageIcon';
+import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useState } from 'react';
 import { hexToRGBA, isDesktop } from '../../common/utils';
