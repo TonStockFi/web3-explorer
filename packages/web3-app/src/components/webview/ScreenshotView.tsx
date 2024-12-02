@@ -4,14 +4,11 @@ import { canvasToBlob, getRoiArea } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
 import { DEFAULT_THRESHOLD } from '../../constant';
 
-import { useIAppContext } from '../../providers/IAppProvider';
-import { usePlayground } from '../../providers/PlaygroundProvider';
+import { getRecoId, usePlayground } from '../../providers/PlaygroundProvider';
 import { useRecognition } from '../../providers/RecognitionProvider';
 import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
 import CutAreaService from '../../services/CutAreaService';
 import { RoiInfo } from '../../services/RoiService';
-import WebviewMainEventService from '../../services/WebviewMainEventService';
-import { SUB_WIN_ID } from '../../types';
 import CutAreaRectView from './CutAreaView';
 import { ScreenshotBar } from './ScreenshotBar';
 
@@ -42,14 +39,19 @@ export default function ScreenshotView({
 }) {
     const ref = useRef<HTMLDivElement>(null);
     const { onCutting } = useScreenshotContext();
-    const { addRoiArea, recognitionCatId } = useRecognition();
+
+    const { addRoiArea, recognitionCatId, showRecognition } = useRecognition();
     const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
     const { currentAccount, tab } = usePlayground();
-    const { env } = useIAppContext();
+
     const handleRecognition = async (tabId: string, cutAreaRect: CutAreaRect) => {
-        if (!currentAccount) {
+        if (!currentAccount || !tab) {
             return;
         }
+        if (recognitionCatId) {
+            showRecognition('');
+        }
+        const recoId = getRecoId(tab, currentAccount);
         let cutImageUrl;
 
         if (inPlayground) {
@@ -79,23 +81,7 @@ export default function ScreenshotView({
             threshold: DEFAULT_THRESHOLD,
             cutAreaRect: cutAreaRect!
         };
-        if (!inPlayground) {
-            const s = new WebviewMainEventService();
-            const isReady = await s.isWinReady(SUB_WIN_ID.PLAYGROUND);
-            const payload = {
-                account: currentAccount,
-                tab,
-                roiInfo,
-                cutImageUrl
-            };
-            if (!isReady) {
-                await new WebviewMainEventService().openFeatureWindow(env, 'onAddRoiArea', payload);
-            } else {
-                await s.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, 'onAddRoiArea', payload);
-            }
-        } else {
-            addRoiArea(roiInfo, cutImageUrl, recognitionCatId);
-        }
+        addRoiArea(roiInfo, cutImageUrl, recoId);
 
         onCutting(false);
     };

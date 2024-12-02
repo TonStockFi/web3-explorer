@@ -47,7 +47,7 @@ export const SideBarVert = () => {
                                     action.tabId === MAIN_NAV_TYPE.CHATGPT ||
                                     action.tabId === MAIN_NAV_TYPE.GENIMI
                                 ) {
-                                    new WebviewMainEventService().openLLMWindow(env, {
+                                    new WebviewMainEventService().openLLMWindow({
                                         site:
                                             action.tabId === MAIN_NAV_TYPE.CHATGPT
                                                 ? 'ChatGpt'

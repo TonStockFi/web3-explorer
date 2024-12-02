@@ -130,6 +130,7 @@ export enum SUB_WIN_ID {
     DEVICES = 'DEVICES',
     ASSETS = 'ASSETS',
     PLAYGROUND = 'PLAYGROUND',
+    OCR = 'OCR',
     LLM = 'LLM',
     OPENCV = 'OPENCV',
     MAIN = 'MAIN'

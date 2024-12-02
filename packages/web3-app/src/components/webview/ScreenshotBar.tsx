@@ -58,7 +58,7 @@ export function ScreenshotBar({
                 <View wh100p rowVCenter jSpaceBetween>
                     <View
                         mr={4}
-                        buttonVariant="outlined"
+                        buttonVariant="text"
                         button={t('CutArea')}
                         sx={{ wordBreak: 'keep-all' }}
                         buttonStartIcon={

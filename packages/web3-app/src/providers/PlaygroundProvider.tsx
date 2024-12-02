@@ -64,7 +64,11 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     }
 
     const [currentExtension, setCurrentExtension] = useLocalStorageState<ExtensionType>(
-        'currentExtension_' + (account?.id || '1') + '' + (account?.index || '1'),
+        'currentExtension_' +
+            (account?.id || '1') +
+            '' +
+            (account?.index || '1') +
+            (tabInit?.tabId || ''),
         ExtensionType.NULL
     );
 

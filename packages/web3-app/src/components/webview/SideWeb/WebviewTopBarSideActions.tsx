@@ -22,7 +22,7 @@ export function WebviewTopBarSideActions({
                 site
             });
         } else {
-            new WebviewMainEventService().openLLMWindow(env, { site });
+            new WebviewMainEventService().openLLMWindow({ site });
         }
     };
     return (

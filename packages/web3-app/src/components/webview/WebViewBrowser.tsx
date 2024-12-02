@@ -138,8 +138,14 @@ const WebViewBrowser = ({
                     width: ref.current.clientWidth,
                     height: ref.current.clientHeight
                 };
-                TabIdWebveiwSizedMap.set(tabId, size);
-                setSize(size);
+                if (size.width === 0) {
+                    setTimeout(() => {
+                        updateSize();
+                    }, 1000);
+                } else {
+                    TabIdWebveiwSizedMap.set(tabId, size);
+                    setSize(size);
+                }
             }
         };
         updateSize();

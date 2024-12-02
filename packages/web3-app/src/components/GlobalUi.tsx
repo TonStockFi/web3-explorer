@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { useIAppContext } from '../providers/IAppProvider';
 
 export function GlobalUi() {
-    const { alert,showBackdrop, showAlert, confirm, backdrop, snackbar, showSnackbar } = useIAppContext();
+    const { alert, showBackdrop, showAlert, confirm, backdrop, snackbar, showSnackbar } =
+        useIAppContext();
     const { t } = useTranslation();
     useEffect(() => {
         function showAlertMessage(e: any) {
@@ -24,7 +25,7 @@ export function GlobalUi() {
         return () => {
             window.removeEventListener('showAlertMessage', showAlertMessage);
             window.removeEventListener('showGlobalLoading', showGlobalLoading);
-        }
+        };
     }, []);
     return (
         <View empty>

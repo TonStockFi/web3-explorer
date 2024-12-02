@@ -11,17 +11,13 @@ export interface RoiInfo {
     pageBelongTo?: string;
     ts: number;
     page?: string;
-    ocrPrompt?:string;
-    ocrReplyFormat?:string;
     jsCode?:string;
     testJsCode?:string;
     isTry?: boolean;
     isMark?: boolean;
     action?:"click" | "callOcr" | "invokeCode" | string;
     mergeArea?: boolean;
-    isOcr?: boolean;
     cutAreaRect: CutAreaRect;
-    ocrId?: string;
 }
 
 export default class RoiService {

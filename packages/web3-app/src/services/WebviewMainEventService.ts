@@ -61,7 +61,7 @@ export default class WebviewMainEventService {
             throw new Error('backgroundApi API is not available');
         }
     }
-    async openFeatureWindow(env: AppEnv, action: string, payload?: any) {
+    async openFeatureWindow(env: AppEnv, action?: string, payload?: any) {
         const { isDev,workArea } = env;
 
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.PLAYGROUND}`;
@@ -77,7 +77,7 @@ export default class WebviewMainEventService {
                 y,
                 width,
                 height,
-                minWidth: 200,
+                minWidth: width,
                 minHeight: 200,
                 titleBarStyle: 'hiddenInset',
                 titleBarOverlay: false,
@@ -91,15 +91,61 @@ export default class WebviewMainEventService {
             isDev
         );
         const res = await this.waitForIsWinReady(SUB_WIN_ID.PLAYGROUND);
-        if (res) {
+        if (res && action) {
             await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, action, payload || {});
         }
     }
-    async openLLMWindow(env: Partial<AppEnv>, sideWeb?: SideWebProps) {
-        let { isDev } = env
-        if(!isDev){
-            isDev = false
+
+    async openOcrWindow(sideWeb?: SideWebProps) {
+        const uri = new URL(location.href)
+        const isDev = !!uri.searchParams.get('isDev');
+        const winId = SUB_WIN_ID.OCR
+        const url = `${getDiscoverHost(isDev)}#${winId}`;
+        const width = 386;
+        const height = 860;
+        const x = window.screen.width - width - 12;
+        const y = 12;
+        
+        await this.openWindow(
+            winId,
+            url,
+            {
+                x,
+                y,
+                width,
+                minWidth: width,
+                height: height,
+                minHeight: height,
+                titleBarStyle: 'hiddenInset',
+                titleBarOverlay: false,
+                trafficLightPosition: { x: 18, y: 14 },
+                frame: false,
+                autoHideMenuBar: true,
+                webPreferences: {
+                    partition: getPartitionKey(DISCOVER_PID)
+                }
+            },
+            true
+        );
+        await this.waitForIsWinReady(winId);
+        if(sideWeb){
+            await this.sendMessageToSubWin(
+                winId,
+                'openSideWeb',
+                sideWeb
+                    ? sideWeb
+                    : {
+                          site: 'GEMINI'
+                      }
+            );
         }
+      
+    }
+    async openLLMWindow(sideWeb?: SideWebProps) {
+
+        const uri = new URL(location.href)
+        const isDev = !!uri.searchParams.get('isDev');
+        
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.LLM}`;
         const width = 420;
         const height = 860;
@@ -128,15 +174,18 @@ export default class WebviewMainEventService {
             true
         );
         await this.waitForIsWinReady(SUB_WIN_ID.LLM);
-        await this.sendMessageToSubWin(
-            SUB_WIN_ID.LLM,
-            'openSideWeb',
-            sideWeb
-                ? sideWeb
-                : {
-                      site: 'ChatGpt'
-                  }
-        );
+        if(sideWeb){
+            await this.sendMessageToSubWin(
+                SUB_WIN_ID.LLM,
+                'openSideWeb',
+                sideWeb
+                    ? sideWeb
+                    : {
+                          site: 'ChatGpt'
+                      }
+            );
+        }
+        
     }
     static getPlaygroundWinId({ index, tabId }: { index: number; tabId: string }) {
         const winId = 'PLAYGROUND_' + index + '_' + encodeURIComponent(tabId);

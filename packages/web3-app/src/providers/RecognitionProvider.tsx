@@ -4,28 +4,20 @@ import { onAction } from '../common/electron';
 import { isPlaygroundMaster } from '../common/helpers';
 import { PAGE_ALL_ROI } from '../constant';
 
-import DecisionRunInfoService from '../services/DecisionRunInfoService';
 import ProService from '../services/ProService';
 import RoiService, { RoiInfo } from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { ProInfoProps, SUB_WIN_ID } from '../types';
+import { useIAppContext } from './IAppProvider';
 import { getRecoId, usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
 
 export const CacheImage: Map<string, string> = new Map();
 
 export interface RoiRunInfo {
-    isOnline: boolean;
-    ts: number;
-    matchedId?: string;
     matchPath?: string[];
-    duration: number;
-    total: number;
-    inspectTotal: number;
-    clickedTotal: number;
-    matchedTotal: number;
-    roiRunTimeTotal: number;
-    matchRunTimeTotal: number;
+    ts: number;
+    matchedIds?: string[];
 }
 
 interface AppContextType {
@@ -42,8 +34,10 @@ interface AppContextType {
     showSettings: boolean;
     clickStopped: boolean;
     showAccounts: boolean;
+    selectOtherPage?: boolean;
+    onSelectOtherPage: (v: boolean) => void;
     onChangeCurrentDecisionn: (roi: RoiRunInfo | null) => void;
-    onChangeRoiRunInfo: (id: number, roi: RoiRunInfo) => void;
+    onChangeRoiRunInfo: (roi: RoiRunInfo) => void;
     notifyTestRoi: (roi: RoiInfo) => void;
     notifyWindow: (action: string, payload?: any) => void;
     notifyWindows: (action: string, payload?: any) => void;
@@ -74,6 +68,14 @@ export const MatchResults: Map<string, MatchResult> = new Map();
 
 export const fixRow = (roi: RoiInfo) => {
     //@ts-ignore
+    delete roi.isOcr;
+    //@ts-ignore
+    delete roi.isTry;
+    //@ts-ignore
+    delete roi.ocrReplyFormat;
+    //@ts-ignore
+    delete roi.ocrPrompt;
+    //@ts-ignore
     delete roi.pageName;
     //@ts-ignore
     delete roi.cutAreaRect.start;
@@ -97,7 +99,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function parseRecognitionCatId(recognitionCatId: string) {
     const t = recognitionCatId.split('-');
-    if (t.length < 3) {
+    if (!recognitionCatId || t.length < 3) {
         throw new Error('parseRecognitionCatId error:' + recognitionCatId);
     }
     const tabId = t[0];
@@ -134,12 +136,16 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
 
-    const [selectedRoiId, setSelectedRoiId] = useState<string>('');
     const { accounts, tab, currentTabId, currentAccount } = usePlayground();
     const index = currentAccount?.index || 0;
-
+    const [selectOtherPage, setSelectOtherPage] = useState<boolean>(false);
     const [clickStopped, setClickStopped] = useState<boolean>(false);
     const recoId = getRecoId(tab || { tabId: currentTabId }, currentAccount!);
+
+    const [selectedRoiId, setSelectedRoiId] = useLocalStorageState<string>(
+        'selectedRoiId_' + recoId,
+        ''
+    );
     const [recognitionCatId, setRecognitionCatId] = useSessionStorageState(
         'recognitionCatId_' + index,
         ''
@@ -168,6 +174,10 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         setSelectedRoiId(i => {
             return id;
         });
+    };
+
+    const onSelectOtherPage = (v: boolean) => {
+        setSelectOtherPage(v);
     };
     const onStopClick = (v: boolean) => {
         setClickStopped(v);
@@ -287,13 +297,13 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         });
         setTimeout(() => {
             if (!recognitionCatId) {
-                setRoiAreaList(() => []);
+                //setRoiAreaList(() => []);
             } else {
                 loadCacheRoiList(recognitionCatId);
             }
         }, 500);
     };
-
+    const { env } = useIAppContext();
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
         // console.log('addRoiArea', { recognitionCatId, selectedRoiId, selectedPage });
 
@@ -326,20 +336,40 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             id
         };
         CacheImage.set(`${recognitionCatId}_${row.id}`, cutImageUrl);
-        new RoiService(getServiceId(recognitionCatId, proInfoList)).save(id, row, cutImageUrl);
+        await new RoiService(getServiceId(recognitionCatId, proInfoList)).save(
+            id,
+            row,
+            cutImageUrl
+        );
+        if (!isPlaygroundMaster()) {
+            const s = new WebviewMainEventService();
 
+            const payload = {
+                account: currentAccount,
+                tab,
+                roiInfo: row
+            };
+            new WebviewMainEventService()
+                .openFeatureWindow(env, 'onOpenFeatureView', {
+                    tab,
+                    account: currentAccount
+                })
+                .then(() => {
+                    s.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, 'onSelectRoiArea', payload);
+                });
+        } else {
+            setRecognitionCatId(r => {
+                return recognitionCatId;
+            });
+
+            setTimeout(() => {
+                onSelectRoi(id);
+            }, 400);
+            notifyWindows('onUpdateRoi');
+        }
         setRoiAreaList(prv => {
             return [row, ...prv.filter(row => r.id !== row.id)];
         });
-
-        setRecognitionCatId(r => {
-            return recognitionCatId;
-        });
-        setTimeout(() => {
-            onSelectRoi(id);
-        }, 400);
-
-        notifyWindows('onUpdateRoi');
     };
 
     const updateRoiArea = (r: RoiInfo) => {
@@ -391,12 +421,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         setIsPage(v);
     };
 
-    const onChangeRoiRunInfo = (id: number, v: RoiRunInfo) => {
-        !isPlaygroundMaster() &&
-            setRecognitionCatId(r => {
-                new DecisionRunInfoService(recognitionCatId).save(id, v);
-                return r;
-            });
+    const onChangeRoiRunInfo = (v: RoiRunInfo) => {
         setRoiRunInfo(v);
     };
 
@@ -411,6 +436,8 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
+                onSelectOtherPage,
+                selectOtherPage,
                 onChangeCurrentDecisionn,
                 currentDecision,
                 onShowScreenMirror,

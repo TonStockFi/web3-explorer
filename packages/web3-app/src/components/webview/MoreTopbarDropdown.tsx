@@ -3,12 +3,14 @@ import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
 import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view';
+import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { BrowserTab } from '../../providers/BrowserProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
+import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
 import { AccountPublic } from '../../types';
@@ -113,6 +115,24 @@ export default function MoreTopbarDropdown({
                 onClose={handleClose}
                 TransitionComponent={Fade}
             >
+                <View
+                    menuItem
+                    onClick={async () => {
+                        setAnchorEl(null);
+                        new WebviewMainEventService().openOcrWindow({
+                            site: 'Gemini'
+                        });
+                    }}
+                >
+                    <ListItemIcon>
+                        <View
+                            icon={<ImageIcon size={16} icon="icon_gemini"></ImageIcon>}
+                            iconSmall
+                        />
+                    </ListItemIcon>
+                    <View text={t(`图文识别`)} textFontSize="0.9rem" />
+                </View>
+
                 <View
                     hide
                     menuItem

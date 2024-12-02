@@ -1,41 +1,59 @@
-import { RoiInfo } from "./RoiService";
+import { RoiInfo } from './RoiService';
 
 export class F {
     constructor(id?: string) {}
 }
 
 export class G {
+
+    static getFeatures() {}
+    static getMatchedIds() {}
+    static isTest() {}
     static random(start: number, end: number) {}
     static async sleep() {}
     static log() {}
+    static featureMatched(id:string) {}
     static waitForResult(cb: () => any | Promise<any>, timeout: number, interval: number) {}
     static async click(position: { x: number; y: number }) {}
-    static async clickRect(rect: { x: number; y: number; w: number; h: number }) {}
+    static async clickRect(rect: { x: number; y: number; w: number; h: number },sleepSecond:number) {}
     static async showRect(
         rect: { x: number; y: number; w: number; h: number },
         showSeconds?: number,
-        color?:string
+        color?: string
     ) {}
-    static async clickFeature(feature: F) {}
-    static async clearRect(delaySeconds:number) {}
+    static async clickFeature(feature: F,sleepSeconds:number) {}
+    static async clearRect(delaySeconds: number) {}
     static async drag(x: number, y: number, x1: number, y1: number, steps: number) {}
 }
 
 export const GMethodSnapCodes: Record<string, string> = {
-    getOcrResult: `// Get Ocr Result
-const ocrResult = G.getOcrResult();
-G.log(ocrResult);`,
+    featureMatched: `\n// if Feature Matched
+if(G.featureMatched("#1")){
 
-    random: `// Generate a random number between start and end
+}`,
+
+    isTest: `\n// Get isTest 
+const isTest = G.isTest();
+G.log(isTest);`,
+
+    getFeatures: `\n// Get Features
+const Features = G.getFeatures();
+G.log(Features);`,
+
+    getMatchedIds: `\n// Get matched ids
+const matchedIds = G.getMatchedIds();
+G.log(matchedIds);`,
+
+    random: `\n// Generate a random number between start and end
 const randomNumber = G.random(10, 99);
 G.log(randomNumber);`,
 
-    log: `G.log("")`,
+    log: `\nG.log("")`,
 
-    sleep: `// Pause execution for a specified time (in seconds)
+    sleep: `\n// Pause execution for a specified time (in seconds)
 await G.sleep(2);`,
 
-    waitForResult: `// Wait for a callback to return a truthy value within a timeout
+    waitForResult: `\n// Wait for a callback to return a truthy value within a timeout
 const result = await G.waitForResult(() => {
     return true;
 }, 5000, 500);
@@ -45,44 +63,59 @@ if (result) {
     G.log("Callback timed out!");
 }`,
 
-    click: `// click at a specific position
+    click: `\n// click at a specific position
 await G.click({x, y});`,
 
-    clickFeature: `// click at the center of a feature
+    clickFeature: `\n// click at the center of a feature
 await G.clickFeature(F("#1"));`,
 
-    clickRect: `// a click at a specific rect
-await G.clickRect({x, y, w , h});`,
+    clickRect: `\n// a click at a specific rect and sleep 1 seconds
+await G.clickRect({x, y, w , h}, 1);`,
 
-    showRect: `// show a specific rect
+    showRect: `\n// show a specific rect
 G.showRect({x, y, w , h});`,
 
-    clearRect: `// clear all rect
+    clearRect: `\n// clear all rect
 await G.clearRect(1);`,
-
-    drag: `// a drag a postion to position
-await G.drag(x,y,x1,y1);`
+    
+    drag: `\n// a drag a postion to position
+await G.drag(x,y,x1,y1);`,
+    
 };
-
 
 export const jsCodePrefix = `
 
 if(!window.__Actions){
     window.__Actions = new Map()
 }
+
+if(!window.__ActionResults){
+    window.__ActionResults = new Map()
+}
+    
 class G {
-    static isTest = false;
-    static __OcrResult = null;
+    static __isTest = false;
+
     static __CurrentFeatureId = null;
+    static __matchedIds = [];
     static __Features = new Map();
     
     static getCurrentFeatureId() {
         return G.__CurrentFeatureId;
     }
 
+    static setMatchedIds(v){
+        G.__matchedIds = v;
+    }
+
+    static getMatchedIds(){
+        return G.__matchedIds;
+    }
+
     static setCurrentFeatureId(id) {
         G.__CurrentFeatureId = id;
     }
+
     static getFeatures() {
         return G.__Features;
     }
@@ -92,19 +125,30 @@ class G {
             G.__Features.set(row.id,row)
         })
     }
-
-    static getOcrResult() {
-        return G.__OcrResult;
+        
+    static getCache(key,value) {
+        const res = localStorage.getItem("_G-"+key,value)
+        if(res){
+            const data = JSON.parse(res)
+            return data[0]
+        }else{
+            return null
+        }
+    }
+    static setCache(key,value) {
+        localStorage.setItem("_G-"+key,JSON.stringify([value]))
     }
 
-    static setOcrResult(ocrReply) {
-        G.__OcrResult = ocrReply;
+    static featureMatched(featureId){
+        return  G.__matchedIds.indexOf(featureId) > -1
     }
-
+        
     static random(start, end) {
         return Math.floor(Math.random() * (end - start + 1)) + start;
     }
-
+    static isTest(){
+        return G.__isTest;
+    }
     static log(...args) {
         console.log(...args.map(arg =>
             typeof arg === 'object' && arg !== null ? JSON.stringify(arg) : arg
@@ -146,16 +190,19 @@ class G {
         return G.waitForResult(() => {
             const res = window.__Actions.get(ts);
             return !res;
-        }, 30000, 1000);
+        }, 30000, 500);
     }
 
-    static clickFeature(feature) {
+    static async clickFeature(feature,sleepSeconds) {
         const { x, y, w, h } = feature;
-        return G.clickRect({ x, y, w, h });
+        return G.clickRect({ x, y, w, h },sleepSeconds);
     }
 
-    static clickRect({ x, y, w, h }) {
-        return G.click({x:x + w / 2, y:y + h / 2});
+    static async clickRect({ x, y, w, h },sleepSeconds) {
+        await G.click({x:x + w / 2, y:y + h / 2});
+        if(sleepSeconds){
+            await G.sleep(sleepSeconds)
+        }
     }
 
     static drag(x, y, x1, y1, steps = 1) {
@@ -165,9 +212,48 @@ class G {
         return G.waitForResult(() => {
             const res = window.__Actions.get(ts);
             return !res;
-        }, 30000, 1000);
+        }, 30000, 500);
     }
 
+
+    static async onOcrImg(ocr,timeout = 30000,interval = 1000) {
+        const ts = +new Date();
+        window.__Actions.set(ts, { type: "onOcrImg", ts, ocr });
+        return G.waitForResult(() => {
+            const res = window.__Actions.get(ts);
+            if(res){
+                return false
+            }else{
+                const result = window.__ActionResults.get(ts);
+                if(result){
+                    window.__ActionResults.delete(ts)
+                    return result
+                }
+                return {};
+            }
+        }, timeout, interval);
+    }
+    static async onMatch(featureId,timeout = 30000,interval = 1000) {
+        const ts = +new Date();
+        const {feature} = F(featureId) || {}
+        if(!feature){
+            return null;
+        }
+        window.__Actions.set(ts, { type: "onMatch", ts, feature });
+        return G.waitForResult(() => {
+            const res = window.__Actions.get(ts);
+            if(res){
+                return false
+            }else{
+                const result = window.__ActionResults.get(ts);
+                if(result){
+                    window.__ActionResults.delete(ts)
+                    return result
+                }
+                return {};
+            }
+        }, timeout, interval);
+    }
     static async clearRect(delaySeconds) {
         const t = delaySeconds ? delaySeconds * 1000: 0
         setTimeout(() => {
@@ -261,7 +347,7 @@ class Feature {
         this.id = id || G.__CurrentFeatureId;
         this.feature = G.__Features.get(this.id);
         if(!this.feature){
-            throw new Error("no feature")
+            throw new Error(id+", Error: feature is null! ")
         }
         return this;
     }
@@ -270,10 +356,18 @@ class Feature {
         return this.feature.id;
     }
 
+    get name() {
+        return this.feature.name || "";
+    }
+        
+    get feature() {
+        return this.feature || {};
+    }
+        
     get w() {
         return this.feature.cutAreaRect.w || 0;
     }
-
+        
     get h() {
         return this.feature.cutAreaRect.h || 0;
     }
@@ -290,69 +384,89 @@ class Feature {
         return this.feature.cutAreaRect;
     }
 
-    click() {
-        return G.clickFeature(this)
+    click(sleepSeconds) {
+        return G.clickFeature(this,sleepSeconds)
     }
 }
 const F = (id)=>{
     return new Feature(id)
 }
-`
+`;
 
 export default class JsCodeService {
-    static formatCodeWithFeature(code:string,roi:RoiInfo|null,roiAreaList:RoiInfo[],ocrResult:null|string|any,isTest?:boolean){
-        let features:string[] = []
+    static formatCodeWithFeature(
+        code: string,
+        roi: RoiInfo | null,
+        roiAreaList: RoiInfo[],
+        isTest: boolean = false,
+        matchedIds: string[] = []
+    ) {
+        let features: string[] =  [];
+        features = [...matchedIds]
         const matches = [...code.matchAll(/#\d+/g)]; // 使用扩展运算符将迭代器转换为数组
         matches.forEach(match => {
-            features.push(match[0])
+            if(features.indexOf(match[0]) === -1){
+                features.push(match[0]);
+            }
         });
-        const featuresPrefix = JsCodeService.getFeaturesPrefix(roi,roiAreaList,features)
-        const ocrPrefix = JsCodeService.getOcrResultPrefix(ocrResult)
-        return JsCodeService.formatCode(`\n${ocrPrefix}\n${featuresPrefix}\n${code}\n`,isTest)
-    }
-    static getFeaturesPrefix(roi:RoiInfo|null,roiAreaList:RoiInfo[],features:string[]) {
-        const currentFeatureId = roi ? `"${roi.id}"` : "null";
-        const roiAreaListNew = [...roiAreaList].filter(row=>{
-            return row.id === currentFeatureId || features.indexOf(row.id) > -1
-        }).map(row=>{
-            const {jsCode,testJsCode,ocrReplyFormat,ocrPrompt,...row1} = row
-            return row1
-        })
-        
-        return `\nG.setCurrentFeatureId(${currentFeatureId});\nG.setFeatures(${JSON.stringify(roiAreaListNew,null,2)});\n`
-    }
-    static getOcrResultPrefix(ocrResult:any) {
-        let ocrResultString = 'null';
-        if (ocrResult && typeof ocrResult === 'string') {
-            ocrResultString = `'${ocrResult}'`;
+        if (roi) {
+            if(features.indexOf(roi.id) === -1){
+                features.push(roi.id);
+            }
         }
+        const featuresPrefix = JsCodeService.getFeaturesPrefix(roi, roiAreaList, features);
 
-        if (ocrResult && typeof ocrResult !== 'string') {
-            ocrResultString = JSON.stringify(ocrResult, null, 2);
-        }
-        return `G.setOcrResult(${ocrResultString});\n`
+        const matchedIdsInPagePrefix = JsCodeService.getMatchedIdsInPagePrefix(matchedIds);
+
+        return JsCodeService.formatCode(
+            `\n${featuresPrefix}\n${matchedIdsInPagePrefix}\n${code}\n`,
+            isTest
+        );
     }
-    static formatCode(code: string,isTest?:boolean) {
-        let testCode = isTest ? "G.isTest = true\n":""
+
+    static getMatchedIdsInPagePrefix(ids: string[]) {
+        return `\nG.setMatchedIds(${JSON.stringify(ids)});\n`;
+    }
+    static getFeaturesPrefix(roi: RoiInfo | null, roiAreaList: RoiInfo[], features: string[]) {
+        const currentFeatureId = roi ? `"${roi.id}"` : 'null';
+        const roiAreaListNew = [...roiAreaList]
+            .filter(row => {
+                return features.indexOf(row.id) > -1;
+            })
+            .map(row => {
+                const { jsCode, ...row1 } = row;
+                return row1;
+            });
+
+        return `\nG.setCurrentFeatureId(${currentFeatureId});\nG.setFeatures(${JSON.stringify(
+            roiAreaListNew,
+            null,
+            2
+        )});\n`;
+    }
+    
+    static formatCode(code: string, isTest?: boolean) {
+        let testCode = isTest ? 'G.__isTest = true\n' : '';
         const code1 = `
 try{
     ${jsCodePrefix}\n\n${testCode}\n${code}
     if(main){
-        return main()
+        return await main()
     }else{
         return null;
     }
 }catch(e){
-    console.log("error",e.message,e.stack)
+    alert(e.stack)
+    console.log(">>>> error <<<<< ", e.stack)
     return null
-}`
-        return JsCodeService.handleConsole(code1)
+}`;
+        return JsCodeService.handleConsole(code1);
     }
 
     static handleConsole(code: string) {
-        const res = code.replace(/console\.log\(/g, function() {
+        const res = code.replace(/console\.log\(/g, function () {
             return `console.log('[>>>]',`;
         });
-        return res
+        return res;
     }
 }

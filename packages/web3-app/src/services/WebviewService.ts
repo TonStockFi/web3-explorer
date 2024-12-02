@@ -1,5 +1,4 @@
 import { WebviewTag } from 'electron';
-import { onAction } from '../common/electron';
 import { resizeImage } from '../common/image';
 import { sleep } from '../common/utils';
 import {
@@ -20,13 +19,14 @@ export default class WebviewService {
         if(!webview){
             return;
         }
-        if (!webview.isDevToolsOpened()) {
-            webview.openDevTools();
-        }
-        const webContentsId = this.getWebviewContentsId()
-        onAction("openDevTools",{
-            webContentsId,
-        })
+        webview.openDevTools();
+        // if (!webview.isDevToolsOpened()) {
+        //     webview.openDevTools();
+        // }
+        // const webContentsId = this.getWebviewContentsId()
+        // onAction("openDevTools",{
+        //     webContentsId,
+        // })
     }
     private tabId: string;
 

@@ -283,6 +283,44 @@ export function matchMultiTemplateV1(
     return res;
 }
 
+export function combineCanvasesFromElements(
+    canvasList: HTMLCanvasElement[],
+    outputCanvas: HTMLCanvasElement
+): HTMLCanvasElement {
+    if (canvasList.length === 0) {
+        throw new Error('The canvas list is empty.');
+    }
+
+    const outputCtx = outputCanvas.getContext('2d');
+    if (!outputCtx) {
+        throw new Error('Failed to get 2D context for the output canvas.');
+    }
+
+    // Calculate the total width and height for the output canvas
+    const totalWidth = canvasList.reduce((sum, canvas) => sum + canvas.width, 0);
+    const height = canvasList[0].height;
+
+    // Ensure all canvases have the same height
+    for (const canvas of canvasList) {
+        if (canvas.height !== height) {
+            throw new Error('All canvases must have the same height.');
+        }
+    }
+
+    // Resize the output canvas
+    outputCanvas.width = totalWidth;
+    outputCanvas.height = height;
+
+    // Draw each canvas onto the output canvas
+    let currentX = 0;
+    for (const canvas of canvasList) {
+        outputCtx.drawImage(canvas, currentX, 0);
+        currentX += canvas.width;
+    }
+
+    return outputCanvas;
+}
+
 export function combineCanvases(canvasIdList: string[], outputId: string): HTMLCanvasElement {
     if (canvasIdList.length === 0) {
         throw new Error('The canvas ID list is empty.');

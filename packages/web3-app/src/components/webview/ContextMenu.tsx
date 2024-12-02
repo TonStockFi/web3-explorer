@@ -155,7 +155,7 @@ export default function ContextMenu({
                             ts: currentTs(),
                             prompt
                         };
-                        new WebviewMainEventService().openLLMWindow(env, {
+                        new WebviewMainEventService().openLLMWindow({
                             site: 'ChatGpt',
                             message
                         });

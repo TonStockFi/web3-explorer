@@ -9,6 +9,10 @@ export default class LLMGeminiService extends LLMService {
     constructor(tabId:string) {
         super(tabId)
     }
+
+    static getTabId(){
+        return `llm_gemini`
+    }
     static getTabIdFromRecoId(recoId:string){
         return `${recoId}_gemini`
     }

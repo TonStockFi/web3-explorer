@@ -8,14 +8,12 @@ import { copyImageToClipboard } from '../../common/image';
 import { urlToDataUri } from '../../common/opencv';
 import { copyTextToClipboard, currentTs } from '../../common/utils';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { ExtensionType, getRecoId, usePlayground } from '../../providers/PlaygroundProvider';
+import { usePlayground } from '../../providers/PlaygroundProvider';
 import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
 import CutAreaService from '../../services/CutAreaService';
-import LLMGeminiService from '../../services/LLMGeminiService';
 import LLMService from '../../services/LLMService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import { SUB_WIN_ID, ViewSize } from '../../types';
-import { getPlaygroundCutImag } from './ScreenshotView';
 
 export function ScreenshotCutAreaBar({
     handleRecognition,
@@ -51,7 +49,7 @@ export function ScreenshotCutAreaBar({
     if (top + barHeight > height) {
         top = y - 4 - barHeight;
     }
-    const { showSnackbar, showBackdrop, env } = useIAppContext();
+    const { showSnackbar, env } = useIAppContext();
     const theme = useTheme();
     return (
         <>
@@ -68,6 +66,36 @@ export function ScreenshotCutAreaBar({
                 >
                     <View wh100p rowVCenter jSpaceBetween>
                         <View
+                            mr={4}
+                            onClick={async () => {
+                                showGlobalLoading(true);
+                                handleRecognition(tabId, cutAreaRect);
+                                setTimeout(() => {
+                                    showGlobalLoading(false);
+                                    onCut(false);
+                                }, 1000);
+                            }}
+                            iconButton={{
+                                sx: {
+                                    width: 24,
+                                    height: 24
+                                }
+                            }}
+                            hide={getWinId() === SUB_WIN_ID.LLM}
+                            iconProps={{ sx: { width: 16, height: 16 } }}
+                            tips={t('提取特征')}
+                            iconButtonSmall
+                            icon="Add"
+                        />
+
+                        <View
+                            divider
+                            dividerProps={{
+                                orientation: 'vertical'
+                            }}
+                        ></View>
+                        <View
+                            mr={4}
                             onClick={async () => {
                                 showGlobalLoading(true);
                                 const prompt = `${t('RecognitionImageTransTo').replace(
@@ -81,59 +109,23 @@ export function ScreenshotCutAreaBar({
                                     prompt
                                 };
 
-                                if (!getWinId() || getWinId() === SUB_WIN_ID.PLAYGROUND) {
-                                    let imageUrl;
-                                    if (getWinId() === SUB_WIN_ID.PLAYGROUND) {
-                                        imageUrl = await getPlaygroundCutImag(tabId, cutAreaRect);
-                                        if (!imageUrl) {
-                                            return showAlertMessage('截图失败', true);
-                                        }
-                                        imageUrl = await urlToDataUri(imageUrl);
-                                        if (!imageUrl) {
-                                            return showAlertMessage('截图失败', true);
-                                        }
-                                    } else {
-                                        const imgBlob = await CutAreaService.getCutBlob(
-                                            tabId,
-                                            cutAreaRect
-                                        );
+                                const imgBlob = await CutAreaService.getCutBlob(tabId, cutAreaRect);
 
-                                        if (!imgBlob) {
-                                            showSnackbar(false);
-                                            return showAlertMessage('截图失败', true);
-                                        }
-
-                                        const url = URL.createObjectURL(imgBlob);
-                                        imageUrl = await urlToDataUri(url);
-                                    }
-
-                                    new WebviewMainEventService().openLLMWindow(env, {
-                                        site: 'Gemini',
-                                        message: {
-                                            ...message,
-                                            imageUrl
-                                        }
-                                    });
-                                } else {
-                                    if (currentExtension !== ExtensionType.GEMINI) {
-                                        onChangeCurrentExtension(ExtensionType.GEMINI);
-                                    }
-                                    const ls = new LLMGeminiService(
-                                        LLMGeminiService.getTabIdFromRecoId(
-                                            getRecoId(tab!, currentAccount!)
-                                        )
-                                    );
-                                    const ready = await ls.checkWebviewIsReady();
-                                    if (!ready) {
-                                        showSnackbar(false);
-                                        return showAlertMessage('Genimi 加载失败，请重试', true);
-                                    }
-
-                                    ls.sendMessageOnce({
-                                        ...message,
-                                        cutArea: cutAreaRect
-                                    });
+                                if (!imgBlob) {
+                                    showSnackbar(false);
+                                    return showAlertMessage('截图失败', true);
                                 }
+
+                                const url = URL.createObjectURL(imgBlob);
+                                const imageUrl = await urlToDataUri(url);
+
+                                new WebviewMainEventService().openLLMWindow({
+                                    site: 'Gemini',
+                                    message: {
+                                        ...message,
+                                        imageUrl
+                                    }
+                                });
                                 setTimeout(() => {
                                     showGlobalLoading(false);
                                     onCut(false);
@@ -151,34 +143,9 @@ export function ScreenshotCutAreaBar({
                             iconButtonSmall
                             icon="Translate"
                         />
-                        <View
-                            hide={getWinId() === SUB_WIN_ID.LLM || !getWinId()}
-                            onClick={async () => {
-                                onCut(false);
-                                if (currentExtension !== ExtensionType.GEMINI) {
-                                    onChangeCurrentExtension(ExtensionType.GEMINI);
-                                }
 
-                                const imgBlob = await CutAreaService.getCutBlob(tabId, cutAreaRect);
-                                if (imgBlob) {
-                                    const url = URL.createObjectURL(imgBlob);
-                                    onChangeCurrentRecoAreaImage(url);
-                                } else {
-                                    showAlertMessage('截图失败');
-                                }
-                            }}
-                            iconButton={{
-                                sx: {
-                                    width: 24,
-                                    height: 24
-                                }
-                            }}
-                            iconProps={{ sx: { width: 16, height: 16 } }}
-                            tips={t('RecognitionInGemini')}
-                            iconButtonSmall
-                            icon={<ImageIcon size={16} icon={'icon_gemini'} />}
-                        />
                         <View
+                            mr={4}
                             hide={!!inPlayground}
                             onClick={async () => {
                                 onCut(false);
@@ -203,11 +170,15 @@ export function ScreenshotCutAreaBar({
                             icon="ContentCopy"
                         />
                         <View
+                            mr={4}
                             onClick={async () => {
-                                await copyTextToClipboard(`{x:${x}, y:${y}, w:${w}, h:${h}}`);
+                                await copyTextToClipboard(
+                                    `\n//clickRect and sleep 1 seconds\nawait G.clickRect({x:${x}, y:${y}, w:${w}, h:${h}}, 1)\n`
+                                );
                                 showSnackbar({
-                                    message: `{x:${x}, y:${y}, w:${w}, h:${h}} copied!`
+                                    message: `Copied!`
                                 });
+                                onCut(false);
                             }}
                             iconButton={{
                                 sx: {
@@ -216,7 +187,7 @@ export function ScreenshotCutAreaBar({
                                 }
                             }}
                             iconProps={{ sx: { width: 16, height: 16 } }}
-                            tips={`点击复制: {x:${x}, y:${y}, w:${w}, h:${h}}`}
+                            tips={`点击复制`}
                             iconButtonSmall
                             icon="AdsClick"
                         />

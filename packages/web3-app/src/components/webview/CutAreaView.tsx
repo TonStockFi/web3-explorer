@@ -1,4 +1,5 @@
 import { View } from '@web3-explorer/uikit-view';
+import { copyTextToClipboard } from '../../common/utils';
 import { useRecognition } from '../../providers/RecognitionProvider';
 import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
 
@@ -101,7 +102,7 @@ export default function CutAreaRectView({
         }
     };
 
-    const handleMouseUp = (e: any) => {
+    const handleMouseUp = async (e: any) => {
         const view = e.currentTarget.getBoundingClientRect();
         const relativeX = e.clientX - view.left;
         const relativeY = e.clientY - view.top;
@@ -122,6 +123,10 @@ export default function CutAreaRectView({
                 w: Math.abs(startPosition.x - relativeX),
                 h: Math.abs(startPosition.y - relativeY)
             };
+
+            copyTextToClipboard(
+                `\n//clickRect and sleep 1 seconds\nawait G.clickRect({x:${t.x}, y:${t.y}, w:${t.w}, h:${t.h}}, 1)\n`
+            );
             changeCutAreaRect(t);
             if (inPlayground) {
                 if (tabId && recognitionCatId) {
@@ -130,6 +135,7 @@ export default function CutAreaRectView({
                 } else {
                     onCutting(false);
                 }
+            } else {
             }
 
             onCutting(false);
