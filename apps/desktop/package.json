@@ -1,7 +1,7 @@
 {
     "name": "@web3-explorer/desktop",
     "license": "Apache-2.0",
-    "version": "1.0.36",
+    "version": "1.0.38",
     "description": "web3-explorer desktop",
     "main": ".webpack/main",
     "repository": {
@@ -81,6 +81,7 @@
         "@web3-explorer/app": "1.0.0",
         "@web3-explorer/uikit-mui": "1.0.0",
         "@web3-explorer/uikit-view": "1.0.0",
+        "@web3-explorer/utils": "1.0.0",
         "@web3-explorer/web3-app": "1.0.0",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",

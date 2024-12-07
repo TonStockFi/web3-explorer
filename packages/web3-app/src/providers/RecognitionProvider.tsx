@@ -1,13 +1,14 @@
 import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { onAction } from '../common/electron';
-import { isPlaygroundMaster } from '../common/helpers';
-import { PAGE_ALL_ROI } from '../constant';
+import { isPlaygroundMaster, showAlertMessage } from '../common/helpers';
+import { ENTRY_ID_ROI, MARK_ID_ROI, TASK_ID_ROI } from '../constant';
 
+import parser from 'cron-parser';
 import ProService from '../services/ProService';
-import RoiService, { RoiInfo } from '../services/RoiService';
+import RoiService from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { ProInfoProps, SUB_WIN_ID } from '../types';
+import { ProInfoProps, RoiInfo, SUB_WIN_ID } from '../types';
 import { useIAppContext } from './IAppProvider';
 import { getRecoId, usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
@@ -68,6 +69,33 @@ export const MatchResults: Map<string, MatchResult> = new Map();
 
 export const fixRow = (roi: RoiInfo) => {
     //@ts-ignore
+    if (roi.isMark) {
+        roi.type = 'mark';
+    }
+    if (!roi.type) {
+        roi.type = 'reco';
+    }
+
+    //@ts-ignore
+    if (roi.page) {
+        roi.pid = '#0';
+        //@ts-ignore
+        roi.name = roi.name || roi.page;
+    }
+
+    //@ts-ignore
+    delete roi.ocrId;
+    //@ts-ignore
+    delete roi.testJsCode;
+    //@ts-ignore
+    delete roi.isMark;
+    //@ts-ignore
+    delete roi.page;
+    //@ts-ignore
+    delete roi.pageBelongTo;
+    //@ts-ignore
+    delete roi.isTask;
+    //@ts-ignore
     delete roi.isOcr;
     //@ts-ignore
     delete roi.isTry;
@@ -94,6 +122,16 @@ export const fixRow = (roi: RoiInfo) => {
     roi.tabId = roi.tabId || roi.catId;
     //@ts-ignore
     delete roi.catId;
+
+    if (roi.type === 'task') {
+        roi.pid = TASK_ID_ROI;
+    }
+    if (roi.type === 'mark') {
+        roi.pid = MARK_ID_ROI;
+    }
+    if (!roi.pid && roi.type === 'reco') {
+        roi.pid = '#0';
+    }
 };
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -150,9 +188,9 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         'recognitionCatId_' + index,
         ''
     );
-    const [selectedPage, setSelectedPage] = useSessionStorageState(
+    const [selectedPage, setSelectedPage] = useSessionStorageState<string>(
         'selectedPage_' + index,
-        PAGE_ALL_ROI
+        ENTRY_ID_ROI
     );
 
     const [screenPushDelayMs, setScreenPushDelayMs] = useLocalStorageState(
@@ -184,6 +222,9 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     function notifyTestRoi(roi: RoiInfo) {
+        if (!RoiService.isRecoFeature(roi)) {
+            return;
+        }
         notifyWindow('onTestRoiArea', { roi });
         window.dispatchEvent(
             new CustomEvent('onTestRoiArea', {
@@ -195,24 +236,24 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     }
 
     const getScreenImg = (tabId: string) => {
-        setRecognitionCatId(recognitionCatId => {
-            if (recognitionCatId) {
-                const screenImgUrl = localStorage.getItem(`screen_${recognitionCatId}`);
-                if (screenImgUrl) {
-                    // console.log(screenImgUrl);
-                    window.dispatchEvent(
-                        new CustomEvent('onUpdateScreenImgUrl', {
-                            detail: {
-                                screenImageUrl: screenImgUrl
-                            }
-                        })
-                    );
-                } else {
-                    notifyWindow('getScreenImage', { tabId, recognitionCatId });
-                }
-            }
-            return recognitionCatId;
-        });
+        // setRecognitionCatId(recognitionCatId => {
+        //     if (recognitionCatId) {
+        //         const screenImgUrl = localStorage.getItem(`screen_${recognitionCatId}`);
+        //         if (screenImgUrl) {
+        //             // console.log(screenImgUrl);
+        //             window.dispatchEvent(
+        //                 new CustomEvent('onUpdateScreenImgUrl', {
+        //                     detail: {
+        //                         screenImageUrl: screenImgUrl
+        //                     }
+        //                 })
+        //             );
+        //         } else {
+        //             notifyWindow('getScreenImage', { tabId, recognitionCatId });
+        //         }
+        //     }
+        //     return recognitionCatId;
+        // });
     };
 
     const notifyWindow = (action: string, payload?: any) => {
@@ -273,7 +314,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             onStopClick(false);
         }
 
-        setSelectedPage(PAGE_ALL_ROI);
+        setSelectedPage('');
         setRecognitionCatId(r => {
             // console.log({ r, recognitionCatId });
             const rr = recognitionCatId ? recognitionCatId : r;
@@ -305,8 +346,6 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
     const { env } = useIAppContext();
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
-        // console.log('addRoiArea', { recognitionCatId, selectedRoiId, selectedPage });
-
         const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
         if (IdCache.get(id)) {
             return;
@@ -321,25 +360,39 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             }, 1000);
         }
         IdCache.set(id, true);
-        let page = '未设置';
-        let pageBelongTo = '';
-        if (selectedPage && selectedPage !== PAGE_ALL_ROI) {
-            pageBelongTo = selectedPage;
-            page = '';
+        let pid = r.pid;
+        if (!pid) {
+            pid = selectedPage;
+            if (r.type === 'task') {
+                pid = TASK_ID_ROI;
+            }
+            if (r.type === 'mark') {
+                pid = MARK_ID_ROI;
+            }
+            if (!pid && r.type === 'reco') {
+                pid = ENTRY_ID_ROI;
+            }
         }
-
+        let name = r.name;
+        if (!name) {
+            name = '未设置';
+        }
         const row: RoiInfo = {
             ...r,
             priority: 1000,
-            page,
-            pageBelongTo,
-            id
+            pid,
+            id,
+            name
         };
-        CacheImage.set(`${recognitionCatId}_${row.id}`, cutImageUrl);
+        if (cutImageUrl) {
+            CacheImage.set(`${recognitionCatId}_${row.id}`, cutImageUrl);
+        }
+
         await new RoiService(getServiceId(recognitionCatId, proInfoList)).save(
             id,
             row,
-            cutImageUrl
+            cutImageUrl,
+            cutImageUrl.startsWith('data')
         );
         if (!isPlaygroundMaster()) {
             const s = new WebviewMainEventService();
@@ -350,7 +403,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
                 roiInfo: row
             };
             new WebviewMainEventService()
-                .openFeatureWindow(env, 'onOpenFeatureView', {
+                .openFeatureWindow({
                     tab,
                     account: currentAccount
                 })
@@ -373,11 +426,35 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const updateRoiArea = (r: RoiInfo) => {
+        if (r.crontab && r.action === 'cron') {
+            try {
+                parser.parseExpression(r.crontab!);
+            } catch (e) {
+                showAlertMessage('定时任务不合法:r.crontab');
+
+                return;
+            }
+        }
+        let pid = r.pid;
+        if (r.type === 'task') {
+            pid = TASK_ID_ROI;
+        }
+        if (r.type === 'mark') {
+            pid = MARK_ID_ROI;
+        }
+        if (!pid && r.type === 'reco') {
+            pid = ENTRY_ID_ROI;
+        }
         setRecognitionCatId(recognitionCatId => {
             new RoiService(getServiceId(recognitionCatId, proInfoList)).update(r);
             setRoiAreaList(prv => {
                 return prv.map(row => {
-                    return row.id !== r.id ? row : r;
+                    return row.id !== r.id
+                        ? row
+                        : {
+                              ...r,
+                              pid
+                          };
                 });
             });
             notifyWindows('onUpdateRoi');

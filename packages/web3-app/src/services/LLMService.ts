@@ -9,7 +9,7 @@ import WebviewService from './WebviewService';
 export interface MessageLLM {
     id: string;
     ts: number;
-    tabId:string;
+    tabId?:string;
     accountId?: string;
     accountIndex?: number;
     winId?: string;
@@ -141,24 +141,23 @@ export default class LLMService {
     async checkWebviewIsReady() {
         return false;
     }
-
-    async waitWebviewMessageReply(message: MessageLLM) {
+    async runFormatResultCode(formatResult:string){
         const ws = new WebviewService(this.tabId);
-        console.log("waitWebviewMessageReply",message.id)
         await ws.waitwebviewIsReady();
-        let {formatResult} = message
-        formatResult = formatResult?.replace(/MESSAGE_ID/g,message.id)
-        
+
         const res = (await ws.waitForExecJsResult(
             `${JsCodeService.formatCode(formatResult!)}`,
             60000,
             1000
         )) as any;
-        console.log("waitWebviewMessageReply res",message.id)
         return res;
     }
-    
-    
+    async waitWebviewMessageReply(message: MessageLLM) {
+        console.log("waitWebviewMessageReply",message.id)
+        let {formatResult} = message
+        formatResult = formatResult?.replace(/MESSAGE_ID/g,message.id)
+        return this.runFormatResultCode(formatResult||"")
+    }
     async checIsReady(timeout:number = -1){
         return waitForResult(()=>{
             return this.getIsReady()

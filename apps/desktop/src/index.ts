@@ -53,6 +53,14 @@ app.on('web-contents-created', (_event, contents) => {
     // });
 
     const session = contents.session
+    session.on('will-download', (event, item, webContents) => {
+        if(item.getFilename().indexOf("extension") > -1 && item.getFilename().endsWith(".wet")){
+            console.log(`Blocked download: ${item.getFilename()} from ${item.getURL()}`);
+            webContents.executeJavaScript(`localStorage.setItem("extension_download","${item.getFilename()}")`)
+            webContents.executeJavaScript(`localStorage.setItem("extension_download_url","${item.getURL()}")`)
+            event.preventDefault(); // Prevent the download
+        }
+      });
     // session.setProxy()
     // session.loadExtension('/Users/ton/Desktop/projects/chrome-ext/test').then(({ id }) => {
     //     console.log("loadExtension",{id})

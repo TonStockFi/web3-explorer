@@ -2,17 +2,18 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useRef, useState } from 'react';
 import { canvasToBlob, getRoiArea } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
-import { DEFAULT_THRESHOLD } from '../../constant';
+import { DEFAULT_THRESHOLD, ENTRY_ID_ROI } from '../../constant';
 
 import { getRecoId, usePlayground } from '../../providers/PlaygroundProvider';
 import { useRecognition } from '../../providers/RecognitionProvider';
-import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
+import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import CutAreaService from '../../services/CutAreaService';
-import { RoiInfo } from '../../services/RoiService';
+
+import { RoiInfo, XYWHProps } from '../../types';
 import CutAreaRectView from './CutAreaView';
 import { ScreenshotBar } from './ScreenshotBar';
 
-export const getPlaygroundCutImag = async (tabId: string, cutAreaRect: CutAreaRect) => {
+export const getPlaygroundCutImag = async (tabId: string, cutAreaRect: XYWHProps) => {
     const img = document.querySelector(`#screen_img_copy_${tabId}`) as HTMLImageElement;
     if (!img) {
         return;
@@ -44,7 +45,7 @@ export default function ScreenshotView({
     const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
     const { currentAccount, tab } = usePlayground();
 
-    const handleRecognition = async (tabId: string, cutAreaRect: CutAreaRect) => {
+    const handleRecognition = async (tabId: string, cutAreaRect: XYWHProps) => {
         if (!currentAccount || !tab) {
             return;
         }
@@ -74,15 +75,16 @@ export default function ScreenshotView({
         //@ts-ignore
         delete cutAreaRect.end;
         const roiInfo: RoiInfo = {
-            priority: 0,
+            priority: 1000,
             id: '',
+            pid: ENTRY_ID_ROI,
             ts,
             tabId,
+            type: 'reco',
             threshold: DEFAULT_THRESHOLD,
             cutAreaRect: cutAreaRect!
         };
         addRoiArea(roiInfo, cutImageUrl, recoId);
-
         onCutting(false);
     };
     useEffect(() => {

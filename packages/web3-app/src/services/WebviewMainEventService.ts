@@ -20,11 +20,12 @@ import {
 import { BaseWindowConstructorOptions } from 'electron';
 import { onAction, openWindow } from '../common/electron';
 import { getDiscoverHost } from '../common/helpers';
-import { getPartitionKey } from '../common/utils';
-import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT } from '../constant';
+import { currentTs, getPartitionKey } from '../common/utils';
+import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
 import { AccountPublic, SUB_WIN_ID } from '../types';
+import LLMService, { MessageLLM } from './LLMService';
 
 const colors = [
     indigo,
@@ -61,14 +62,14 @@ export default class WebviewMainEventService {
             throw new Error('backgroundApi API is not available');
         }
     }
-    async openFeatureWindow(env: AppEnv, action?: string, payload?: any) {
-        const { isDev,workArea } = env;
-
-        const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.PLAYGROUND}`;
+    async openFeatureWindow(payload?:{tab:BrowserTab,account:AccountPublic}) {
+        const isDev = this.getIsDev();
+        const initMessage  = this.getInitMessage()
+        const url = `${getDiscoverHost(isDev)}&initMessage=${initMessage}#${SUB_WIN_ID.PLAYGROUND}`;
         const width = 910;
-        const height = workArea.height / 2;
-        const x = workArea.x;
-        const y = workArea.height ;
+        const height = 500;
+        const x = 100;
+        const y = 100 ;
         await this.openWindow(
             SUB_WIN_ID.PLAYGROUND,
             url,
@@ -91,14 +92,23 @@ export default class WebviewMainEventService {
             isDev
         );
         const res = await this.waitForIsWinReady(SUB_WIN_ID.PLAYGROUND);
-        if (res && action) {
-            await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, action, payload || {});
+        if (res && payload) {
+            await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, "onOpenFeatureView", payload || {});
         }
     }
 
-    async openOcrWindow(sideWeb?: SideWebProps) {
+    getIsDev(){
         const uri = new URL(location.href)
-        const isDev = !!uri.searchParams.get('isDev');
+        return !!uri.searchParams.get('isDev');
+    }
+
+    getInitMessage(){
+        const uri = new URL(location.href)
+        return uri.searchParams.get('initMessage');
+    }
+
+    async openOcrWindow(sideWeb?: SideWebProps) {
+        const isDev = this.getIsDev();
         const winId = SUB_WIN_ID.OCR
         const url = `${getDiscoverHost(isDev)}#${winId}`;
         const width = 386;
@@ -141,7 +151,7 @@ export default class WebviewMainEventService {
         }
       
     }
-    async openLLMWindow(sideWeb?: SideWebProps) {
+    async openLLMWindow(sideWeb?: SideWebProps,message?:Partial<MessageLLM>) {
 
         const uri = new URL(location.href)
         const isDev = !!uri.searchParams.get('isDev');
@@ -174,15 +184,27 @@ export default class WebviewMainEventService {
             true
         );
         await this.waitForIsWinReady(SUB_WIN_ID.LLM);
-        if(sideWeb){
+        if(sideWeb || message){
+            let sideWeb1 = {
+                site: 'ChatGpt',
+                ...sideWeb,
+            }
+            if(message){
+                let id = message.id || LLMService.genId()
+                let prompt = message.prompt || "";
+                if(!prompt){
+                    return;
+                }
+                sideWeb1.message = {
+                    ...message,
+                    prompt,
+                    id,ts:currentTs()
+                }
+            }
             await this.sendMessageToSubWin(
                 SUB_WIN_ID.LLM,
                 'openSideWeb',
-                sideWeb
-                    ? sideWeb
-                    : {
-                          site: 'ChatGpt'
-                      }
+                sideWeb1
             );
         }
         
@@ -192,7 +214,6 @@ export default class WebviewMainEventService {
         return winId;
     }
     static getPlaygroundWindowProps({
-        isMac,
         isDev,
         index,
         tabId,
@@ -201,7 +222,6 @@ export default class WebviewMainEventService {
     }: {
         initMessage:string;
         isDev: boolean;
-        isMac: boolean;
         index: number;
         resizable?:boolean;
         tabId: string;
@@ -209,7 +229,7 @@ export default class WebviewMainEventService {
         const topColor = getTopColor(index);
 
         let height = PLAYGROUND_WIN_HEIGHT;
-        let resizable_ = resizable || true;
+        let resizable_ = true;
         const minWidth = 368;
         let y = 12;
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
@@ -232,9 +252,7 @@ export default class WebviewMainEventService {
                 x,
                 y,
                 titleBarStyle: 'hiddenInset',
-                titleBarOverlay: isMac
-                    ? false
-                    : { height: 44, color: topColor, symbolColor: '#ffffff' },
+                titleBarOverlay: false,
                 trafficLightPosition: { x: 18, y: 14 },
                 frame: false,
                 autoHideMenuBar: true,
@@ -271,13 +289,41 @@ export default class WebviewMainEventService {
             animate: true
         });
     }
+    async openTelegramWindow(account: AccountPublic){
+        
+        const url = TELEGRAME_WEB
+        const uri = new URL(url)
+        const tabId = uri.hostname.replace(/\./g,"_")
+        const tab:BrowserTab = {
+            tabId,
+            ts: currentTs(),
+            initUrl:url,
+            ts1: 0
+        }
+        const isDev = this.getIsDev();
+
+        const initMessage = Buffer.from(JSON.stringify({
+            account,tab
+        })).toString("hex")
+        
+        const { options, winId, playgroundUrl } = WebviewMainEventService.getPlaygroundWindowProps({
+            index:account.index,
+            isDev,
+            tabId: tab.tabId,
+            initMessage,
+            resizable:!tab.twa
+        });
+
+        await this.openWindow(winId, playgroundUrl, options, isDev);
+        
+    }
     async openPlaygroundWindow(
         tab: BrowserTab,
         account: AccountPublic,
         env: AppEnv
     ) {
         const { index } = account;
-        const { isDev, isMac } = env;
+        const { isDev } = env;
 
         const initMessage = Buffer.from(JSON.stringify({
             account,tab
@@ -285,7 +331,6 @@ export default class WebviewMainEventService {
 
         const { options, winId, playgroundUrl } = WebviewMainEventService.getPlaygroundWindowProps({
             index,
-            isMac,
             isDev,
             tabId: tab.tabId,
             initMessage,

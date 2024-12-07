@@ -6,7 +6,7 @@ import CardContent from '@web3-explorer/uikit-mui/dist/mui/CardContent';
 import Chip from '@web3-explorer/uikit-mui/dist/mui/Chip';
 import type { DividerProps } from '@web3-explorer/uikit-mui/dist/mui/Divider';
 import Divider from '@web3-explorer/uikit-mui/dist/mui/Divider';
-import Drawer from '@web3-explorer/uikit-mui/dist/mui/Drawer';
+import Drawer, { DrawerProps } from '@web3-explorer/uikit-mui/dist/mui/Drawer';
 import type { IconButtonProps } from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import { getIcon } from '@web3-explorer/uikit-mui/dist/mui/Icons';
@@ -21,7 +21,7 @@ import Snackbar from '@web3-explorer/uikit-mui/dist/mui/Snackbar';
 import Loading from '@web3-explorer/uikit-mui/dist/components/Loading';
 import Tooltip from '@web3-explorer/uikit-mui/dist/mui/Tooltip';
 import Typography from '@web3-explorer/uikit-mui/dist/mui/Typography';
-import React from 'react';
+import React, { useState } from 'react';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import DialogView from '../components/DialogView';
 import Prompt from '../components/Prompt';
@@ -31,10 +31,20 @@ import { handleProps } from './utils';
 
 declare const IS_DEV: string;
 
+const handleDrawer = (props: DrawerProps) => {
+    return {
+        sx: { '& .MuiPaper-root': { top: 0 } },
+        anchor: 'right',
+        ...props
+    } as DrawerProps;
+};
+
 //@ts-ignore
 export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     const {
         loading,
+        label,
+        labelWidth,
         loadingProps,
         card,
         cardProps,
@@ -84,6 +94,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         hide,
         button,
         buttonContained,
+        buttonOutlined,
         buttonSize,
         buttonColor,
         buttonVariant,
@@ -96,7 +107,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         iconButtonProps,
         ...props_
     } = props;
-
+    const [showDrawer, setShowDrawer] = useState(false);
     if (hide) return null;
 
     if (_D !== undefined && _D0 === undefined) {
@@ -117,21 +128,28 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
             </Box>
         );
     }
-    if (drawer) {
-        return (
-            <Drawer {...drawer}>
-                <Box {...handleProps(props_)} />
-            </Drawer>
-        );
-    }
-
-    if (button) {
-        const { onClick, ...p1 } = handleProps(props_);
+    if (button || buttonOutlined || buttonContained) {
+        if (drawer) {
+        }
+        let buttonText = button;
         let buttonVariant1 = buttonVariant;
+        if (typeof buttonOutlined === 'string') {
+            buttonText = buttonOutlined;
+        }
+        if (buttonOutlined) {
+            buttonVariant1 = 'outlined';
+        }
+        if (typeof buttonContained === 'string') {
+            buttonText = buttonContained;
+            buttonVariant1 = 'contained';
+        }
+
         if (buttonContained) {
             buttonVariant1 = 'contained';
         }
-        const p2 = {
+        const { onClick, ...p1 } = handleProps(props_);
+
+        let p2 = {
             onClick,
             variant: buttonVariant1 || 'text',
             size: buttonSize || 'small',
@@ -141,8 +159,39 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
             ...p1,
             ...buttonProps
         };
+        if (drawer) {
+            p2 = {
+                ...p2,
+                onClick: () => {
+                    setShowDrawer(true);
+                }
+            };
+        }
         //@ts-ignore
-        return <Button {...p2}>{button}</Button>;
+        const node = <Button {...p2}>{buttonText}</Button>;
+        if (drawer) {
+            return (
+                <>
+                    {node}
+                    <Drawer
+                        {...handleDrawer(drawer)}
+                        open={showDrawer}
+                        onClose={() => setShowDrawer(false)}
+                    >
+                        <Box {...handleProps(props_)} />
+                    </Drawer>
+                </>
+            );
+        } else {
+            return node;
+        }
+    }
+    if (drawer) {
+        return (
+            <Drawer {...handleDrawer(drawer)}>
+                <Box {...handleProps(props_)} />
+            </Drawer>
+        );
     }
 
     if (iconButton || iconButtonSmall) {
@@ -165,7 +214,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         const node = <IconButton {...p2}>{node1}</IconButton>;
         if (tips) {
             return (
-                <Tooltip placement={tipsPlacement || 'bottom'} title={tips}>
+                <Tooltip arrow placement={tipsPlacement || 'bottom'} title={tips}>
                     <Box {...p1}>{node}</Box>
                 </Tooltip>
             );
@@ -189,6 +238,23 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         const { sx, ...p2 } = textProps || { sx: {} };
         return (
             <Box {...p1}>
+                {label && (
+                    <Typography
+                        sx={{
+                            userSelect: 'none',
+                            display: 'inline-flex',
+                            width: labelWidth ? `${labelWidth}px` : undefined
+                        }}
+                        fontSize={textFontSize}
+                        fontWeight={700}
+                        color={textColor || 'inherit'}
+                        variant={textVariant}
+                        component="span"
+                    >
+                        {label}
+                    </Typography>
+                )}
+
                 <Typography
                     sx={{
                         wordBreak: 'break-word',
@@ -208,7 +274,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
                     fontWeight={textBold ? 700 : undefined}
                     color={textColor || 'inherit'}
                     variant={textVariant}
-                    component="div"
+                    component="span"
                     {...p2}
                 >
                     {children || text}
@@ -348,5 +414,3 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     // @ts-ignore
     return <Box {...handleProps(props_)} ref={ref} />;
 });
-
-View.displayName = 'View';

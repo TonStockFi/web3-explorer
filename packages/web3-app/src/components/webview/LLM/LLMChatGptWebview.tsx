@@ -52,7 +52,7 @@ export function LLmChatGptWebview({
             const prompt = message.prompt.replace(/MESSAGE_ID/g, message.id);
             let { imageUrl, cutArea } = message;
             if (cutArea) {
-                const ws = new WebviewService(message.tabId);
+                const ws = new WebviewService(message.tabId!);
                 await ws.sendClickEvent(cutArea.x + cutArea.w / 2, cutArea.y + cutArea.h / 2);
                 await sleep(200);
                 imageUrl = (await ws.captureScreenToDataURL(
@@ -102,7 +102,7 @@ export function LLmChatGptWebview({
                     <LLmWebview currentTabId={currentTabId} pid={pid1} tabId={tabId} url={url} />
                 </View>
             </View>
-            {tabId === currentTabId && <ControlsView findInPageTop={72} tabId={tabId} />}
+            {tabId === currentTabId && <ControlsView findInPageTop={5} tabId={tabId} />}
         </View>
     );
 }

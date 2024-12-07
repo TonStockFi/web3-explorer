@@ -1,29 +1,15 @@
+import { bool } from '@web3-explorer/opencv/dist/types/opencv';
 import { IndexedDbCache } from '@web3-explorer/utils';
 import { urlToDataUri } from '../common/opencv';
-import { CutAreaRect } from '../providers/ScreenshotProvider';
+import { ENTRY_ID_ROI } from '../constant';
+import { ExtenssionPublishData, RoiInfo } from '../types';
 
-export interface RoiInfo {
-    id: string;
-    tabId: string;
-    threshold: number;
-    name?: string;
-    priority: number;
-    pageBelongTo?: string;
-    ts: number;
-    page?: string;
-    jsCode?:string;
-    testJsCode?:string;
-    isTry?: boolean;
-    isMark?: boolean;
-    action?:"click" | "callOcr" | "invokeCode" | string;
-    mergeArea?: boolean;
-    cutAreaRect: CutAreaRect;
-}
 
 export default class RoiService {
     indexedDb: IndexedDbCache;
     indexedDbImg: IndexedDbCache;
     indexedDbIds: IndexedDbCache;
+    indexedDbExt: IndexedDbCache;
     tabId: string;
 
     constructor(tabId: string) {
@@ -31,9 +17,18 @@ export default class RoiService {
         this.indexedDb = new IndexedDbCache().init(`roi-Info/${tabId}`);
         this.indexedDbImg = new IndexedDbCache().init(`roi-Img/${tabId}`);
         this.indexedDbIds = new IndexedDbCache().init(`roi-Ids/${tabId}`);
+        this.indexedDbExt = new IndexedDbCache().init(`roi-ext/${tabId}`);
     }
     
 
+    getExtenssion(eId: any) {
+        return this.indexedDbExt.get(eId)
+    }
+
+    saveExtenssion(eId: any,ext:ExtenssionPublishData) {
+        return this.indexedDbExt.put(eId,ext)
+    }
+    
     async getImage(id: string): Promise<string> {
         return await this.indexedDbImg.get(id);
     }
@@ -70,10 +65,16 @@ export default class RoiService {
         return true;
     }
 
-    async save(id: string, info: RoiInfo, imageUrl: string, isDataUrl?: boolean) {
+    async get(id: string) {
+        return this.indexedDb.get(`${id}`);
+    }
+
+    async save(id: string, info: RoiInfo, imageUrl?: string, isDataUrl?: boolean) {
         await this.indexedDb.put(`${id}`, info);
-        const dataUrl = isDataUrl ? imageUrl : await urlToDataUri(imageUrl);
-        await this.indexedDbImg.put(`${id}`, dataUrl);
+        if(imageUrl){
+            const dataUrl = isDataUrl ? imageUrl : await urlToDataUri(imageUrl);
+            await this.indexedDbImg.put(`${id}`, dataUrl);
+        }
         return true;
     }
 
@@ -89,5 +90,45 @@ export default class RoiService {
             await this.remove(id)
         }
         this.indexedDbIds.delete(this.tabId)
+    }
+    
+    
+    static hasActionOrIsRecoFeature(row: RoiInfo): bool {
+        return Boolean(row.action) || row.type === "reco"
+    }
+    static hasAction(row: RoiInfo): bool {
+        return Boolean(row.action) 
+    }
+    
+    static isRecoFeature(row: RoiInfo): bool {
+        return row.type === "reco"
+    }
+    
+    static isNotMarkFeature(row: RoiInfo): bool {
+        return row.type !== "mark"
+    }
+
+    static getEntryId(): string {
+        return ENTRY_ID_ROI
+    }
+    
+    static isEntryElement(row: RoiInfo): bool {
+        return row.pid === RoiService.getEntryId()
+    }
+
+    static getEntryRunElements(rows?: RoiInfo[]):  RoiInfo[]{
+        return rows ? rows.filter(row=>RoiService.isRecoFeature(row) && RoiService.isEntryElement(row)):[]
+    }
+
+    static getEntryElements(rows?: RoiInfo[]):  RoiInfo[]{
+        return rows ? rows.filter(row=>RoiService.isEntryElement(row)):[]
+    }
+
+    static getNotEntryElements(rows?: RoiInfo[]):  RoiInfo[]{
+        return rows ? rows.filter(row=>!RoiService.isEntryElement(row)):[]
+    }
+
+    static getFinishLoopElements(rows?: RoiInfo[]):  RoiInfo[]{
+        return rows ? rows.filter(row=>row.action === 'finishLoop'):[]
     }
 }

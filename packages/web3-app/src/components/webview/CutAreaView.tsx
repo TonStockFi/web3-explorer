@@ -1,9 +1,9 @@
 import { View } from '@web3-explorer/uikit-view';
-import { copyTextToClipboard } from '../../common/utils';
 import { useRecognition } from '../../providers/RecognitionProvider';
-import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
+import { useScreenshotContext } from '../../providers/ScreenshotProvider';
+import { XYWHProps } from '../../types';
 
-export function getBorderWidthFromRect(width: number, height: number, rect: CutAreaRect) {
+export function getBorderWidthFromRect(width: number, height: number, rect: XYWHProps) {
     if (!isCutAreaExists(rect)) {
         return {
             borderLeftWidth: 0,
@@ -27,27 +27,16 @@ export function getBorderWidthFromRect(width: number, height: number, rect: CutA
     };
 }
 
-export const DefaultCutRect: CutAreaRect = {
-    start: { x: 0, y: 0 },
-    end: { x: 0, y: 0 },
+export const DefaultCutRect: XYWHProps = {
     x: 0,
     y: 0,
     w: 0,
     h: 0
 };
 
-export function getRoiRect(rect: CutAreaRect) {
-    return {
-        x: rect.start.x,
-        y: rect.start.y,
-        w: Math.abs(rect.start.x - rect.end.x),
-        h: Math.abs(rect.start.y - rect.end.y)
-    };
-}
-
 let startPosition = { x: 0, y: 0 };
 
-export function isCutAreaExists(cutAreaRect: CutAreaRect) {
+export function isCutAreaExists(cutAreaRect: XYWHProps) {
     return cutAreaRect.w > 0 && cutAreaRect.h > 0;
 }
 export default function CutAreaRectView({
@@ -57,7 +46,7 @@ export default function CutAreaRectView({
     handleRecognition
 }: {
     tabId?: string;
-    handleRecognition: (tabId: string, cutAreaRect: CutAreaRect) => Promise<void>;
+    handleRecognition: (tabId: string, cutAreaRect: XYWHProps) => Promise<void>;
     inPlayground?: boolean;
     viewSize: { width: number; height: number };
 }) {
@@ -88,12 +77,6 @@ export default function CutAreaRectView({
             (startPosition.x > 0 || startPosition.y > 0)
         ) {
             changeCutAreaRect({
-                start: startPosition,
-                end: {
-                    x: relativeX,
-                    y: relativeY
-                },
-
                 x: startPosition.x < relativeX ? startPosition.x : relativeX,
                 y: startPosition.y < relativeY ? startPosition.y : relativeY,
                 w: Math.abs(startPosition.x - relativeX),
@@ -113,20 +96,20 @@ export default function CutAreaRectView({
             (startPosition.x > 0 || startPosition.y > 0)
         ) {
             const t = {
-                start: startPosition,
-                end: {
-                    x: relativeX,
-                    y: relativeY
-                },
+                // start: startPosition,
+                // end: {
+                //     x: relativeX,
+                //     y: relativeY
+                // },
                 x: startPosition.x < relativeX ? startPosition.x : relativeX,
                 y: startPosition.y < relativeY ? startPosition.y : relativeY,
                 w: Math.abs(startPosition.x - relativeX),
                 h: Math.abs(startPosition.y - relativeY)
             };
 
-            copyTextToClipboard(
-                `\n//clickRect and sleep 1 seconds\nawait G.clickRect({x:${t.x}, y:${t.y}, w:${t.w}, h:${t.h}}, 1)\n`
-            );
+            // copyTextToClipboard(
+            //     `\n//clickRect and sleep 1 seconds\nawait G.clickRect({x:${t.x}, y:${t.y}, w:${t.w}, h:${t.h}}, 1)\n`
+            // );
             changeCutAreaRect(t);
             if (inPlayground) {
                 if (tabId && recognitionCatId) {

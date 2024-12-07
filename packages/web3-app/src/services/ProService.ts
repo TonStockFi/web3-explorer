@@ -41,7 +41,7 @@ export default class ProService {
         await this.indexedDb.delete(`${index}`);
     }
 
-    static getAccluntCurrentPlan(proInfoList: ProInfoProps[], account?: AccountPublic | null) {
+    static getAccountCurrentPlan(proInfoList: ProInfoProps[], account?: AccountPublic | null) {
         if(!account){
             return null
         }

@@ -1,8 +1,6 @@
 import { sleep } from '../common/utils';
 import WebviewService from './WebviewService';
 
-
-
 // export const getAvatar = async (userId: string, accessKey: string, webview: WebviewTag) => {
 //     try {
 //         await webview.executeJavaScript(`  
@@ -117,9 +115,6 @@ import WebviewService from './WebviewService';
 //     }
 // };
 
-
-
-
 export default class WebviewServiceTelegram extends WebviewService {
     
     constructor(tabId: string) {
@@ -138,17 +133,24 @@ export default class WebviewServiceTelegram extends WebviewService {
 
     }
 
-    async isLogged(): Promise<boolean> {
+    async getAuthUserId(): Promise<null|string> {
         const webview = this.getWebview();
         if (!webview) {
             console.warn('webview is null when isLogged ');
-            return false;
+            return null;
         }
-        const code = `const user_auth = JSON.parse(localStorage.getItem("user_auth") || "{}")
-        return !!user_auth.id;`;
+        const code = `
+        const user_auth = JSON.parse(localStorage.getItem("user_auth") || "{}")
+        return user_auth.id || null`;
         console.debug('isLogged', code);
         return this.execJs(code);
     }
+
+    async isLogged(): Promise<boolean> {
+        const userId = this.getAuthUserId()
+        return !!userId
+    }
+
     async waitForLogged(): Promise<boolean> {
         const webview = this.getWebview();
         if (!webview) {

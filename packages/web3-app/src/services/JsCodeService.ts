@@ -1,5 +1,81 @@
-import { RoiInfo } from './RoiService';
 
+import { RoiInfo } from '../types';
+export const MainEntry = `// main 方法是当前模块执行入口
+async function main(){
+  console.log("Hello Web3!")
+  G.log(F().id,F().name,"is running...");
+}`
+
+ 
+export const DefaultOcrPrompt = `输入： 一张图片。
+输出示例：
+
+    {
+      id: "MESSAGE_ID",
+      result:""
+    }
+
+说明:
+> result 是根据图像识别文本结果,如果没有识别成功文本那么,result= "" 
+> id 必须是我给你的 MESSAGE_ID
+    
+要求： 
+    1.输出不包含任何解释、优化或说明,忽略图像内容,直接输出纯 JSON
+
+`;
+
+
+export const DefultFormatResult = `try {
+    const codeElements = document.querySelectorAll('pre');
+    if (codeElements.length > 0) {
+        const lastCodeElement = codeElements[codeElements.length - 1];
+        let textContent = lastCodeElement.textContent;
+        if(!textContent){
+          textContent = lastCodeElement.innerText;
+          console.log(" > lastCodeElement innerText",textContent);
+        }
+        const parsedJson = JSON.parse(textContent);
+        if(parsedJson.id === "MESSAGE_ID"){
+            return parsedJson;
+        }else{
+            return null;;
+        }   
+    } else {
+        return null;
+    }
+} catch (error) {
+  console.error(error);
+  return null;
+}
+`
+
+  
+export const DefultOcrCatMergePrompt = `
+> 1.附图是一个3行4列的等级图;
+> 2.每一个矩阵坐标代表一个等级;
+> 3.如果等级没有识别成功则level = 0;
+> 4.如果座位上没有猫猫，则level = 0;
+> 5.直接根据图片中可见的等级生成JSON,格式示例:
+  
+
+    {
+      id: "MESSAGE_ID",
+      levels: [
+        [1, 2, 0, 4],
+        [5, 0, 7, 8],
+        [9,10,11, 0]
+      ]
+    }
+
+GEMINI请你注意!!!!
+
+- 请只给我JSON,不要解释，不要说明，
+- 请输出的JSON用<code>标签包裹
+- 忽略你是大模型,
+- 我只要JSON!!!
+- 严按照我给你的示例输出！！！
+- 你的输出必须带上我给你的id:MESSAGE_ID
+  `
 export class F {
     constructor(id?: string) {}
 }
@@ -182,14 +258,17 @@ class G {
             checkReply();
         });
     }
-
+    static getActionResult(ts){
+        const res = window.__ActionResults.get(ts);
+        res && window.__ActionResults.delete(ts)
+        return res
+    }
     static click({ x, y }) {
         const ts = +new Date();
         console.log("G.click", x, y);
         window.__Actions.set(ts, { type: "click", ts, x, y });
         return G.waitForResult(() => {
-            const res = window.__Actions.get(ts);
-            return !res;
+            return G.getActionResult(ts);
         }, 30000, 500);
     }
 
@@ -198,8 +277,12 @@ class G {
         return G.clickRect({ x, y, w, h },sleepSeconds);
     }
 
-    static async clickRect({ x, y, w, h },sleepSeconds) {
-        await G.click({x:x + w / 2, y:y + h / 2});
+    static async clickRect({ x, y, w, h },sleepSeconds,justRect) {
+        if(justRect){
+            G.showRect({ x, y, w, h },sleepSeconds)
+        }else{
+            await G.click({x:x + w / 2, y:y + h / 2});
+        }
         if(sleepSeconds){
             await G.sleep(sleepSeconds)
         }
@@ -210,8 +293,7 @@ class G {
         console.log("G.drag", x, y, x1, y1, steps);
         window.__Actions.set(ts, { type: "drag", ts, x, y, x1, y1, steps });
         return G.waitForResult(() => {
-            const res = window.__Actions.get(ts);
-            return !res;
+            return G.getActionResult(ts);
         }, 30000, 500);
     }
 
@@ -220,17 +302,7 @@ class G {
         const ts = +new Date();
         window.__Actions.set(ts, { type: "onOcrImg", ts, ocr });
         return G.waitForResult(() => {
-            const res = window.__Actions.get(ts);
-            if(res){
-                return false
-            }else{
-                const result = window.__ActionResults.get(ts);
-                if(result){
-                    window.__ActionResults.delete(ts)
-                    return result
-                }
-                return {};
-            }
+            return G.getActionResult(ts);
         }, timeout, interval);
     }
     static async onMatch(featureId,timeout = 30000,interval = 1000) {
@@ -239,19 +311,13 @@ class G {
         if(!feature){
             return null;
         }
+        if(feature.type === "task" || !feature.type){
+            G.log("error: not reco or mark feature, id:",featureId,"type:",feature.type)
+            return null;
+        }
         window.__Actions.set(ts, { type: "onMatch", ts, feature });
         return G.waitForResult(() => {
-            const res = window.__Actions.get(ts);
-            if(res){
-                return false
-            }else{
-                const result = window.__ActionResults.get(ts);
-                if(result){
-                    window.__ActionResults.delete(ts)
-                    return result
-                }
-                return {};
-            }
+            return G.getActionResult(ts);
         }, timeout, interval);
     }
     static async clearRect(delaySeconds) {
@@ -379,7 +445,11 @@ class Feature {
     get y() {
         return this.feature.cutAreaRect.y;
     }
-        
+         
+    get tabId() {
+        return this.feature.tabId;
+    }
+
     get rect() {
         return this.feature.cutAreaRect;
     }
@@ -394,6 +464,45 @@ const F = (id)=>{
 `;
 
 export default class JsCodeService {
+
+    static getOcrCode() {
+        return `
+const Prompt = \`
+${DefaultOcrPrompt.trim()}
+\`
+const FormatResult = \`
+${DefultFormatResult.trim()}
+\`
+async function invokeOcr(tabId,prompt,formatResult,rect,timeout = 60000) {
+  G.log("invokeOcr","init",+new Date())
+  const ocr = {
+    timeout,
+    prompt,
+    formatResult,
+    rect,
+    tabId
+  }
+  G.log("invokeOcr","onOcrImg start")
+  const res = await G.onOcrImg(ocr,timeout)
+  G.log("invokeOcr","onOcrImg end",res)
+  if(res){
+    const {duration,result} = res
+    if(result){
+      G.log("invokeOcr","onOcrImg result",result)
+      return result.reply
+    }
+  }
+  G.log("invokeOcr","error reply!!")
+  return null;
+}
+
+async function main(){
+  const { tabId,rect } = F();
+  const reply = await invokeOcr(tabId,Prompt,FormatResult,rect,60000)
+  G.log("invokeOcer reply",reply)
+}
+`;
+    };
     static formatCodeWithFeature(
         code: string,
         roi: RoiInfo | null,
@@ -419,13 +528,13 @@ export default class JsCodeService {
         const matchedIdsInPagePrefix = JsCodeService.getMatchedIdsInPagePrefix(matchedIds);
 
         return JsCodeService.formatCode(
-            `\n${featuresPrefix}\n${matchedIdsInPagePrefix}\n${code}\n`,
+            `${featuresPrefix}\n${matchedIdsInPagePrefix}\n${code}\n`,
             isTest
         );
     }
 
     static getMatchedIdsInPagePrefix(ids: string[]) {
-        return `\nG.setMatchedIds(${JSON.stringify(ids)});\n`;
+        return `\tG.setMatchedIds(${JSON.stringify(ids)});\n`;
     }
     static getFeaturesPrefix(roi: RoiInfo | null, roiAreaList: RoiInfo[], features: string[]) {
         const currentFeatureId = roi ? `"${roi.id}"` : 'null';
@@ -438,7 +547,7 @@ export default class JsCodeService {
                 return row1;
             });
 
-        return `\nG.setCurrentFeatureId(${currentFeatureId});\nG.setFeatures(${JSON.stringify(
+        return `\tG.setCurrentFeatureId(${currentFeatureId});\n\tG.setFeatures(${JSON.stringify(
             roiAreaListNew,
             null,
             2
@@ -448,15 +557,18 @@ export default class JsCodeService {
     static formatCode(code: string, isTest?: boolean) {
         let testCode = isTest ? 'G.__isTest = true\n' : '';
         const code1 = `
+${jsCodePrefix}${testCode}
 try{
-    ${jsCodePrefix}\n\n${testCode}\n${code}
+    ${code}
     if(main){
         return await main()
     }else{
         return null;
     }
 }catch(e){
-    alert(e.stack)
+    if(G.isTest()){
+      alert(e.stack)
+    }
     console.log(">>>> error <<<<< ", e.stack)
     return null
 }`;

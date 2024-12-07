@@ -2,8 +2,7 @@ import { Html5Cache, IndexedDbCache } from '@web3-explorer/utils';
 import { onAction } from '../common/electron';
 import { resizeImage } from '../common/image';
 import { urlToBlob } from '../common/opencv';
-import { CutAreaRect } from '../providers/ScreenshotProvider';
-import { RoiInfo } from './RoiService';
+import { RoiInfo, XYWHProps } from '../types';
 import WebviewMainEventService from './WebviewMainEventService';
 import WebviewService from './WebviewService';
 
@@ -97,7 +96,7 @@ export default class CutAreaService {
         }
     }
 
-    static async getCutBlob(tabId: string, cutAreaRect: CutAreaRect) {
+    static async getCutBlob(tabId: string, cutAreaRect: XYWHProps) {
         if (tabId) {
             const ws = new WebviewService(tabId);
             const webview = ws.getWebview();

@@ -1,4 +1,4 @@
-import { CutAreaRect, XYWHProps } from "../types";
+import { XYWHProps } from "../types";
 import { currentTs } from "./utils";
 
 export function roiAreaDelta({
@@ -190,7 +190,7 @@ export async function urlToDataUri(url: string): Promise<string> {
 }
 
 
-export const getRoiArea = async (cutAreaRect: CutAreaRect, outputId: string, tabId: string) => {
+export const getRoiArea = async (cutAreaRect: XYWHProps, outputId: string, tabId: string) => {
     //@ts-ignore
     const { cv } = window;
     try {

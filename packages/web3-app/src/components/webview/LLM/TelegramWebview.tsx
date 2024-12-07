@@ -4,34 +4,31 @@ import { useOnce } from '@web3-explorer/utils';
 import { useState } from 'react';
 import { useTheme } from 'styled-components';
 import { sleep } from '../../../common/utils';
+import { TELEGRAME_WEB } from '../../../constant';
 import { usePlayground } from '../../../providers/PlaygroundProvider';
-import LLMGeminiService from '../../../services/LLMGeminiService';
+import LLMChatGptService from '../../../services/LLMChatGptService';
 import WebviewService from '../../../services/WebviewService';
 import { LoopView } from '../../common/LoopView';
 import { ControlsView } from '../ControlsView';
 import { LLmWebview } from './LLmWebview';
 
-export function LLmGeminiWebview({
+export function TelegramWebview({
     currentTabId,
     pid,
-    tabId,
-    noCut,
-    loop
+    tabId
 }: {
-    noCut?: boolean;
-    loop?: (reply: string) => Promise<void>;
     currentTabId?: string;
     pid?: string;
     tabId: string;
 }) {
-    const url = 'https://gemini.google.com/app';
+    const url = TELEGRAME_WEB;
     const [reply, setReply] = useState('');
     const { currentAccount } = usePlayground();
 
     const pid1 = pid || `p_llm_${currentAccount!.id}_${currentAccount!.index || 0}`;
 
     useOnce(() => {
-        const ls = new LLMGeminiService(tabId);
+        const ls = new LLMChatGptService(tabId);
         ls.setIsReady(false);
         ls.getAll().then(rows => {
             rows.forEach(element => {
@@ -40,100 +37,73 @@ export function LLmGeminiWebview({
         });
     });
 
-    const checkGeminiCb = async () => {
-        loop && (await loop(reply));
-        await new LLMGeminiService(tabId).checkWebviewIsReady();
+    const checkChatGptCb = async () => {
+        await new LLMChatGptService(tabId).checkWebviewIsReady();
     };
 
     const pullMessageCb = async () => {
-        const ls = new LLMGeminiService(tabId);
+        const ls = new LLMChatGptService(tabId);
         if (!ls.getIsReady()) {
             return;
         }
         const message = await ls.pullMessage();
 
         if (message) {
-            setReply('');
-            console.debug('llm gemini pullMessage', message);
+            console.debug('llm ChatGpt pullMessage', message);
             const prompt = message.prompt.replace(/MESSAGE_ID/g, message.id);
             let { imageUrl, cutArea } = message;
-            let imageUrl1;
             if (cutArea) {
                 const ws = new WebviewService(message.tabId!);
                 await ws.sendClickEvent(cutArea.x + cutArea.w / 2, cutArea.y + cutArea.h / 2);
                 await sleep(200);
-                imageUrl1 = await ws.captureScreenToDataURL(
+                imageUrl = (await ws.captureScreenToDataURL(
                     cutArea.x,
                     cutArea.y,
                     cutArea.w,
                     cutArea.h
-                );
-                if (!imageUrl1) {
+                )) as string;
+                if (!imageUrl) {
                     ls.fisnishMessage(message.id, '');
                     return;
                 }
-                imageUrl = imageUrl1;
             }
             let res = '';
-            console.debug('llm gemini onPromptGemini');
+            console.debug('llm ChatGpt onPromptChatGpt');
             await ls.onPrompt(prompt, imageUrl);
             if (message.formatResult) {
                 res = await ls.waitWebviewMessageReply(message);
-                console.debug('llm gemini waitWebviewMessageReply', res);
+                console.debug('llm ChatGpt waitWebviewMessageReply', res);
                 setReply(res || '');
-                ls.fisnishMessage(message.id, res);
-            } else {
-                ls.remove(message.id);
             }
+            ls.fisnishMessage(message.id, res);
         }
     };
     const theme = useTheme();
-    let showControl = tabId === currentTabId;
-
     return (
         <View wh100p relative>
-            <View
-                zIdx={11}
-                abs
-                opacity={0.8}
-                hide
-                bgColor={theme.backgroundBrowserActive}
-                left={8}
-                right={8}
-                px12
-                borderRadius={8}
-                bottom={110}
-                h={120}
-            >
-                <View absFull mx12 py12 overflowYAuto>
-                    <View text={JSON.stringify(reply)} />
-                </View>
+            <View hide zIdx={11} absFull bgColor={theme.backgroundBrowserActive}>
                 <View
-                    zIdx={100}
                     icon={'Close'}
                     iconButtonSmall
                     abs
-                    top={6}
+                    top={12}
                     onClick={() => {
                         setReply('');
                     }}
-                    right={6}
+                    right={12}
                 />
+                <View absFull top={44}>
+                    <View json={[reply]} />
+                </View>
             </View>
-            <LoopView callback={checkGeminiCb} delay={1000} />
+            <LoopView callback={checkChatGptCb} delay={1000} />
             <LoopView callback={pullMessageCb} delay={100} />
             <View abs left0 right0 top={0} bottom={0} flx>
                 <View flex1 h100p borderBox overflowHidden relative>
-                    <LLmWebview
-                        noCut
-                        currentTabId={currentTabId}
-                        pid={pid1}
-                        tabId={tabId}
-                        url={url}
-                    />
+                    <LLmWebview currentTabId={currentTabId} pid={pid1} tabId={tabId} url={url} />
                 </View>
             </View>
-            {showControl && <ControlsView findInPageTop={5} tabId={tabId} />}
+            {tabId === currentTabId && <ControlsView findInPageTop={5} tabId={tabId} />}
         </View>
     );
 }

@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { DefaultCutRect } from '../components/webview/CutAreaView';
+import { XYWHProps } from '../types';
 
 export type Position = {
     x: number;
@@ -17,9 +18,9 @@ export type CutAreaRect = {
 interface AppContextType {
     isCutting: boolean;
     isCutEnable: boolean;
-    cutAreaRect: CutAreaRect;
+    cutAreaRect: XYWHProps;
 
-    changeCutAreaRect: (cutAreaRect: CutAreaRect) => void;
+    changeCutAreaRect: (cutAreaRect: XYWHProps) => void;
     onCut: (isCutEnable: boolean) => void;
     onCutting: (isCutting: boolean) => void;
 }
@@ -31,7 +32,7 @@ export const ScreenshotProvider = (props: { children: ReactNode }) => {
 
     const [isCutEnable, setIsCutEnable] = useState(false);
     const [isCutting, setIsCutting] = useState(false);
-    const [cutAreaRect, setCutAreaRect] = useState<CutAreaRect>(DefaultCutRect);
+    const [cutAreaRect, setCutAreaRect] = useState<XYWHProps>(DefaultCutRect);
     const onCut = (isCutEnable: boolean) => {
         setIsCutEnable(isCutEnable);
         if (!isCutEnable) {
@@ -40,7 +41,7 @@ export const ScreenshotProvider = (props: { children: ReactNode }) => {
         }
     };
     const onCutting = (isCutting: boolean) => setIsCutting(isCutting);
-    const changeCutAreaRect = (cutAreaRect: CutAreaRect) => setCutAreaRect(cutAreaRect);
+    const changeCutAreaRect = (cutAreaRect: XYWHProps) => setCutAreaRect(cutAreaRect);
 
     return (
         <AppContext.Provider

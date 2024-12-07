@@ -190,6 +190,8 @@ export interface ComponentsProps {
     dividerProps?: DividerProps;
     textEllipsis?: boolean;
     text?: string;
+    label?: string;
+    labelWidth?: number;
     textVariant?:"h1"|"h6";
     textColor?: string;
     textFontSize?: string;
@@ -198,12 +200,24 @@ export interface ComponentsProps {
     json?: object | Array<any> | null | undefined;
     snackbar?: SnackbarProps;
     tips?: string;
-    tipsPlacement?: 'top' | 'bottom' | 'left' | 'right';
+    tipsPlacement?: | 'bottom-end'
+    | 'bottom-start'
+    | 'bottom'
+    | 'left-end'
+    | 'left-start'
+    | 'left'
+    | 'right-end'
+    | 'right-start'
+    | 'right'
+    | 'top-end'
+    | 'top-start'
+    | 'top';
     button?: string;
     buttonProps?: ButtonProps;
     buttonSize?: 'small' | 'medium' | 'large';
     buttonVariant?: 'text' | 'outlined' | 'contained';
-    buttonContained?: boolean;
+    buttonContained?: boolean | string;
+    buttonOutlined?: boolean | string;
     buttonEndIcon?: React.ReactNode;
     buttonColor?: ButtonColor;
     buttonStartIcon?: React.ReactNode;

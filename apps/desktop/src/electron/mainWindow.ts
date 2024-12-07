@@ -322,8 +322,10 @@ export class MainWindow {
             );
             const patchTgCors = details.url === 'https://oauth.telegram.org/auth/get';
 
+            const patchTelegramFileUrlCors = details.url.startsWith('https://api.telegram.org/file/bot');
+
             /* patch cors  */
-            if (patchMercuryCors || patchTonkeeperCors || patchTgCors) {
+            if (patchMercuryCors || patchTonkeeperCors || patchTgCors || patchTelegramFileUrlCors) {
                 const corsHeader =
                     Object.keys(details.responseHeaders).find(
                         k => k.toLowerCase() === 'access-control-allow-origin'
@@ -571,7 +573,26 @@ export class MainWindow {
             if (keys && keys.length > 0) {
                 this.shortcutKeys = keys;
             }
-        } else if (messageAction === 'copyImageDataUrlToClipBoard') {
+        }  else if (messageAction === 'copyFileToClipBoard') {
+            const { data, type } = messageValue || {};
+
+            if (data && type) {
+                try {
+                    // Create a Blob-like buffer for the JSON file
+                    const fileBuffer = Buffer.from(data, 'utf-8');
+                  
+                    // Create a metadata header for clipboard support (optional for selection type)
+                    clipboard.writeBuffer(type, fileBuffer, 'clipboard');
+                  
+                    console.log('File copied to clipboard successfully in Electron!');
+                } catch (error) {
+                    console.error('Failed to copy file to clipboard:', error);
+                }
+            } else {
+                console.error('Invalid data for copyFileToClipBoard');
+            }            
+            
+        }else if (messageAction === 'copyImageDataUrlToClipBoard') {
             const { base64Data } = messageValue || {};
             if (base64Data) {
                 try {

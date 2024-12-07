@@ -1,9 +1,10 @@
 import { matchSimpleTemplateV1 } from '@web3-explorer/opencv';
 import { urlToDataUri } from '../common/opencv';
 import { currentTs } from '../common/utils';
-import { SUB_WIN_ID, XYWHProps } from '../types';
+import { RoiInfo, SUB_WIN_ID, XYWHProps } from '../types';
 import LLMGeminiService from './LLMGeminiService';
-import { RoiInfo } from './RoiService';
+import { MessageLLM } from './LLMService';
+import RoiService from './RoiService';
 import WebviewMainEventService from './WebviewMainEventService';
 import WebviewService from './WebviewService';
 
@@ -134,10 +135,10 @@ export default class WebviewLoopCallbackService extends WebviewService {
                 console.warn('match screenImgUrl is null');
                 return;
             }
-            screenId = `screen_img_copy_${tabId}_1`;
+            screenId = `screen_img_copy_${tabId}_xxx`;
             img = document.createElement('img');
             img.id = screenId;
-            img.style.display = 'block';
+            img.style.display = 'none';
             img.src = screenImgUrl;
             document.body.appendChild(img);
             await imageLoaded(img);
@@ -147,10 +148,10 @@ export default class WebviewLoopCallbackService extends WebviewService {
         }
         return img;
     }
-    async onMatch(feature: RoiInfo, ts: number) {
+    async onMatch(feature: RoiInfo) {
         console.log('onMatch', feature);
         if (!feature) {
-            return;
+            return null
         }
         let startTime = currentTs();
         const { tabId } = feature;
@@ -158,14 +159,24 @@ export default class WebviewLoopCallbackService extends WebviewService {
         const { cv } = window;
         const img = await this.handleScreenCopy(tabId);
         if (!img) {
-            return;
+            return null
         }
+        const imgRoiSrc = await new RoiService(feature.tabId).getImage(feature.id)
+        
+        const imgRoi = document.createElement('img');
+        imgRoi.id = "imgRoi";
+        imgRoi.style.display = 'none';
+        imgRoi.src = imgRoiSrc;
+        document.body.appendChild(imgRoi);
+        await imageLoaded(imgRoi);
+
         let src = cv.imread(img);
         const { x, y, w, h } = feature.cutAreaRect;
         let rect = new cv.Rect(x, y, w, h);
         const refImg = src.roi(rect);
 
-        const matchResult = matchSimpleTemplateV1(cv, src, refImg, feature.threshold);
+        let imgRoiDst = cv.imread(imgRoi);
+        const matchResult = matchSimpleTemplateV1(cv, refImg, imgRoiDst, feature.threshold);
         const endTime = currentTs();
         const duration = (endTime - startTime) / 1000;
         let { maxVal } = matchResult! || { maxVal: 0 };
@@ -175,19 +186,26 @@ export default class WebviewLoopCallbackService extends WebviewService {
             time: endTime,
             duration
         };
-        if (img) {
+        if (img && img.id.endsWith("_xxx")) {
             img.remove();
         }
+        imgRoi.remove()
+        imgRoiDst.delete()
         refImg.delete();
         src.delete();
-
-        await this.execJs(`
-            __ActionResults.set(${ts},${JSON.stringify(res)})`);
+        return res;
     }
-
+    async responseActionResult(ts:number,result:any){
+        const ts1 = currentTs()
+        await this.execJs(`__ActionResults.set(${ts},${JSON.stringify({
+            duration:(ts1 - ts)/1000,
+            result
+        })})`);
+    }
     async onOcrImg(data: OcrType, ts: number) {
         const { rect, tabId, prompt, formatResult, timeout } = data;
         console.log("onOcrImg",data)
+        await this.log("onOcrImg")
         let startTime = currentTs();
         const ls = new LLMGeminiService(LLMGeminiService.getTabId());
         const wme = new WebviewMainEventService()
@@ -198,79 +216,91 @@ export default class WebviewLoopCallbackService extends WebviewService {
         if (!ls.getIsReady()) {
             const isGeminiReady = await ls.checIsReady(timeout);
             if (!isGeminiReady) {
-                console.warn('ocr>> GeminiIsReady is false');
-                return;
+                await this.log('ocr>> GeminiIsReady is false');
+                return null;
             }
         }
-
+        
         const ws = new WebviewService(tabId);
         await ws.waitwebviewIsReady();
         const { x, y, w, h } = rect;
         const blob = await ws.captureScreenToBlob(x, y, w, h);
         if (!blob) {
-            console.warn('ocr captureScreenToBlob is null');
-            return;
+            await this.log('ocr captureScreenToBlob is null');
+            return null;
         }
         const url = URL.createObjectURL(blob);
         const dataUrl = await urlToDataUri(url);
         const messageId = LLMGeminiService.genId();
-        console.log('>>> ocr message id', messageId);
-        const message = await ls.sendMessageWaitForReply(
-            {
-                id: messageId,
-                tabId,
-                ts: currentTs(),
-                prompt,
-                formatResult,
-                imageUrl: dataUrl
-            },
-            timeout
-        );
-        if (!message || !message.reply) {
-            console.warn('ocr>> Gemini ocr reply message is null');
-            return;
+        await this.log(`messageId: ${messageId}`)
+        let message:MessageLLM =  {
+            id: messageId,
+            tabId,
+            ts: currentTs(),
+            prompt,
+            formatResult,
+            imageUrl: dataUrl
+        }
+        if(formatResult){
+            message = await ls.sendMessageWaitForReply(
+                message,
+                timeout
+            );
+            if (!message || !message.reply) {
+                await this.log('ocr>> Gemini ocr reply message is null');
+                return null;
+            }
+        }else{
+            await this.log(`formatResult is null,sendMessageOnce`)
+            await ls.sendMessageOnce(message)
+            return null;
         }
 
         const endTime = currentTs();
         const duration = (endTime - startTime) / 1000;
-        console.log('ocr>> message reply', message.reply, duration);
-        const reply = {
+        const res = {
             duration,
             reply: message.reply
         };
-        await this.execJs(`
-            __ActionResults.set(${ts},${JSON.stringify(reply)})`);
+        console.log('ocr>> message reply', message.reply, duration);
+        return res
+    }
+    async log(message:string){
+        await this.execJs(`console.log("> ${message}")`);
     }
     async process() {
         const ws = this;
         if (ws.webviewIsReady()) {
             const __Actions: ActionType = await ws.execJs(`
-                console.debug("loop action...",!window.__Actions ? "" :JSON.stringify(Array.from(window.__Actions)))
+                console.debug("> loop action...",!window.__Actions ? "" :window.__Actions.size)
                 return window.__Actions;`);
 
             if (__Actions && __Actions.size > 0) {
                 const keys = Array.from(__Actions).map(row => row[0]);
                 keys.sort((a, b) => a - b);
-                const k = keys[0];
-                const action = __Actions.get(k)!;
-                console.debug('useTimeoutLoop', k, __Actions.get(k));
-                const { x, y, x1, y1, type, ts, feature, ocr, steps } = action;
+                const ts = keys[0];
+                await ws.execJs(`__Actions.delete(${ts})`);
+                const action = __Actions.get(ts)!;
+                console.debug('useTimeoutLoop', ts, __Actions.get(ts));
+                const { x, y, x1, y1, type, feature, ocr, steps } = action;
+                await this.log(`run action: ${type} ts:${ts}`)
                 if (type === 'click') {
                     await ws.sendClickEvent(action.x, action.y);
+                    await this.responseActionResult(ts,true)
                 }
                 if (type === 'onMatch') {
-                    await this.onMatch(feature, ts);
+                    const res = await this.onMatch(feature);
+                    await this.responseActionResult(ts,res)
                 }
 
                 if (type === 'onOcrImg') {
-                    await this.onOcrImg(ocr, ts);
+                    const res = await this.onOcrImg(ocr, ts);
+                    await this.responseActionResult(ts,res)
                 }
                 if (type === 'drag') {
                     await ws.sendDragEvent({ x, y }, { x: x1, y: y1 }, steps || 10);
+                    await this.responseActionResult(ts,true)
                 }
-                await ws.execJs(`
-                    console.debug(" > run: ${type}")
-                    __Actions.delete(${k})`);
             }
         }
     }

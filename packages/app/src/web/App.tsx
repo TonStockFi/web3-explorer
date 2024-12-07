@@ -109,6 +109,11 @@ const GlobalStyle = createGlobalStyle`
         height: var(--app-height);
     }
 
+    #root > div.MuiBox-root {
+        color:#e9e9e9
+    }
+
+
     button, input[type="submit"], input[type="reset"] {
         background: none;
         color: inherit;

@@ -28,6 +28,9 @@ export function SideWebviewInner({ site, currentSite }: { site: string; currentS
             {site === 'Gemini' && (
                 <LLmGeminiWebview currentTabId={current_tabId} pid={'side_webview'} tabId={tabId} />
             )}
+            {site === 'Telegram' && (
+                <LLmGeminiWebview currentTabId={current_tabId} pid={'side_webview'} tabId={tabId} />
+            )}
         </View>
     );
 }

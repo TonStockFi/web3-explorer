@@ -274,6 +274,44 @@ export interface XYWHProps {
     h: number;
 }
 
+export interface ExtenssionPublishDataRow {
+    img: string;
+    row: RoiInfo;
+    plainData?:{
+        id:string;
+        name:string;
+    },
+    encryptData?:string;
+}
+
+export interface ExtenssionPublishData {
+    extensionId: string;
+    createTs:number;
+    version:string;
+    ids:string[];
+    desc: string;
+    amount: number;
+    payAddress: string;
+    rows: ExtenssionPublishDataRow[];
+}
+
+export interface RoiInfo {
+    id: string;
+    tabId: string;
+    pid:string;
+    threshold: number;
+    cutAreaRect: XYWHProps;
+    ts: number;
+    name?: string;
+    priority: number;
+    jsCode?:string;
+    type?:"mark"|"task"|"reco"|string;
+    crontab?:string;
+    action?:"click" | "invokeCode" |"finishLoop"|"cron" | string;
+    icon?:string;
+    creator?:string;
+    desc?:string;
+}
 
 
 export interface CutItemProps {

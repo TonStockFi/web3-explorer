@@ -6,6 +6,7 @@ export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
 export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
 
 export const P2E_ChatId = '7363481027';
+export const BOT_ID_EXTESSION_CENTER = '7168826112';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
 export const TELEGRAME_WEB_P2E = `${TELEGRAME_WEB}#${P2E_ChatId}`
 export const TWA_URL_PREFIX = "https://t.me/"
@@ -50,7 +51,7 @@ export const HeaderHeight = 58;
 export const HomHeaderHeight = 44;
 export const SiderBarWidth = 54;
 export const AsideWidth = 360;
-
+export const FEATUR_STUDIO_RIGHT_WIDTH = 280;
 export const WIN_TITLE_BAR_WIDTH = 0;
 export const MAC_TITLE_BAR_WIDTH = 88;
 export const PLAYGROUND_WEBVIEW_WIDTH = 360;
@@ -59,6 +60,7 @@ export const PLAYGROUND_WEBVIEW_HEIGHT = 720;
 export const PLAYGROUND_WIN_HEIGHT = 772;
 export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;
 export const WEBVIEW_BORDERRADIUS = 8;
+export const BG_COLOR_ACE = "#272822";
 
 export const MainNavList = [
     {
@@ -181,5 +183,15 @@ export const DropDownMenuSx = {
     }
 };
 
-export const PAGE_ALL_ROI = "全部"
-export const PAGE_NULL_ROI = "无"
+export const ENTRY_ID_ROI = "#0"
+export const MARK_ID_ROI = "#-1"
+export const TASK_ID_ROI = "#-2"
+export const ALL_ID_ROI = ""
+export const NOT_SHOW_IDS_ROI = [ALL_ID_ROI,MARK_ID_ROI,TASK_ID_ROI]
+export const DEFAULT_CUT_AREA = {
+   
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0
+}

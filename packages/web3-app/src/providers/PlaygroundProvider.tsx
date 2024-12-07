@@ -12,9 +12,9 @@ interface AppContextType {
     currentTabId: string;
     showCodeDrawer: boolean;
     showGameListDrawer: boolean;
-    tab: BrowserTab | undefined;
+    tab: BrowserTab;
     windowStatus: Map<number, boolean>;
-    currentAccount: AccountPublic | null;
+    currentAccount: AccountPublic;
     screenCopyVisible: boolean;
     currentExtension: ExtensionType;
     currentRecoAreaImage: string;
@@ -43,7 +43,10 @@ export enum ExtensionType {
     NULL = 'NULL',
     GEMINI = 'GEMINI',
     JS_CODE = 'JS_CODE',
-    DECISION = 'DECISION'
+    DECISION = 'DECISION',
+    CRONTAB = 'CRONTAB',
+    MARKET = 'MARKET',
+    EXTENSION_CENTER = 'EXTENSION_CENTER'
 }
 
 export const PlaygroundProvider = (props: { children: ReactNode }) => {
@@ -83,7 +86,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
 
     const [accounts, setAccounts] = useLocalStorageState<AccountPublic[]>('accounts', []);
     const [screenCopyVisible, setScreenCopyVisible] = useState(false);
-    const [currentAccount, setCurrentAccount] = useSessionStorageState<AccountPublic | null>(
+    const [currentAccount, setCurrentAccount] = useSessionStorageState<AccountPublic>(
         'currentAccount',
         account
     );
@@ -153,7 +156,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         setCurrentExtension(v);
     };
 
-    const tab = tabInit || browserTabs.get(currentTabId);
+    const tab = tabInit || browserTabs.get(currentTabId)!;
     // console.log({ tab, tabInit });
     // console.log(
     //     {

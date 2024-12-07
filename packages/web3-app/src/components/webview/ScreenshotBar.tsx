@@ -1,6 +1,6 @@
 import Paper from '@web3-explorer/uikit-mui/dist/mui/Paper';
 import { View } from '@web3-explorer/uikit-view/dist/View';
-import { CutAreaRect, useScreenshotContext } from '../../providers/ScreenshotProvider';
+import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
@@ -9,7 +9,7 @@ import { downloadImage } from '../../common/image';
 import { urlToBlob } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
 import WebviewService from '../../services/WebviewService';
-import { ViewSize } from '../../types';
+import { ViewSize, XYWHProps } from '../../types';
 import { DefaultCutRect, isCutAreaExists } from './CutAreaView';
 import { ScreenshotCutAreaBar } from './ScreenshotCutAreaBar';
 
@@ -20,7 +20,7 @@ export function ScreenshotBar({
     inPlayground
 }: {
     inPlayground?: boolean;
-    handleRecognition: (tabId: string, cutAreaRect: CutAreaRect) => Promise<void>;
+    handleRecognition: (tabId: string, cutAreaRect: XYWHProps) => Promise<void>;
     tabId: string;
     viewSize: ViewSize;
 }) {
@@ -57,7 +57,11 @@ export function ScreenshotBar({
             >
                 <View wh100p rowVCenter jSpaceBetween>
                     <View
+                        tips="拖动鼠标，选取截取区域"
                         mr={4}
+                        buttonProps={{
+                            disabled: true
+                        }}
                         buttonVariant="text"
                         button={t('CutArea')}
                         sx={{ wordBreak: 'keep-all' }}

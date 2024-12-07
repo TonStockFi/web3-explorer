@@ -196,7 +196,9 @@ const ThemeAndContent = () => {
     if (!isOnline) {
         return (
             <View w100vw h100vh center column>
-                <View iconFontSize="3rem" iconColor="#d9d9d9" icon={'WifiOff'} />
+                <View sx={{ color: '#d9d9d9' }}>
+                    <View iconFontSize="3rem" icon={'WifiOff'} />
+                </View>
                 <View mt={32} textColor="#d9d9d9" text={t('WifiOffTips')} />
                 <View
                     mt={12}

@@ -90,7 +90,7 @@ export default class WebviewService {
     getContentsId() {
         const webview = this.getWebview();
         if (!webview) {
-            console.warn('webview is null when waitForElemenBoundingClientRect ');
+            console.warn('webview is null when getContentsId ');
             return null;
         }
         return webview?.getWebContentsId();
@@ -144,7 +144,7 @@ export default class WebviewService {
     async getElemenBoundingClientRect(selector: string): Promise<BoundingClientRect | null> {
         const webview = this.getWebview();
         if (!webview) {
-            console.warn('webview is null when waitForElemenBoundingClientRect ');
+            console.warn('webview is null when getElemenBoundingClientRect ');
             return null;
         }
         const code = `

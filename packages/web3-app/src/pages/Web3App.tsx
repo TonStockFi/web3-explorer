@@ -12,6 +12,8 @@ import { FavorProvider } from '../providers/FavorProvider';
 import { useIAppContext } from '../providers/IAppProvider';
 
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
+import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
+import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useActiveAccount, useMutateActiveTonWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect } from 'react';
 import { onAction } from '../common/electron';
@@ -79,10 +81,31 @@ export function MainMessageDispatcher() {
     const { id: accountId } = useAccountInfo();
     const activeAcount = useActiveAccount();
     const { mutateAsync: setActiveAccount } = useMutateActiveTonWallet();
+    const { onOpen: sendTransfer } = useSendTransferNotification();
+    const format = useFormatCoinValue();
 
     useEffect(() => {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(async (e: any) => {
+                if (e.action === 'onSendTransfer') {
+                    let { address, amount, text, asset, jetton } = e.payload;
+                    if (!jetton) {
+                        jetton = 'TON';
+                    }
+                    if (!asset) {
+                        asset = 'TON';
+                    }
+                    const amount1 = String(format(String(amount * 1000000000)));
+                    sendTransfer({
+                        transfer: {
+                            address,
+                            amount: amount1,
+                            text,
+                            jetton
+                        },
+                        asset
+                    });
+                }
                 if (e.action === 'onPayPro') {
                     onShowProBuyDialog(true);
                 }

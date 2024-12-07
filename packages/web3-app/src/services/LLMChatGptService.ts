@@ -18,7 +18,13 @@ export default class LLMChatGptService extends LLMService {
         await ws.waitwebviewIsReady()!;
         const rect = (await ws.waitForExecJsResult(
             `const textarea = document.querySelector("textarea")
+        if(!textarea){
+            return null;
+        }
         const parentDiv = textarea.parentElement;
+          if(!parentDiv){
+                return null;
+            }
         const rect = parentDiv.getBoundingClientRect();
         return {top:rect.top,left:rect.left,width:rect.width,height:rect.height}`,
             timeOut

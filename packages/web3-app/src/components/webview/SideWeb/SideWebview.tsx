@@ -5,7 +5,6 @@ import { MAC_TITLE_BAR_WIDTH } from '../../../constant';
 import { useBrowserContext } from '../../../providers/BrowserProvider';
 import { useIAppContext } from '../../../providers/IAppProvider';
 import { TitleBarControlView } from '../../app/TitleBarControlView';
-import { ControlsView } from '../ControlsView';
 import MoreTopbarDropdown from '../MoreTopbarDropdown';
 import { PromptAction } from '../PromptAction';
 import { SideWebviewInner } from './SideWebviewInner';
@@ -74,12 +73,11 @@ export function SideWebview() {
             </View>
             <View abs left0 right0 top={44 + 36} bottom={0} py={2} px={2} flx>
                 <View flex1 h100p borderRadius={0} borderBox overflowHidden relative>
-                    {['Gemini', 'ChatGpt'].map(site1 => {
+                    {['Gemini', 'ChatGpt', 'Telegram'].map(site1 => {
                         return <SideWebviewInner currentSite={site} key={site1} site={site1} />;
                     })}
                 </View>
             </View>
-            <ControlsView findInPageTop={72} tabId={`side_${sideWeb?.site || 'ChatGpt'}`} />
         </View>
     );
 }
