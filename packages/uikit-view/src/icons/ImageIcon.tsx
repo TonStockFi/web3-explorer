@@ -46,26 +46,31 @@ export function ImageIcon({
     if (!size) {
         size = 32;
     }
-    if (icon && (icon.startsWith('http') || icon.startsWith('icon_'))) {
+    if (!icon || icon.startsWith('http') || icon.startsWith('icon_')) {
+        let zoom = 1;
         if (icon.startsWith('icon_')) {
             const k = icon.substring('icon_'.length);
             if (Object.keys(ImageIconMap).indexOf(k) > -1) {
                 //@ts-ignore
                 icon = ImageIconMap[k];
+                if (k !== 'chatgpt' && k !== 'twitter') {
+                    zoom = 0.9;
+                }
             }
         }
         return (
             <View wh={size} relative center>
-                <View wh={size} absFull zIdx={0} bgColor={'#e9e9e9'} borderRadius={size / 2} />
+                <View wh={size} absFull zIdx={0} bgColor={'#e9e9e9'} borderRadius={10} />
                 <View
                     wh={size}
                     center
+                    sx={{ zoom }}
                     avatar={{
                         variant: variant || 'rounded',
                         src: icon,
                         sx: { width: size, height: size }
                     }}
-                />
+                ></View>
             </View>
         );
     } else {

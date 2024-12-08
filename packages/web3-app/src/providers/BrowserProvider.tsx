@@ -233,6 +233,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
                     ts
                 };
             }
+            newTab(tab);
         }
 
         setCurentTabId(tabId);

@@ -26,6 +26,7 @@ export function WebviewPage() {
                     .map(row => row[0])
                     .filter(row => row.startsWith('tab'))
                     .filter(row => row !== MAIN_NAV_TYPE.DISCOVERY)
+                    .filter(row => row !== MAIN_NAV_TYPE.GAME_FI)
                     .map(tabId => (
                         <View key={tabId} empty>
                             {[partitionId].map(pid => (

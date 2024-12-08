@@ -58,17 +58,7 @@ export function WebviewDiscoverApps({
         }
     }, [currentTabId]);
     const url = `${getDiscoverHost(env.isDev)}#${winId}`;
-
-    useEffect(() => {
-        try {
-            const ws = new WebviewService(tabId);
-            if (ws.webviewIsReady()) {
-                ws.execJs(
-                    `localStorage.setItem('__currentAccount', '${JSON.stringify(currentAccount)}');`
-                );
-            }
-        } catch (e) {}
-    }, [currentAccount]);
+    console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({
         action,
@@ -87,14 +77,13 @@ export function WebviewDiscoverApps({
 
         if (action === 'onOpenTab') {
             const account = getCurrentAccount();
-
             const { item } = payload as { item: WebApp };
-            const { id, ...item1 } = item;
-
+            const { id, url, ...item1 } = item;
             const ts = currentTs();
             const tabId = id ? `tab_${id}` : formatTabIdByUrl(url);
             const tab = {
                 ...item1,
+                url,
                 tabId,
                 ts
             };
@@ -102,6 +91,7 @@ export function WebviewDiscoverApps({
             new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
         }
     };
+
     if (firstLoad) {
         return null;
     }
@@ -153,9 +143,7 @@ export function WebviewDiscoverApps({
                         onReady: (webview: WebviewTag) => {
                             if (webview.getURL() === START_URL) {
                                 new WebviewService(tabId).goTo(url);
-                                return;
                             }
-                            const ws = new WebviewService(tabId);
                             setLoading(false);
                         }
                     }}

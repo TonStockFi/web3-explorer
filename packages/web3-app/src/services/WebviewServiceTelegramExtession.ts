@@ -1,7 +1,7 @@
 
 import { TelegramApiAction } from '@web3-explorer/lib-telegram';
 import { showAlertMessage } from '../common/helpers';
-import { BOT_ID_EXTESSION_CENTER } from '../constant';
+import { BOT_ID_EXTESSION_CENTER, BOT_ID_SERVICE_CENTER } from '../constant';
 
 import { addressToShortValue, formatTsToDate } from '../common/utils';
 import { ExtenssionPublishData } from '../types';
@@ -98,4 +98,26 @@ ${desc}
         return res ? userId :false
     }
     
+
+    async openServiceCenter(){
+        const isReady = await this.waitwebviewIsReady()
+        if(!isReady){
+            return showAlertMessage("请等待网页加载完成！")
+        }
+
+        const userId = await this.getAuthUserId()
+        if(!userId){
+            return showAlertMessage("请先登陆")
+        }
+
+        const {uri:{hash}} = this.getWebviewUrlUri()
+        const chatId = BOT_ID_SERVICE_CENTER
+
+        if(hash !== `#${chatId}`){
+            await this.goToTgChat(chatId)
+        }
+        await this.waitForExecJsResult(`return location.hash === "#${chatId}"`)
+        const res = await this.waitForElemenBoundingClientRect(`#editable-message-text`);
+        return res ? userId :false
+    }
 }

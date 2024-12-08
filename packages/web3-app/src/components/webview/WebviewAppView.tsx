@@ -7,7 +7,7 @@ import { useAccountInfo, useAccountWallePartitionId } from '../../hooks/wallets'
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import WebviewService from '../../services/WebviewService';
-import { MAIN_NAV_TYPE, WebveiwEventType } from '../../types';
+import { WebveiwEventType } from '../../types';
 import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
@@ -26,7 +26,7 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
     const isSelected = currentTabId === tabId;
     const displayNone = !isSelected;
     const [firstLoad, setFirstLoad] = useState(true);
-
+    console.log({ currentTabId, tabId, url });
     const onEvent = async (webview1: WebviewTag, eventType: WebveiwEventType, payload: any) => {
         switch (eventType) {
             case 'did-start-navigation': {
@@ -88,16 +88,7 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
             hide={firstLoad}
         >
             <View flex1 bgColor={theme.backgroundBrowserActive} column overflowHidden relative>
-                <View
-                    hide={tabId === MAIN_NAV_TYPE.GAME_FI}
-                    borderBox
-                    w100p
-                    h={44}
-                    px={12}
-                    aCenter
-                    row
-                    jSpaceBetween
-                >
+                <View borderBox w100p h={44} px={12} aCenter row jSpaceBetween>
                     <View aCenter jStart flex1 hide={!webviewUrl || !tab}>
                         <WebviewTopBar tab={tab} currentUrl={currentUrl} />
                     </View>
@@ -114,7 +105,7 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
                     borderBox
                 >
                     <View
-                        hide={!webviewUrl || tabId === MAIN_NAV_TYPE.GAME_FI}
+                        hide={!webviewUrl}
                         w={width}
                         h={height}
                         borderRadius={0}

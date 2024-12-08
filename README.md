@@ -19,6 +19,8 @@ corepack enable
 yarn
 
 # Build desktop for current OS
+cp apps/desktop/.env.example apps/desktop/.env
+yarn build:pkg
 yarn build:desktop
 ```
 

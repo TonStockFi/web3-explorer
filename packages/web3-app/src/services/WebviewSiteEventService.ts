@@ -67,6 +67,7 @@ export default class WebviewSiteEventService {
         });
     }
     updateProPlan({proPlans, proRecvAddress}:{proPlans:ProPlan[], proRecvAddress:string}){
+      
         return window.__appApi.message({
             action: 'updateProPlan',
             payload: {

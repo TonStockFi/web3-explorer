@@ -7,6 +7,7 @@ export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
 
 export const P2E_ChatId = '7363481027';
 export const BOT_ID_EXTESSION_CENTER = '7168826112';
+export const BOT_ID_SERVICE_CENTER = '7853783224';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
 export const TELEGRAME_WEB_P2E = `${TELEGRAME_WEB}#${P2E_ChatId}`
 export const TWA_URL_PREFIX = "https://t.me/"
@@ -69,6 +70,20 @@ export const MainNavList = [
         icon: 'icon_chatgpt',
         // side: true
     },
+
+    {
+        name: 'Games',
+        tabId: MAIN_NAV_TYPE.GAME_FI,
+        icon: 'SportsEsports',
+        side: true
+    },
+    {
+        name: 'aside_discover',
+        tabId: MAIN_NAV_TYPE.DISCOVERY,
+        icon: 'Explore',
+        side: true
+    },
+    
     {
         name: 'Gemini',
         tabId: MAIN_NAV_TYPE.GENIMI,
@@ -93,19 +108,6 @@ export const MainNavList = [
         tabId: MAIN_NAV_TYPE.MARKET,
         side: true
     },
-    {
-        name: 'aside_discover',
-        tabId: MAIN_NAV_TYPE.DISCOVERY,
-        icon: 'Explore',
-        side: true
-    },
-    {
-        name: 'Games',
-        tabId: MAIN_NAV_TYPE.GAME_FI,
-        icon: 'SportsEsports',
-        side: true
-    },
-    
     {
         name: 'Favor',
         tabId: MAIN_NAV_TYPE.FAVOR,
