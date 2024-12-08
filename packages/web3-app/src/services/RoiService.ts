@@ -20,7 +20,6 @@ export default class RoiService {
         this.indexedDbExt = new IndexedDbCache().init(`roi-ext/${tabId}`);
     }
     
-
     getExtenssion(eId: any) {
         return this.indexedDbExt.get(eId)
     }
@@ -48,7 +47,7 @@ export default class RoiService {
     async getId() {
         let id = await this.indexedDbIds.get(this.tabId);
         if (!id) {
-            id = `#1`;
+            id = `#100`;
         } else {
             id = `#${id + 1}`;
         }

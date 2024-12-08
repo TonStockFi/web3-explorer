@@ -66,7 +66,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         }
     }
 
-    const [currentExtension, setCurrentExtension] = useLocalStorageState<ExtensionType>(
+    const [currentExtension, setCurrentExtension] = useSessionStorageState<ExtensionType>(
         'currentExtension_' +
             (account?.id || '1') +
             '' +

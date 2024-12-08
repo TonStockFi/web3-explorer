@@ -47,7 +47,6 @@ export const TonPage = () => {
 
     const { api, standalone } = useAppContext();
     const wallet = useActiveWallet();
-
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } = useInfiniteQuery({
         queryKey: [wallet.rawAddress, QueryKey.activity, 'ton'],
         queryFn: ({ pageParam = undefined }) =>

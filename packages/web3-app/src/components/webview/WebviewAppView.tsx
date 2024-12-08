@@ -8,27 +8,21 @@ import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import WebviewService from '../../services/WebviewService';
 import { MAIN_NAV_TYPE, WebveiwEventType } from '../../types';
-import { onOpenTab } from '../discover/DiscoverView';
 import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
-let _tabId = '';
 
 export function WebviewAppView({ tabId }: { tabId: string }) {
     const { isCutEnable } = useScreenshotContext();
-    const { currentTabId, updateAt, editTab, openTab, closeTab, newTab, browserTabs, saveTab } =
-        useBrowserContext();
+    const { currentTabId, updateAt, browserTabs, saveTab } = useBrowserContext();
 
-    useEffect(() => {
-        _tabId = tabId;
-    }, [tabId]);
     const theme = useTheme();
     const tab = browserTabs.get(tabId)!;
-    let { initUrl, mobile } = tab || {};
+    let { url } = tab || {};
     const account = useAccountInfo();
     const partitionId = useAccountWallePartitionId();
 
-    const [currentUrl, setCurrentUrl] = useState(initUrl);
+    const [currentUrl, setCurrentUrl] = useState(url);
     const isSelected = currentTabId === tabId;
     const displayNone = !isSelected;
     const [firstLoad, setFirstLoad] = useState(true);
@@ -47,7 +41,7 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
                     ) {
                         saveTab(tabId, {
                             ...tab,
-                            initUrl: url
+                            url: url
                         });
                         setCurrentUrl(url);
                     }
@@ -71,10 +65,6 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
         payload?: Record<string, any> | undefined;
     }) => {
         console.log('_ET', action, payload);
-
-        if (action === 'onOpenTab') {
-            onOpenTab({ _tabId, payload, editTab, openTab, closeTab, newTab, browserTabs });
-        }
     };
 
     useEffect(() => {
@@ -85,23 +75,9 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
 
     let httpReferrer = undefined;
 
-    let width = '360px';
-    let height = '700px';
-    let isMobile = mobile;
-    if (!isMobile) {
-        width = '100%';
-        height = '100%';
-    }
-
-    let webviewUrl = initUrl || '';
-    // console.log('>>', {
-    //     currentUrl,
-    //     browserTabs,
-    //     currentTabId,
-    //     tab,
-    //     initUrl,
-    //     displayNone
-    // });
+    const width = '100%';
+    const height = '100%';
+    let webviewUrl = url || '';
     return (
         <View
             wh100p
@@ -122,7 +98,7 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
                     row
                     jSpaceBetween
                 >
-                    <View aCenter jStart flex1 hide={!initUrl || !tab}>
+                    <View aCenter jStart flex1 hide={!webviewUrl || !tab}>
                         <WebviewTopBar tab={tab} currentUrl={currentUrl} />
                     </View>
                 </View>
@@ -138,10 +114,10 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
                     borderBox
                 >
                     <View
-                        hide={!initUrl || tabId === MAIN_NAV_TYPE.GAME_FI}
+                        hide={!webviewUrl || tabId === MAIN_NAV_TYPE.GAME_FI}
                         w={width}
                         h={height}
-                        borderRadius={isMobile ? 8 : 0}
+                        borderRadius={0}
                         overflowHidden
                         relative
                     >

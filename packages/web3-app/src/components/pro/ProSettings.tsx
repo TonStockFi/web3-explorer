@@ -1,3 +1,4 @@
+import { Network, switchNetwork } from '@tonkeeper/core/dist/entries/network';
 import { ColumnText } from '@tonkeeper/uikit/dist/components/Layout';
 import { ListBlock, ListItem, ListItemPayload } from '@tonkeeper/uikit/dist/components/List';
 import { Body1, Title } from '@tonkeeper/uikit/dist/components/Text';
@@ -6,12 +7,16 @@ import { Radio } from '@tonkeeper/uikit/dist/components/fields/Checkbox';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
+import { useMutateDevSettings } from '@tonkeeper/uikit/dist/state/dev';
+import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { genId } from '../../common/helpers';
 import { currentTs } from '../../common/utils';
+import { useIAppContext } from '../../providers/IAppProvider';
 import { usePro } from '../../providers/ProProvider';
-
+import PayCommentOrderService from '../../services/PayCommentOrderService';
 import ProService from '../../services/ProService';
 import { ProInfoProps, ProPlan } from '../../types';
 
@@ -107,7 +112,17 @@ export const ProSettings: FC<{
     walletTitle: string;
 }> = ({ accountId, accountIndex, accountTitle, walletTitle }) => {
     const { t } = useTranslation();
-    const { proPlans, proInfoList, proRecvAddress, updateOrderComment } = usePro();
+    const { env } = useIAppContext();
+    const network = useActiveTonNetwork();
+    const { mutate: mutateDevSettings } = useMutateDevSettings();
+
+    useEffect(() => {
+        if (network === Network.TESTNET && !env.isDev) {
+            mutateDevSettings({ tonNetwork: switchNetwork(network) });
+        }
+    }, [network]);
+
+    const { proPlans, proInfoList, proRecvAddress } = usePro();
     let plans: ProPlan[] = proPlans.map(proPlan => {
         let { description } = proPlan;
         description = description?.replace('{accountTitle}', accountTitle);
@@ -115,7 +130,7 @@ export const ProSettings: FC<{
         return { ...proPlan, description };
     });
     const currentPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
-    console.log({ currentPlan });
+
     const isLongProLevel = currentPlan.isLongProLevel;
     const currentProInfo = currentPlan.plan;
     if (currentPlan && currentPlan.isLongProLevel) {
@@ -134,9 +149,18 @@ export const ProSettings: FC<{
     const format = useFormatCoinValue();
     useEffect(() => {
         function finishPay(e: any) {
-            console.log(e.detail);
             setOrderComment(text => {
-                updateOrderComment(text);
+                const [comment, amount] = text.split('|');
+                const id = genId();
+                const amount1 = String(Number(amount) / 1000000000);
+                new PayCommentOrderService().save(genId(), {
+                    id,
+                    symbol: 'TON',
+                    amount: amount1,
+                    address: proRecvAddress,
+                    ts: currentTs(),
+                    comment: comment
+                });
                 return '';
             });
         }
@@ -152,7 +176,8 @@ export const ProSettings: FC<{
         const { level, amount } = selectedPlan;
         const amount1 = String(format(amount));
         const text = `${level}/${amount1}/${accountIndex}/${currentTs()}/${accountId}`;
-        setOrderComment(text);
+
+        setOrderComment(text + '|' + amount1);
         setIsLoading(true);
         sendTransfer({
             transfer: {
@@ -175,6 +200,7 @@ export const ProSettings: FC<{
     }, []);
 
     const theme = useTheme();
+
     return (
         <View px={24} py12 relative userSelectNone>
             <View abs xx0 center bottom={8}>

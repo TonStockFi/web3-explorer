@@ -1,6 +1,8 @@
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { DevSettings } from '@tonkeeper/uikit/dist/pages/settings/Dev';
 import { FiatCurrency } from '@tonkeeper/uikit/dist/pages/settings/FiatCurrency';
 import { Localization } from '@tonkeeper/uikit/dist/pages/settings/Localization';
+import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
@@ -19,6 +21,7 @@ export default function SideSettingIcon() {
     const { openTab } = useBrowserContext();
     const { env } = useIAppContext();
     const [showDialog, setShowDialog] = React.useState(false);
+    const network = useActiveTonNetwork();
 
     const [dialogType, setDialogType] = React.useState<
         'Localization' | 'DevSettings' | 'FiatCurrency'
@@ -115,7 +118,7 @@ export default function SideSettingIcon() {
                 onClose={handleClose}
                 TransitionComponent={Fade}
             >
-                <View
+                {/* <View
                     menuItem
                     sx={{ width: 300 }}
                     onClick={async () => {
@@ -127,7 +130,7 @@ export default function SideSettingIcon() {
                         <View icon="History" iconSmall />
                     </ListItemIcon>
                     <View text={t('BrowserHistory')} textFontSize="0.9rem" />
-                </View>
+                </View> */}
 
                 <View
                     menuItem
@@ -141,7 +144,7 @@ export default function SideSettingIcon() {
                     </ListItemIcon>
                     <View text={t('apps_connect')} textFontSize="0.9rem" />
                 </View>
-                <View divider />
+                {/* <View divider />
                 <View
                     hide={!env.isDev}
                     menuItem
@@ -154,7 +157,7 @@ export default function SideSettingIcon() {
                         <View icon="Devices" iconSmall />
                     </ListItemIcon>
                     <View text={t('MobileDevice')} textFontSize="0.9rem" />
-                </View>
+                </View> */}
                 <View hide={!env.isDev} divider />
                 <View
                     menuItem
@@ -198,7 +201,7 @@ export default function SideSettingIcon() {
                     </ListItemIcon>
                     <View text={t('wallet_multi_send')} textFontSize="0.9rem" />
                 </View>
-                <View
+                {/* <View
                     hide={!env.isDev}
                     menuItem
                     onClick={async () => {
@@ -210,7 +213,7 @@ export default function SideSettingIcon() {
                         <View icon="FormatListBulleted" iconSmall />
                     </ListItemIcon>
                     <View text={t('aside_dashboard')} textFontSize="0.9rem" />
-                </View>
+                </View> */}
                 <View
                     menuItem
                     onClick={async () => {
@@ -227,7 +230,6 @@ export default function SideSettingIcon() {
                 <View divider hide={!env.isDev} />
                 <View
                     menuItem
-                    hide={!env.isDev}
                     onClick={async () => {
                         setAnchorEl(null);
                         setDialogType('DevSettings');
@@ -237,7 +239,11 @@ export default function SideSettingIcon() {
                     <ListItemIcon>
                         <View icon="Code" iconSmall />
                     </ListItemIcon>
-                    <View text={t('preferences_aside_dev_menu')} textFontSize="0.9rem" />
+
+                    <View
+                        text={network !== Network.TESTNET ? '切换到 测试网' : '切换到 主网'}
+                        textFontSize="0.9rem"
+                    />
                 </View>
 
                 <View hide={!env.isDev} divider />

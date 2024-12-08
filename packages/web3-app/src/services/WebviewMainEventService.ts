@@ -24,7 +24,7 @@ import { currentTs, getPartitionKey } from '../common/utils';
 import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
-import { AccountPublic, SUB_WIN_ID } from '../types';
+import { AccountPublic, RoiInfo, SUB_WIN_ID } from '../types';
 import LLMService, { MessageLLM } from './LLMService';
 
 const colors = [
@@ -61,6 +61,24 @@ export default class WebviewMainEventService {
         if (!window.backgroundApi) {
             throw new Error('backgroundApi API is not available');
         }
+    }
+    async onSelectFeature(payload:{roiInfo:RoiInfo,account:AccountPublic,tab:BrowserTab}){
+        const res = await this.isWinReady(
+            SUB_WIN_ID.PLAYGROUND
+        );
+        if (!res) {
+            await this.openFeatureWindow(
+                {
+                    tab:payload.tab,
+                    account: payload.account
+                }
+            );
+        }
+        await this.sendMessageToSubWin(
+            SUB_WIN_ID.PLAYGROUND,
+            'onSelectRoiArea',
+            payload
+        );
     }
     async openFeatureWindow(payload?:{tab:BrowserTab,account:AccountPublic}) {
         const isDev = this.getIsDev();
@@ -290,14 +308,13 @@ export default class WebviewMainEventService {
         });
     }
     async openTelegramWindow(account: AccountPublic){
-        
         const url = TELEGRAME_WEB
         const uri = new URL(url)
         const tabId = uri.hostname.replace(/\./g,"_")
         const tab:BrowserTab = {
             tabId,
             ts: currentTs(),
-            initUrl:url,
+            url,
             ts1: 0
         }
         const isDev = this.getIsDev();

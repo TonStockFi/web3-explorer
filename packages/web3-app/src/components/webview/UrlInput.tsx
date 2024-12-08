@@ -2,11 +2,10 @@ import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import TextField from '@web3-explorer/uikit-mui/dist/mui/TextField';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useRef, useState } from 'react';
-import { currentTs, isValidDomain } from '../../common/utils';
+import { isValidDomain } from '../../common/utils';
 import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import WebviewService from '../../services/WebviewService';
 import { MAIN_NAV_TYPE } from '../../types';
-import { TopFavorView } from './TopFavorView';
 
 export function UrlInput({
     isDiscover,
@@ -58,13 +57,12 @@ export function UrlInput({
                         }
                     }
                     if (!tab) {
-                        const ts = currentTs();
                         openUrl(newUrl);
                     } else {
-                        if (!tab.initUrl) {
+                        if (!tab.url) {
                             editTab({
                                 ...tab,
-                                initUrl: newUrl
+                                url: newUrl
                             });
                         } else {
                             new WebviewService(tab.tabId).goTo(newUrl);
@@ -133,21 +131,21 @@ export function UrlInput({
                                 </View>
                             </InputAdornment>
                         </View>
-                    ),
-                    endAdornment: tab ? (
-                        <View
-                            empty
-                            hide={
-                                currentUrl === '' ||
-                                urlReadOnly ||
-                                tab?.tabId === MAIN_NAV_TYPE.GAME_FI
-                            }
-                        >
-                            <InputAdornment sx={{ mr: '-10px' }} position="end">
-                                <TopFavorView tabId={tab!.tabId} currentUrl={currentUrl!} />
-                            </InputAdornment>
-                        </View>
-                    ) : undefined
+                    )
+                    // endAdornment: tab ? (
+                    //     <View
+                    //         empty
+                    //         hide={
+                    //             currentUrl === '' ||
+                    //             urlReadOnly ||
+                    //             tab?.tabId === MAIN_NAV_TYPE.GAME_FI
+                    //         }
+                    //     >
+                    //         <InputAdornment sx={{ mr: '-10px' }} position="end">
+                    //             <TopFavorView tabId={tab!.tabId} currentUrl={currentUrl!} />
+                    //         </InputAdornment>
+                    //     </View>
+                    // ) : undefined
                 }
             }}
         />

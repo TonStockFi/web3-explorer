@@ -1,8 +1,13 @@
 import { MenuProps } from "@mui/material/Menu/Menu";
 import { DISCOVER_HOST, DISCOVER_HOST_DEV } from "../constant";
 
+import { v4 as uuidv4 } from 'uuid';
 import { RoiInfo, SUB_WIN_ID } from "../types";
 
+export function genId() {
+    return uuidv4();
+}
+ 
 export function getDiscoverHost(isDev: boolean) {
     if(isDev){
         return `${DISCOVER_HOST_DEV}?isDev=true`

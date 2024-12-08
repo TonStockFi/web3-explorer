@@ -219,14 +219,14 @@ export function useAccountWallet() {
 
 export function useAccountInfo() {
     const account = useActiveAccount();
-    let emoji = account.emoji.substring(0, 2);
+    let emoji = account.emoji;
     let name = `${account.name}`;
     let address = account.activeTonWallet.rawAddress;
     const { accountId } = useAccountWallet();
     let index = 0;
     if (account.type === 'mam') {
         name = account.activeDerivation.name;
-        emoji = account.activeDerivation.emoji.substring(0, 2);
+        emoji = account.activeDerivation.emoji;
         const { activeDerivationIndex } = account as AccountMAM;
         index = activeDerivationIndex;
         address = account.derivations.find(row=>row.index === activeDerivationIndex)!.tonWallets[0].rawAddress;
@@ -255,7 +255,7 @@ export function usePublicAccountsInfo() {
                 address,
                 index,
                 name,
-                emoji:emoji.substring(0, 2),
+                emoji:emoji,
                 id: accountId,
                 isMam:true,
                 isActive:index === activeDerivationIndex,
@@ -289,9 +289,10 @@ export function useBlockChainExplorerTonViewer() {
     return `https://${network === Network.TESTNET ? 'testnet.' : ''}tonviewer.com/%s`;
 }
 
-export function useBlockChainExplorer() {
+export function useBlockChainExplorer(network1?:Network) {
     const network = useActiveTonNetwork();
-    return `https://${network === Network.TESTNET ? 'testnet.' : ''}tonscan.org/address/%s`;
+    let network2 = network1 || network
+    return `https://${network2 === Network.TESTNET ? 'testnet.' : ''}tonscan.org/address/%s`;
 }
 export const useCreateMAMAccountDerivation = () => {
     const storage = useAccountsStorage();

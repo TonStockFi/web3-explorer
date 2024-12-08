@@ -1,19 +1,15 @@
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { AccountBadge } from '@tonkeeper/uikit/dist/components/account/AccountBadge';
 import { useAccountsState } from '@tonkeeper/uikit/dist/state/accounts';
-import {
-    useActiveAccount,
-    useActiveTonNetwork,
-    useMutateActiveAccount
-} from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveAccount, useMutateActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
 import { useTheme } from 'styled-components';
 import { hexToRGBA } from '../../common/utils';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
+import { NetworkView } from '../aside/NetworkView';
 import { WalletEmoji } from '../WalletEmoji';
 import { AddressWithCopy } from './AddressWithCopy';
 import { ToggleActiveAccount } from './ToggleActiveAccount';
@@ -27,7 +23,6 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
     const { showWalletAside } = useIAppContext();
 
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
-    const network = useActiveTonNetwork();
 
     const onClickAccount = (walletId: WalletId) => {
         setActiveAccount(walletId);
@@ -48,9 +43,7 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                     <View ml12 h100p row aCenter>
                         <View text={t('WalletAccounts')} />
                     </View>
-                    {network === Network.TESTNET && (
-                        <View abs top={12} right={44} chip={'Testnet'} />
-                    )}
+                    <NetworkView />
                 </View>
                 <View
                     mr={4}
@@ -105,10 +98,7 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                             <View aCenter jStart>
                                 <ToggleActiveAccount isActived={wallet.id === account.id} />
                                 <View h={32} center mr12>
-                                    <WalletEmoji
-                                        containerSize="20px"
-                                        emoji={wallet.emoji.substring(0, 2)}
-                                    />
+                                    <WalletEmoji containerSize="20px" emoji={wallet.emoji} />
                                 </View>
                                 <View text={wallet.name} textFontSize="0.8rem" />
                                 <View center ml12>

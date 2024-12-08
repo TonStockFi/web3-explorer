@@ -33,7 +33,7 @@ export default class WebviewServiceTelegramExtenssion extends WebviewServiceTele
                 return res as ExtenssionPublishData
             }
         }
-        console.log("no ext file download")
+        // console.log("no ext file download")
         return null;
     }
     async publishExtension(extension:ExtenssionPublishData){
@@ -59,7 +59,7 @@ ID: ${extension.extensionId}
 
 🧒 收款地址: ${addressToShortValue(extension.payAddress)}
 
-💲 ${extension.amount > 0 ? `金额: ${extension.amount} W3C`:"免费"}
+💲 ${extension.amount > 0 ? `金额: ${extension.amount} TON`:"免费"}
 
 ------------------------
 

@@ -57,38 +57,30 @@ export function TabBar({
     onClose?: () => void;
     onClick: () => void;
 }) {
-    const { browserTabs, currentTabId, t, theme } = useBrowserContext();
+    const { browserTabs, currentTabId, theme } = useBrowserContext();
     const tab = browserTabs.get(tabId);
-    let { name, discover, initUrl, icon } = tab! || {};
+    let { name, icon } = tab! || {};
     const isSelected = currentTabId === tabId;
 
-    const noClose = tabId === MAIN_NAV_TYPE.GAME_FI;
-    let mainNav =
-        !tabId.startsWith('tab') ||
-        tabId === MAIN_NAV_TYPE.GAME_FI ||
-        tabId === MAIN_NAV_TYPE.CHATGPT;
-
-    if (mainNav) {
-        const navTab = MainNavList.find(row => row.tabId === tabId)!;
-        if (navTab) {
-            name = navTab.name;
-            icon = navTab.icon;
-        }
+    const navTab = MainNavList.find(row => row.tabId === tabId)!;
+    if (navTab) {
+        name = navTab.name;
+        icon = navTab.icon;
     }
+    let mainNav = !!navTab;
+
     const [loading, setLoading] = useState(false);
     const [hover, setHover] = useState(false);
     const [icon1, setIcon] = useState(icon);
 
     let d_title = name;
-    if (!mainNav && !initUrl) {
-        d_title = 'NewTab';
-    }
+
     const [title1, setTitle] = useState(d_title);
 
     useEffect(() => {
-        if (!mainNav && initUrl && !discover) {
+        if (!mainNav && tab && tab.url) {
             if (!icon1) {
-                const { host } = new URL(initUrl);
+                const { host } = new URL(tab.url);
                 new BrowserFavoricoService(host).get().then((res: any) => {
                     if (res) {
                         setIcon(res.icon);
@@ -96,7 +88,7 @@ export function TabBar({
                 });
             }
             if (!title1) {
-                const hash = md5(initUrl);
+                const hash = md5(tab.url);
                 new BrowserHistoryService(hash).get().then((res: any) => {
                     if (res) {
                         setTitle(res.title);
@@ -104,7 +96,7 @@ export function TabBar({
                 });
             }
         }
-    }, [initUrl, icon1, title1, discover]);
+    }, [tab, icon1, title1]);
 
     useEffect(() => {
         const handleSiteLoading = (event: any) => {
@@ -136,12 +128,12 @@ export function TabBar({
                 window.addEventListener(`siteFavorUpated_${tabId}`, handleSiteFavorUpdated);
             }
         };
-    }, [mainNav, discover]);
+    }, [mainNav]);
 
     const IconNode = () => (
         <>
             <View w={20} center hide={mainNav}>
-                <View empty hide={!tab?.initUrl}>
+                <View empty hide={!tab?.url}>
                     <View hide={!icon}>
                         <View wh={20} center>
                             <ImageIcon icon={icon!} size={16} />
@@ -149,7 +141,7 @@ export function TabBar({
                     </View>
                     <View hide={!!icon}>
                         <View wh={20} center hide={loading}>
-                            {icon1 && <ImageIcon icon={discover ? icon! : icon1} size={16} />}
+                            {icon1 && <ImageIcon icon={mainNav ? icon! : icon1} size={16} />}
                             {!icon1 && <SpinnerIcon />}
                         </View>
                         <View wh={20} center hide={!loading}>
@@ -157,7 +149,7 @@ export function TabBar({
                         </View>
                     </View>
                 </View>
-                <View empty hide={!!tab?.initUrl}>
+                <View empty hide={!!tab?.url}>
                     <View wh={20} center>
                         <View
                             iconProps={{ sx: { width: 16, height: 16 } }}
@@ -195,22 +187,7 @@ export function TabBar({
             />
         );
     };
-    const CloseNode = () => (
-        <View
-            hide={noClose}
-            onClick={e => {
-                e.preventDefault();
-                e.stopPropagation();
-                onClose && onClose();
-                return false;
-            }}
-            iconButton={{ size: 'small' }}
-            iconButtonColor={theme.textPrimary}
-            icon={'Close'}
-            iconButtonProps={{ sx: { p: '2px' } }}
-            iconProps={{ sx: { p: '2px', fontSize: '0.8rem' } }}
-        />
-    );
+
     let borerRadius: any = {
         borderTopLeftRadius: 8,
         borderTopRightRadius: 8
@@ -233,7 +210,11 @@ export function TabBar({
         hideTilte = false;
         widthBar = 120;
     }
-    if (tabId === MAIN_NAV_TYPE.GAME_FI || tabId === MAIN_NAV_TYPE.WALLET) {
+    if (
+        tabId === MAIN_NAV_TYPE.GAME_FI ||
+        tabId === MAIN_NAV_TYPE.WALLET ||
+        tabId === MAIN_NAV_TYPE.DISCOVERY
+    ) {
         hideTilte = false;
         widthBar = 120;
     }
@@ -249,12 +230,9 @@ export function TabBar({
                         h100p
                         flex1
                         borderRadiusTop={8}
-                        w={widthBar}
+                        sx={{ minWidth: widthBar }}
                         overflowHidden
                         pointer
-                        // sx={{
-                        //     transition: 'width 0.5s ease'
-                        // }}
                         onMouseEnter={() => setHover(true)}
                         onMouseLeave={() => setHover(false)}
                         borderRadiusBottom={isSelected ? 0 : 8}
@@ -263,25 +241,11 @@ export function TabBar({
                         }
                         bgColor={isSelected ? theme.backgroundBrowserActive : undefined}
                     >
-                        <View abs top0 w={20} center h100p pl={4}>
+                        <View abs top0 w={20} center h100p pl={12}>
                             <IconNode />
                         </View>
-                        <View pl={28} hide={hideTilte} w={'calc(100% - 48px)'}>
+                        <View ml={40} hide={hideTilte} w={'calc(100% - 50px)'}>
                             <TitleNode w={'100%'} />
-                            <View
-                                abs
-                                opacity={hover ? 1 : 0}
-                                sx={{
-                                    transition: hover ? 'opacity 0.3s ease' : undefined
-                                }}
-                                top0
-                                right={hover ? 10 : -10}
-                                w={20}
-                                center
-                                h100p
-                            >
-                                <CloseNode />
-                            </View>
                         </View>
                     </View>
                     <Corner width={8} type={'right'} hover={false} isSelected={isSelected} />

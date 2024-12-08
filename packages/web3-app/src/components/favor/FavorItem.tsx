@@ -67,8 +67,7 @@ export function FavorItem({
                     newTab({
                         tabId: `tab1_${ts}`,
                         ts,
-                        ts1: ts,
-                        initUrl: favor.url,
+                        url: favor.url,
                         name: favor.title
                     });
                 }}

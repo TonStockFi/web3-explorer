@@ -239,7 +239,6 @@ export const CoinPage: FC<{ justHistory?: boolean; token: string; onClose?: () =
 
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data } =
         useFetchFilteredActivity(token);
-
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
     const activity = useMemo(() => {

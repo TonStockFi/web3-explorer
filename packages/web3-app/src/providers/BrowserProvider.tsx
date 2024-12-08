@@ -1,8 +1,10 @@
+import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DefaultTheme, useTheme } from 'styled-components';
 import { currentTs } from '../common/utils';
+import { getCurrentAccount } from '../components/webview/WebviewDiscoverApps';
 import LLMService, { MessageLLM } from '../services/LLMService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { MAIN_NAV_TYPE } from '../types';
@@ -11,15 +13,12 @@ import { useIAppContext } from './IAppProvider';
 export interface BrowserTab {
     tabId: string;
     ts: number;
-    ts1: number;
-    discover?: boolean;
+    ts1?: number;
     iframeBaseUrl?: string;
     name?: string;
     icon?: string;
-    initUrl?: string;
     url?: string;
     twa?: boolean;
-    mobile?: boolean;
 }
 
 export type SideWebType =
@@ -60,6 +59,13 @@ interface BrowserContextType {
     openSideWeb: (sideWeb: SideWebProps | null) => void;
 }
 
+export function formatTabIdByUrl(url: string) {
+    const id = md5(url);
+    const { hostname } = new URL(url);
+    const hostName = hostname.replace(/\./g, '_');
+    return `tab_${hostName}${id}`;
+}
+
 const BrowserContext = createContext<BrowserContextType | undefined>(undefined);
 
 export const useBrowserContext = () => {
@@ -77,7 +83,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     const { t, i18n } = useTranslation();
     const theme = useTheme();
     const { children } = props || {};
-    const { showWalletAside } = useIAppContext();
+    const { showWalletAside, env } = useIAppContext();
     const [sideWeb, setSideWeb] = useSessionStorageState<null | SideWebProps>('sideWeb', null);
     const [updateAt, setUpdateAt] = useState(currentTs());
 
@@ -85,7 +91,6 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         'currentTabId',
         MAIN_NAV_TYPE.GAME_FI
     );
-    const { env } = useIAppContext();
 
     useEffect(() => {
         if (window.backgroundApi) {
@@ -146,21 +151,29 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     const setTabs = () => {
         const tabs = Array.from(BrowserTabs)
             .map(row => row[1])
-            .filter(row => row.tabId !== MAIN_NAV_TYPE.GAME_FI);
+            .filter(row => row.tabId !== MAIN_NAV_TYPE.GAME_FI)
+            .filter(row => row.tabId !== MAIN_NAV_TYPE.DISCOVERY);
         if (tabs.length > 0) {
             tabs.sort((a, b) => a.ts - b.ts);
         }
-        Tabs = tabs;
+        // Tabs = tabs;
     };
 
-    const openUrl = (url: string) => {
+    const openUrl = async (url: string) => {
+        const account = getCurrentAccount();
+        if (!account) {
+            ('account is null');
+            return;
+        }
         const ts = currentTs();
-        newTab({
-            tabId: `tab2_${ts}`,
+        const tabId = formatTabIdByUrl(url);
+        const tab = {
+            tabId,
             ts,
-            ts1: ts,
-            initUrl: url
-        });
+            url: url
+        };
+
+        new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
     };
 
     const newTab = (tab: BrowserTab) => {
@@ -190,54 +203,34 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
             return;
         }
         let tab = BrowserTabs.get(tabId);
-        const ts = currentTs();
-        if (tab) {
-            tab = {
-                ...tab,
-                ts1: ts
-            };
-            if (tab.initUrl || !tabId.startsWith('tab')) {
-                const tabs = Array.from(BrowserTabs)
-                    .map(row => row[1])
-                    .filter(row => row.tabId.startsWith('tab'));
-                if (tabs.length > 1) {
-                    tabs.sort((a, b) => b.ts1 - a.ts1);
-                    if (!tabs[0].initUrl) {
-                        BrowserTabs.delete(tabs[0].tabId);
-                    }
-                }
-            }
-        } else {
+        if (!tab) {
+            const ts = currentTs();
             if (tabId === MAIN_NAV_TYPE.GAME_FI) {
                 tab = {
                     tabId,
-                    initUrl: 'https://web.telegram.org/a/',
+                    url: 'https://web.telegram.org/a/',
                     name: 'Games',
                     icon: 'SportsEsports',
-                    ts,
-                    ts1: ts
+                    ts
                 };
             } else if (tabId === MAIN_NAV_TYPE.MARKET) {
                 tab = {
                     tabId,
-                    initUrl: 'https://www.coingecko.com/',
+                    url: 'https://www.coingecko.com/',
                     ts,
-                    name: 'Market',
-                    ts1: ts
+                    name: 'Market'
                 };
             } else if (tabId === MAIN_NAV_TYPE.CHATGPT) {
                 tab = {
                     tabId,
-                    initUrl: 'https://chatgpt.com/',
+                    url: 'https://chatgpt.com/',
                     ts,
-                    name: 'ChatGpt',
-                    ts1: ts
+                    name: 'ChatGpt'
                 };
             } else {
                 tab = {
                     tabId,
-                    ts,
-                    ts1: ts
+                    ts
                 };
             }
         }
@@ -248,29 +241,19 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     };
 
     const addTab = () => {
-        const tabs = Array.from(BrowserTabs)
-            .map(row => row[1])
-            .filter(row => row.tabId.startsWith('tab'));
-        tabs.sort((a, b) => b.ts1 - a.ts1);
+        const tabs = Array.from(BrowserTabs).map(row => row[1]);
         const ts = currentTs();
         if (tabs.length > 0) {
-            const r = tabs.find(tab => !tab.initUrl);
+            const r = tabs.find(tab => !tab.url);
             if (r) {
                 openTab(r.tabId);
-            } else {
-                newTab({
-                    tabId: `tab2_${ts}`,
-                    ts,
-                    ts1: ts
-                });
+                return;
             }
-        } else {
-            newTab({
-                tabId: `tab2_${ts}`,
-                ts,
-                ts1: ts
-            });
         }
+        newTab({
+            tabId: `tab_${ts}`,
+            ts
+        });
     };
     const closeTab = (tabId: string) => {
         BrowserTabs.delete(tabId);
@@ -283,7 +266,6 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
             });
         } else {
             if (currentTabId === tabId) {
-                tabs.sort((a, b) => b.ts1 - a.ts1);
                 openTab(tabs[0].tabId);
             } else {
                 setTabs();

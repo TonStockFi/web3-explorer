@@ -1,9 +1,8 @@
 import { View } from '@web3-explorer/uikit-view';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
-import { openWindow } from '../../common/electron';
 import { useAccountInfo } from '../../hooks/wallets';
-import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
+import { BrowserTab, formatTabIdByUrl, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 
 import { getDiscoverHost } from '../../common/helpers';
@@ -11,10 +10,11 @@ import { currentTs } from '../../common/utils';
 import { DISCOVER_PID, START_URL } from '../../constant';
 import { usePro } from '../../providers/ProProvider';
 import WebviewService from '../../services/WebviewService';
-import { MAIN_NAV_TYPE, ProPlan } from '../../types';
-import { onOpenTab } from '../discover/DiscoverView';
+import { MAIN_NAV_TYPE, ProPlan, WebApp } from '../../types';
 import { LoadingView } from '../LoadingView';
-import { PayPlanBackgroundPage } from '../webview-background/PayPlanBackgroundPage';
+
+import WebviewMainEventService from '../../services/WebviewMainEventService';
+import { PayCommentOrderBackgroundPage } from '../webview-background/PayCommentOrderBackgroundPage';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
 
@@ -26,30 +26,38 @@ export const getCurrentAccount = (key?: string) => {
         return null;
     }
 };
-let _tabId = '';
 
-export function WebviewTwa() {
+export function WebviewDiscoverApps({
+    winId,
+    tabId
+}: {
+    winId: 'Games' | 'Discover';
+    tabId: string;
+}) {
+    const isGames = winId === 'Games';
     const { env } = useIAppContext();
-    const { theme, editTab, openTab, closeTab, newTab, browserTabs } = useBrowserContext();
-    let tab: BrowserTab | undefined = browserTabs.get(MAIN_NAV_TYPE.GAME_FI);
-    const tabId = 'game_center';
+    const { theme, currentTabId, browserTabs } = useBrowserContext();
+    let tab: BrowserTab | undefined = browserTabs.get(tabId);
 
     if (!tab) {
-        tab = { tabId: tabId, ts: currentTs(), ts1: currentTs() };
+        tab = { tabId: tabId, ts: currentTs() };
     }
 
     const [loading, setLoading] = useState<boolean>(true);
-    const [showBlockViewer, setShowBlockViewer] = useState<boolean>(false);
-    const { updateProPlans, orderComment } = usePro();
+    const { updateProPlans } = usePro();
     const { name, emoji, index, id, address } = useAccountInfo();
     const currentAccount = { name, emoji, index, id, address };
-    sessionStorage.setItem('currentAccount', JSON.stringify(currentAccount));
+    if (isGames) {
+        sessionStorage.setItem('currentAccount', JSON.stringify(currentAccount));
+    }
 
+    const [firstLoad, setFirstLoad] = useState(!isGames);
     useEffect(() => {
-        _tabId = tabId;
-    }, [tabId]);
-
-    const url = `${getDiscoverHost(env.isDev)}#Games`;
+        if (currentTabId === MAIN_NAV_TYPE.DISCOVERY && !isGames) {
+            setFirstLoad(false);
+        }
+    }, [currentTabId]);
+    const url = `${getDiscoverHost(env.isDev)}#${winId}`;
 
     useEffect(() => {
         try {
@@ -69,29 +77,34 @@ export function WebviewTwa() {
         action: string;
         payload?: Record<string, any> | undefined;
     }) => {
-        if (action === 'onShowBlockViewer') {
-            if (env.isDev) {
-                setShowBlockViewer(showBlockViewer => !showBlockViewer);
-            }
-        }
-
         if (action === 'updateProPlan') {
             const { proPlans, proRecvAddress } = payload as {
                 proPlans: ProPlan[];
                 proRecvAddress: string;
             };
-            // console.log('updateProPlan', proPlans);
             updateProPlans({ proPlans, proRecvAddress });
-        }
-        if (action === 'openWindow') {
-            openWindow(payload as any);
         }
 
         if (action === 'onOpenTab') {
-            onOpenTab({ _tabId, payload, editTab, openTab, closeTab, newTab, browserTabs });
+            const account = getCurrentAccount();
+
+            const { item } = payload as { item: WebApp };
+            const { id, ...item1 } = item;
+
+            const ts = currentTs();
+            const tabId = id ? `tab_${id}` : formatTabIdByUrl(url);
+            const tab = {
+                ...item1,
+                tabId,
+                ts
+            };
+
+            new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
         }
     };
-
+    if (firstLoad) {
+        return null;
+    }
     return (
         <View
             bgColor={theme.backgroundBrowserActive}
@@ -115,26 +128,13 @@ export function WebviewTwa() {
                 </View>
             </View>
 
-            {Boolean(showBlockViewer || orderComment) && (
-                <View
-                    opacity={showBlockViewer ? 1 : 0}
-                    top={44}
-                    w={360}
-                    right={12}
-                    abs
-                    top0
-                    bottom0
-                    zIdx={showBlockViewer ? 1 : -1}
-                >
-                    <PayPlanBackgroundPage />
-                </View>
-            )}
+            {isGames && <PayCommentOrderBackgroundPage />}
 
             <View
                 abs
                 borderRadius={8}
                 overflowHidden
-                right={showBlockViewer ? 400 : 8}
+                right={8}
                 left={8}
                 bottom={0}
                 top={44}
@@ -155,14 +155,7 @@ export function WebviewTwa() {
                                 new WebviewService(tabId).goTo(url);
                                 return;
                             }
-
                             const ws = new WebviewService(tabId);
-                            ws.execJs(
-                                `localStorage.setItem('__currentAccount', '${JSON.stringify(
-                                    currentAccount
-                                )}');`
-                            );
-
                             setLoading(false);
                         }
                     }}

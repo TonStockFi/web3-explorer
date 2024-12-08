@@ -7,7 +7,7 @@ export enum MAIN_NAV_TYPE {
     MARKET = 'tab_Market',
     ACCOUNTS_MANAGE = 'ACCOUNTS_MANAGE',
     MOBILE_MONITORS = 'MOBILE_MONITORS',
-    DISCOVERY = 'DISCOVERY',
+    DISCOVERY = 'tab_DISCOVERY',
     BROWSER_HISTORY = 'BROWSER_HISTORY',
     CONNECTED_APPS = 'CONNECTED_APPS',
     MULTI_SEND = 'MULTI_SEND',
@@ -81,7 +81,7 @@ export interface WebviewProps {
     onLoading?: (loading: boolean) => void;
     onStopLoading?: () => void;
     onError?: (error: {}) => void;
-    onContextMenu?: (e: {params:any,webContentsId:number,tabId:string}) => void;
+    onContextMenu?: (e: { params: any; webContentsId: number; tabId: string }) => void;
     onErrorReset?: () => void;
     onSiteMessage?: (
         message: { action: string; payload?: Record<string, any> },
@@ -137,9 +137,9 @@ export enum SUB_WIN_ID {
 }
 
 export interface AccountPublic {
-    isMam?:boolean,
-    isActive?:boolean,
-    isHide?:boolean,
+    isMam?: boolean;
+    isActive?: boolean;
+    isHide?: boolean;
     address: string;
     name: string;
     index: number;
@@ -247,7 +247,6 @@ export type ScreenInfo = {
     scale: number;
 };
 
-
 export type ViewSize = {
     width: number;
     height: number;
@@ -264,7 +263,7 @@ export interface CutAreaRect {
 export interface RecAreaRect {
     start: { x: number; y: number };
     end: { x: number; y: number };
-    maxVal:number
+    maxVal: number;
 }
 
 export interface XYWHProps {
@@ -275,44 +274,47 @@ export interface XYWHProps {
 }
 
 export interface ExtenssionPublishDataRow {
-    img: string;
+    img?: string;
     row: RoiInfo;
-    plainData?:{
-        id:string;
-        name:string;
-    },
-    encryptData?:string;
+    plainData?: {
+        id: string;
+        name: string;
+    };
+    encryptData?: string;
 }
 
 export interface ExtenssionPublishData {
     extensionId: string;
-    createTs:number;
-    version:string;
-    ids:string[];
+    mainId: string;
+    createTs: number;
+    version: string;
+    ids: string[];
     desc: string;
     amount: number;
     payAddress: string;
+
     rows: ExtenssionPublishDataRow[];
 }
 
 export interface RoiInfo {
     id: string;
     tabId: string;
-    pid:string;
+    pid: string;
     threshold: number;
     cutAreaRect: XYWHProps;
     ts: number;
     name?: string;
     priority: number;
-    jsCode?:string;
-    type?:"mark"|"task"|"reco"|string;
-    crontab?:string;
-    action?:"click" | "invokeCode" |"finishLoop"|"cron" | string;
-    icon?:string;
-    creator?:string;
-    desc?:string;
+    jsCode?: string;
+    type?: 'mark' | 'task' | 'reco' | string;
+    crontab?: string;
+    action?: 'click' | 'invokeCode' | 'finishLoop' | 'cron' | string;
+    icon?: string;
+    extensionId?: string;
+    extensionTs?: number;
+    creator?: string;
+    desc?: string;
 }
-
 
 export interface CutItemProps {
     roiXYWH: XYWHProps;
@@ -325,10 +327,10 @@ export interface CutItemProps {
     name: string;
     screen: ScreenInfo;
 }
-export type PRO_LEVEL =  "MONTH"|"YEAR"|"LONG"
+export type PRO_LEVEL = 'MONTH' | 'YEAR' | 'LONG';
 
 export interface ProPlan {
-    level:PRO_LEVEL;
+    level: PRO_LEVEL;
     name: string;
     description?: string;
     /**
@@ -337,31 +339,72 @@ export interface ProPlan {
     amount: string;
 }
 
-export interface ProInfoProps{
-    id:string,
-    index:number,
-    level:PRO_LEVEL,
-    amount:number,
-    ts:number
+export interface ProInfoProps {
+    id: string;
+    index: number;
+    level: PRO_LEVEL;
+    amount: number;
+    ts: number;
 }
 
-export interface CurrentPayPlan{
-    isLongProLevel:boolean, 
-    isPayMmeber:boolean, 
-    plans:ProInfoProps[],
-    plan:ProInfoProps
+export interface CurrentPayPlan {
+    isLongProLevel: boolean;
+    isPayMmeber: boolean;
+    plans: ProInfoProps[];
+    plan: ProInfoProps;
 }
 
-export interface AssetBalanceProps{
-    amount:number,
-    name:string,
-    symbol:string,
-    image:string
+export interface AssetBalanceProps {
+    amount: number;
+    name: string;
+    symbol: string;
+    image: string;
 }
 
 export interface AccountAssetBalance {
-    id:string,
-    index:number,
-    balance:string,
-    assetList:AssetBalanceProps[]
+    id: string;
+    index: number;
+    balance: string;
+    assetList: AssetBalanceProps[];
+}
+
+export interface PayCommentOrder {
+    id: string;
+    isOk?: boolean;
+    winId?: string;
+    symbol: string;
+    amount: string;
+    checkProLevel?: boolean;
+    address: string;
+    ts: number;
+    comment: string;
+    ts1?: number;
+}
+
+export interface SendTransferPayload {
+    address: string;
+    amount: number;
+    winId?: string;
+    comment?: string;
+    mainNet?: boolean;
+    jetton?: string;
+    needPayOrder?: boolean;
+}
+
+export interface WebApp {
+    name: string;
+    description: string;
+    icon: string;
+    url: string;
+    id?: string;
+    iframeBaseUrl?: string;
+    twa?: boolean;
+}
+
+export interface WebAppListItem {
+    id: string;
+    hide?:boolean;
+    title: string;
+    children: WebAppListItem[];
+    apps?: WebApp[];
 }

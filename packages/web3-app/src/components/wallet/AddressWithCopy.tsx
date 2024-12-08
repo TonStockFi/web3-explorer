@@ -16,7 +16,7 @@ const DoneIconStyled = styled(DoneIcon)`
 `;
 
 const CopyIconStyled = styled(CopyIcon)`
-    color: ${p => p.theme.iconTertiary};
+    color: ${p => p.theme.textPrimary};
     cursor: pointer;
     zoom: 0.8;
 `;

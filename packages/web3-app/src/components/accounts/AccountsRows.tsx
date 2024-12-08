@@ -95,10 +95,7 @@ export const AccountRows: FC<{
                         <ListItem key={wallet.id} hover={false}>
                             <ListItemPayload>
                                 <View h={32} center mr12>
-                                    <WalletEmoji
-                                        containerSize="24px"
-                                        emoji={wallet.emoji.substring(0, 2)}
-                                    />
+                                    <WalletEmoji containerSize="24px" emoji={wallet.emoji} />
                                 </View>
                                 <FirstLineContainer>
                                     <Label2>{wallet.name}</Label2>

@@ -12,7 +12,7 @@ import LLMGeminiService from '../../services/LLMGeminiService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
-import { ContextMenuProps } from '../../types';
+import { ContextMenuProps, MAIN_NAV_TYPE } from '../../types';
 import { getFocusWebview, getTabIdByWebviewContentsId } from './WebViewBrowser';
 
 export default function ContextMenu({
@@ -65,7 +65,7 @@ export default function ContextMenu({
         if (!tabId) {
             return null;
         }
-        if (tabId === 'game_center' || tabId === 'discover_apps') {
+        if (tabId === MAIN_NAV_TYPE.GAME_FI || tabId === MAIN_NAV_TYPE.DISCOVERY) {
             return null;
         }
     }

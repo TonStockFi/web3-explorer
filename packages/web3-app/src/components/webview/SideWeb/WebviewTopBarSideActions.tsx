@@ -7,8 +7,10 @@ import { SUB_WIN_ID } from '../../../types';
 
 export function WebviewTopBarSideActions({
     selected,
-    isSideWeb
+    isSideWeb,
+    hideGemini
 }: {
+    hideGemini?: boolean;
     selected?: string;
     isSideWeb?: boolean;
 }) {
@@ -44,6 +46,7 @@ export function WebviewTopBarSideActions({
                 onClick={() => onClick('ChatGpt')}
             />
             <View
+                hide={hideGemini}
                 ml={4}
                 borderRadius={8}
                 bgColor={selected === 'Gemini' ? sBgColor : undefined}

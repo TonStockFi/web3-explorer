@@ -7,12 +7,10 @@ import { ProInfoProps, ProPlan } from '../types';
 interface AppContextType {
     proRecvAddress: string;
     showProBuyDialog: boolean;
-    orderComment: string;
     proPlans: ProPlan[];
     isLongProLevel: boolean;
     proInfo: ProInfoProps | null;
     proInfoList: ProInfoProps[];
-    updateOrderComment: (comment: string) => void;
     updateProPlans: (v: { proRecvAddress: string; proPlans: ProPlan[] }) => void;
     onShowProBuyDialog: (v: boolean) => void;
     onChangeProInfo: (v: ProInfoProps) => void;
@@ -24,7 +22,6 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const ProProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
     const [showProBuyDialog, setShowProBuyDialog] = useState(false);
-    const [orderComment, setOrderComment] = useState('');
     const [proInfo, setProInfo] = useState<null | ProInfoProps>(null);
     const [proInfoList, setProInfoList] = useState<ProInfoProps[]>([]);
     const [proRecvAddress, setProRecvAddress] = useLocalStorageState<string>(
@@ -41,10 +38,7 @@ export const ProProvider = (props: { children: ReactNode }) => {
     const onShowProBuyDialog = (v: boolean) => {
         setShowProBuyDialog(v);
     };
-    const updateOrderComment = (comment: string) => {
-        console.log('updateOrderComment', comment);
-        setOrderComment(comment);
-    };
+
     const updateProInfo = (proInfoList: ProInfoProps[]) => {
         setProInfoList(proInfoList);
     };
@@ -68,8 +62,6 @@ export const ProProvider = (props: { children: ReactNode }) => {
                 isLongProLevel,
                 updateProInfo,
                 proInfo,
-                orderComment,
-                updateOrderComment,
                 proRecvAddress,
                 proPlans,
                 updateProPlans,

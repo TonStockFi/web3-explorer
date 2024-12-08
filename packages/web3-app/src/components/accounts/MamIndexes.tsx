@@ -133,10 +133,7 @@ export const MAMIndexesPageContent: FC<{
                         <ListItem style={{ paddingLeft: 12 }} hover={false} key={derivation.index}>
                             <ListItemPayload>
                                 <NameContainer style={{ marginTop: 6 }}>
-                                    <WalletEmoji
-                                        containerSize="24px"
-                                        emoji={derivation.emoji.substring(0, 2)}
-                                    />
+                                    <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
                                     <TextContainer>
                                         <FirstLineContainer>
                                             <Label2>{derivation.name}</Label2>

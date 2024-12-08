@@ -13,8 +13,8 @@ export function ProHandler() {
     const theme = useTheme();
     const account = useActiveAccount() as AccountMAM;
     const walletAccount = account.derivations.find(d => d.index === account.activeDerivationIndex)!;
-    const accountTitle = `${account.emoji.substring(0, 2)} ${account.name}`;
-    const walletTitle = `${walletAccount.emoji.substring(0, 2)} ${walletAccount.name}`;
+    const accountTitle = `${account.name}`;
+    const walletTitle = `${walletAccount.name}`;
     const [currentProInfo, setCurrentProInfo] = useState<ProInfoProps | null>(null);
     const [isLongProLevel, setIsLongProLevel] = useState<boolean>(false);
     const [ready, setReady] = useState<boolean>(false);

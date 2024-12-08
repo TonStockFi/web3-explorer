@@ -78,7 +78,7 @@ export const fixRow = (roi: RoiInfo) => {
 
     //@ts-ignore
     if (roi.page) {
-        roi.pid = '#0';
+        roi.pid = ENTRY_ID_ROI;
         //@ts-ignore
         roi.name = roi.name || roi.page;
     }
@@ -130,7 +130,18 @@ export const fixRow = (roi: RoiInfo) => {
         roi.pid = MARK_ID_ROI;
     }
     if (!roi.pid && roi.type === 'reco') {
-        roi.pid = '#0';
+        roi.pid = ENTRY_ID_ROI;
+    }
+    if (roi.pid === '#0') {
+        roi.pid = ENTRY_ID_ROI;
+    }
+
+    if (roi.pid === '#-1') {
+        roi.pid = MARK_ID_ROI;
+    }
+
+    if (roi.pid === '#-2') {
+        roi.pid = TASK_ID_ROI;
     }
 };
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -338,7 +349,9 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         });
         setTimeout(() => {
             if (!recognitionCatId) {
-                //setRoiAreaList(() => []);
+                if (isPlaygroundMaster()) {
+                    setRoiAreaList(() => []);
+                }
             } else {
                 loadCacheRoiList(recognitionCatId);
             }

@@ -7,7 +7,6 @@ import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewService from '../../services/WebviewService';
-import { WebviewTopBarSideActions } from './SideWeb/WebviewTopBarSideActions';
 import { UrlInput } from './UrlInput';
 
 export function WebviewTopBar({
@@ -58,7 +57,9 @@ export function WebviewTopBar({
                     mr12
                     onClick={() => {
                         const ws = new WebviewService(tab.tabId);
-                        ws.reloadWebview();
+                        if (ws.getWebview() && ws.getWebview()?.canGoBack()) {
+                            ws.goBack();
+                        }
                     }}
                     iconButton={{
                         disabled: !canGoBack,
@@ -113,11 +114,9 @@ export function WebviewTopBar({
                     icon={<ImageIcon icon={'OpenInNew'} size={18} />}
                     iconButtonSmall
                     onClick={() => {
-                        closeTab(tab.tabId);
                         new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
                     }}
                 />
-                <WebviewTopBarSideActions />
             </View>
         </View>
     );

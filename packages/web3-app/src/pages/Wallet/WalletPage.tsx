@@ -6,14 +6,19 @@ import { Page } from '../../components/Page';
 import TabViewContainer from '../../components/TabViewContainer';
 import { DesktopTokens } from '../../components/wallet/DesktopTokens';
 import { WalletTop } from '../../components/wallet/WalletTop';
+import { useAccountInfo, useBlockChainExplorer } from '../../hooks/wallets';
+import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { CoinPage } from './coin/DesktopCoinPage';
 import { DesktopHistoryPage } from './history/DesktopHistoryPage';
 
 export function WalletPage() {
     const { t } = useTranslation();
+    const { openUrl } = useBrowserContext();
     const { selectedToken, onSelectToken } = useIAppContext();
     const [currentTabIndex, setCurrentTabIndex] = useState(0);
+    const accountExplorer = useBlockChainExplorer();
+    const { address } = useAccountInfo();
     useEffect(() => {
         onSelectToken('');
     }, []);
@@ -30,6 +35,11 @@ export function WalletPage() {
         },
         {
             title: t('wallet_aside_history'),
+            node: DesktopHistoryPage
+        },
+
+        {
+            title: t('NFT'),
             node: DesktopHistoryPage
         }
     ];
@@ -51,7 +61,21 @@ export function WalletPage() {
                         paddingTop: 1,
                         overflowY: 'auto'
                     }}
-                    onChangeTabIndex={setCurrentTabIndex}
+                    onChangeTabIndex={v => {
+                        if (v === 0) {
+                            setCurrentTabIndex(v);
+                        }
+                        if (v === 1) {
+                            const url = accountExplorer.replace('%s', address);
+                            openUrl(url);
+                            return;
+                        }
+                        if (v === 2) {
+                            const url = accountExplorer.replace('%s', address);
+                            openUrl(url + '#nfts');
+                            return;
+                        }
+                    }}
                     tabs={tabs}
                     topTabStyle={{ color: 'white' }}
                     currentTabIndex={currentTabIndex}

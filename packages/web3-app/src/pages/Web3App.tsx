@@ -2,7 +2,7 @@ import { View } from '@web3-explorer/uikit-view';
 import { AppRegionDrag } from '../components/AppRegionDrag';
 import { GlobalUi } from '../components/GlobalUi';
 import { IBrowserProvider, useBrowserContext } from '../providers/BrowserProvider';
-import { MAIN_NAV_TYPE } from '../types';
+import { MAIN_NAV_TYPE, PayCommentOrder, SendTransferPayload } from '../types';
 import DashboardPage from './Dashboard/DashboardPage';
 
 import { SideBarVert } from '../components/app/SideBarVert';
@@ -12,11 +12,15 @@ import { FavorProvider } from '../providers/FavorProvider';
 import { useIAppContext } from '../providers/IAppProvider';
 
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
+import { useMutateDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useActiveAccount, useMutateActiveTonWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { onAction } from '../common/electron';
+import { genId } from '../common/helpers';
+import { currentTs } from '../common/utils';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
@@ -26,6 +30,7 @@ import { ProProvider, usePro } from '../providers/ProProvider';
 import { RecognitionProvider } from '../providers/RecognitionProvider';
 import { ScreenshotProvider } from '../providers/ScreenshotProvider';
 import { Web3AppThemeWrpper } from '../providers/Web3AppThemeWrpper';
+import PayCommentOrderService from '../services/PayCommentOrderService';
 import ProService from '../services/ProService';
 import DevView from './DevView';
 import { BrowserFavorPage } from './Discover/BrowserFavorPage';
@@ -60,7 +65,6 @@ function Pages() {
             <View wh100p displayNone={!currentTabId.startsWith('tab')}>
                 <WebviewPage />
             </View>
-
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.BROWSER_HISTORY}>
                 <BrowserHistoryPage />
             </View>
@@ -83,27 +87,86 @@ export function MainMessageDispatcher() {
     const { mutateAsync: setActiveAccount } = useMutateActiveTonWallet();
     const { onOpen: sendTransfer } = useSendTransferNotification();
     const format = useFormatCoinValue();
-
+    const [_, setPayCommentOrder] = useState<null | PayCommentOrder>(null);
+    const { mutate: mutateDevSettings } = useMutateDevSettings();
+    useEffect(() => {
+        function finishPay(e: any) {
+            setPayCommentOrder(payCommentOrder => {
+                if (payCommentOrder) {
+                    new PayCommentOrderService().save(payCommentOrder.id, payCommentOrder);
+                    onAction('subWin', {
+                        toWinId: payCommentOrder.winId,
+                        action: 'onPayCommentOrderSubmit',
+                        payload: {
+                            id: payCommentOrder.id
+                        }
+                    });
+                }
+                return null;
+            });
+        }
+        window.addEventListener('finishPay', finishPay);
+        return () => {
+            window.removeEventListener('finishPay', finishPay);
+        };
+    }, []);
     useEffect(() => {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(async (e: any) => {
+                if (e.action === 'getPayCommentOrder') {
+                    let { payCommentOrderId, fromWinId } = e.payload as {
+                        payCommentOrderId: string;
+                        fromWinId: string;
+                    };
+                    console.log('getPayCommentOrder', payCommentOrderId);
+                    const order = await new PayCommentOrderService().get(payCommentOrderId);
+                    onAction('subWin', {
+                        toWinId: fromWinId,
+                        action: 'onGetPayCommentOrder',
+                        payload: {
+                            order
+                        }
+                    });
+                }
+                if (e.action === 'delPayCommentOrder') {
+                    let { payCommentOrderId } = e.payload as {
+                        payCommentOrderId: string;
+                    };
+                    await new PayCommentOrderService().remove(payCommentOrderId);
+                }
                 if (e.action === 'onSendTransfer') {
-                    let { address, amount, text, asset, jetton } = e.payload;
+                    let { address, amount, comment, winId, mainNet, jetton, needPayOrder } =
+                        e.payload as SendTransferPayload;
+                    if (mainNet) {
+                        mutateDevSettings({ tonNetwork: Network.MAINNET });
+                    }
                     if (!jetton) {
                         jetton = 'TON';
                     }
-                    if (!asset) {
-                        asset = 'TON';
+                    if (needPayOrder && comment) {
+                        setPayCommentOrder({
+                            id: genId(),
+                            winId,
+                            symbol: jetton,
+                            amount: String(amount),
+                            address,
+                            ts: currentTs(),
+                            comment
+                        });
+                    } else {
+                        setPayCommentOrder(null);
                     }
+
                     const amount1 = String(format(String(amount * 1000000000)));
+
                     sendTransfer({
                         transfer: {
                             address,
                             amount: amount1,
-                            text,
+                            text: comment || '',
                             jetton
                         },
-                        asset
+                        asset: jetton
                     });
                 }
                 if (e.action === 'onPayPro') {

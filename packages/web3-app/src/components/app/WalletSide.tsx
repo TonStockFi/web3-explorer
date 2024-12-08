@@ -1,10 +1,12 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
-import { useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useActiveAccount, useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
 import { AsideWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { AsideMenu } from '../aside/AsideMenu';
+import { WalletEmoji } from '../WalletEmoji';
 
 export const WalletSide = () => {
     const account = useActiveAccount();
@@ -13,6 +15,8 @@ export const WalletSide = () => {
     const { walletAside, showWalletAside } = useIAppContext();
     const { theme } = useBrowserContext();
     const { env } = useIAppContext();
+    const network = useActiveTonNetwork();
+
     if (account.type === 'mam') {
         const name = account.activeDerivation.name;
         accountEmoji = account.activeDerivation.emoji;
@@ -28,26 +32,23 @@ export const WalletSide = () => {
         <View center w100p h100p>
             <View
                 hoverBgColor={theme.backgroundContentAttention}
-                bgColor={theme.backgroundContentTint}
+                bgColor={network === Network.TESTNET ? 'red' : theme.backgroundContentTint}
                 center
                 rowVCenter
                 onClick={() => showWalletAside(true)}
                 pointer
                 borderRadius={4}
+                tips={network === Network.TESTNET ? '测试网' : '主网'}
                 borderBox
                 px={8}
                 py={4}
+                sx={{
+                    borderLeft: `1px solid ${theme.separatorCommon}`
+                }}
                 overflowHidden
                 mb={4}
             >
-                <View
-                    center
-                    overflowHidden
-                    w={16}
-                    h={16}
-                    text={accountEmoji.substring(0, 2)}
-                    textFontSize="0.9rem"
-                />
+                <WalletEmoji emojiSize="16px" emoji={accountEmoji} />
                 <View
                     mt={2}
                     ml={8}

@@ -1,8 +1,8 @@
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
-import { DiscoverView } from '../../components/discover/DiscoverView';
+import { useTheme } from 'styled-components';
 import { WebviewAppView } from '../../components/webview/WebviewAppView';
-import { WebviewTwa } from '../../components/webview/WebviewTwa';
+import { WebviewDiscoverApps } from '../../components/webview/WebviewDiscoverApps';
 import { useAccountWallePartitionId } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { MAIN_NAV_TYPE } from '../../types';
@@ -10,23 +10,22 @@ import { MAIN_NAV_TYPE } from '../../types';
 export function WebviewPage() {
     const { browserTabs, currentTabId } = useBrowserContext();
     const partitionId = useAccountWallePartitionId();
-    const tab = browserTabs.get(currentTabId);
-    const [ready, setReady] = useState(false);
-    const showDiscover = currentTabId.startsWith('tab') && !tab?.initUrl;
 
+    const [ready, setReady] = useState(false);
+    const theme = useTheme();
     useEffect(() => {
         setReady(true);
     }, []);
-    if (!ready && showDiscover) {
+    if (!ready) {
         return null;
     }
-
     return (
         <View wh100p userSelectNone flx row relative>
             <View flex1>
                 {Array.from(browserTabs)
                     .map(row => row[0])
                     .filter(row => row.startsWith('tab'))
+                    .filter(row => row !== MAIN_NAV_TYPE.DISCOVERY)
                     .map(tabId => (
                         <View key={tabId} empty>
                             {[partitionId].map(pid => (
@@ -35,26 +34,22 @@ export function WebviewPage() {
                         </View>
                     ))}
                 <View
+                    bgColor={theme.backgroundBrowserActive}
                     absFull
-                    left={8}
                     bottom={8}
-                    top={8}
-                    right={8}
-                    zIdx={showDiscover ? 1 : -1}
-                    opacity={showDiscover ? 1 : 0}
+                    zIdx={currentTabId === MAIN_NAV_TYPE.DISCOVERY ? 1 : -1}
+                    opacity={currentTabId === MAIN_NAV_TYPE.DISCOVERY ? 1 : 0}
                 >
-                    <DiscoverView showDiscover={showDiscover} tabId={'discover_apps'} />
+                    <WebviewDiscoverApps winId={'Discover'} tabId={MAIN_NAV_TYPE.DISCOVERY} />
                 </View>
                 <View
+                    bgColor={theme.backgroundBrowserActive}
                     absFull
-                    left={0}
                     bottom={8}
-                    top={0}
-                    right={0}
                     zIdx={currentTabId == MAIN_NAV_TYPE.GAME_FI ? 1 : -1}
                     opacity={currentTabId == MAIN_NAV_TYPE.GAME_FI ? 1 : 0}
                 >
-                    <WebviewTwa />
+                    <WebviewDiscoverApps winId={'Games'} tabId={MAIN_NAV_TYPE.GAME_FI} />
                 </View>
             </View>
         </View>

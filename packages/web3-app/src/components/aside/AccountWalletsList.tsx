@@ -3,7 +3,6 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
     useAccountsState,
     useActiveAccount,
-    useActiveTonNetwork,
     useMutateActiveTonWallet
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { useCallback, useState } from 'react';
@@ -12,7 +11,6 @@ import styled from 'styled-components';
 import { PlusIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { Label2 } from '@tonkeeper/uikit/dist/components/Text';
 
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { WalletIndexBadge } from '@tonkeeper/uikit/dist/components/account/AccountBadge';
 import FormControl from '@web3-explorer/uikit-mui/dist/mui/FormControl';
@@ -32,6 +30,7 @@ import { ToggleActiveAccount } from '../wallet/ToggleActiveAccount';
 import { WalletAccountsList } from '../wallet/WalletAccountsList';
 import { WalletEmoji } from '../WalletEmoji';
 import { AccountsPager } from './AccountsPager';
+import { NetworkView } from './NetworkView';
 
 const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     border-radius: ${p => p.theme.corner2xSmall};
@@ -91,7 +90,6 @@ export const AccountWalletsList = () => {
     );
 
     const [openSetCountDialog, setOpenSetCountDialog] = useState(false);
-    const network = useActiveTonNetwork();
 
     const accountMAM = activeAcount as AccountMAM;
     const { derivations, activeDerivationIndex } = accountMAM;
@@ -144,10 +142,7 @@ export const AccountWalletsList = () => {
                             button={activeAcount.name}
                             buttonVariant="text"
                             buttonStartIcon={
-                                <WalletEmoji
-                                    containerSize="16px"
-                                    emoji={activeAcount.emoji.substring(0, 2)}
-                                />
+                                <WalletEmoji containerSize="16px" emoji={activeAcount.emoji} />
                             }
                             buttonEndIcon={<ExpandMoreIcon />}
                             px={12}
@@ -159,7 +154,7 @@ export const AccountWalletsList = () => {
                         />
                     </View>
                     <View rowVCenter jEnd>
-                        {network === Network.TESTNET && <View mr={8} chip={'Testnet'} />}
+                        <NetworkView />
                         <View
                             hide
                             mr={4}
@@ -262,7 +257,7 @@ export const AccountWalletsList = () => {
                                         <WalletEmoji
                                             emojiSize="16px"
                                             containerSize="16px"
-                                            emoji={wallet.emoji.substring(0, 2)}
+                                            emoji={wallet.emoji}
                                         />
                                         <View aCenter px={8}>
                                             <Label2>{wallet.name}</Label2>

@@ -7,6 +7,7 @@ export enum TelegramApiAction  {
     SendDocument="SendDocument",
     GetExtensionDecryptKey="GetExtensionDecryptKey",
     PublishExtension="PublishExtension",
+    GetExtPassword="GetExtPassword",
 }
 
 export interface TelegramApi_GetExtensionDecryptKey{
@@ -34,5 +35,10 @@ export interface TelegramApi_PublishExtension{
     caption?: string
 }
 
+export interface TelegramApi_GetExtPassword{
+    extensionId:string,
+    createTs:number
+}
 
-export type TelegramApiPayload  = TelegramApi_PublishExtension| TelegramApi_SendDocument | TelegramApi_SendTextMessage
+
+export type TelegramApiPayload  = TelegramApi_GetExtPassword | TelegramApi_PublishExtension| TelegramApi_SendDocument | TelegramApi_SendTextMessage

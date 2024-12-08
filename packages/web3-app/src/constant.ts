@@ -94,6 +94,12 @@ export const MainNavList = [
         side: true
     },
     {
+        name: 'aside_discover',
+        tabId: MAIN_NAV_TYPE.DISCOVERY,
+        icon: 'Explore',
+        side: true
+    },
+    {
         name: 'Games',
         tabId: MAIN_NAV_TYPE.GAME_FI,
         icon: 'SportsEsports',
@@ -104,7 +110,7 @@ export const MainNavList = [
         name: 'Favor',
         tabId: MAIN_NAV_TYPE.FAVOR,
         icon: 'Folder',
-        side: true
+        side: false
     },
 
     {
@@ -183,9 +189,9 @@ export const DropDownMenuSx = {
     }
 };
 
-export const ENTRY_ID_ROI = "#0"
-export const MARK_ID_ROI = "#-1"
-export const TASK_ID_ROI = "#-2"
+export const ENTRY_ID_ROI = "#99"
+export const MARK_ID_ROI = "#1"
+export const TASK_ID_ROI = "#2"
 export const ALL_ID_ROI = ""
 export const NOT_SHOW_IDS_ROI = [ALL_ID_ROI,MARK_ID_ROI,TASK_ID_ROI]
 export const DEFAULT_CUT_AREA = {

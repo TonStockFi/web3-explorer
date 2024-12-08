@@ -309,7 +309,7 @@ export const AccountDrawerSelect = ({ onClose }: { onClose: () => void }) => {
                                 <CheckboxItemRow
                                     key={wallet.id}
                                     address={address}
-                                    emoji={wallet.emoji.substring(0, 2)}
+                                    emoji={wallet.emoji}
                                     label={`${wallet.name}`}
                                     checked={selectedWalletIndex.indexOf(index) > -1}
                                     disabled={wallet.id === activeAcount.id}
@@ -340,7 +340,7 @@ export const AccountDrawerSelect = ({ onClose }: { onClose: () => void }) => {
                                 <CheckboxItemRow
                                     key={wallet.index}
                                     address={address}
-                                    emoji={wallet.emoji.substring(0, 2)}
+                                    emoji={wallet.emoji}
                                     label={`# ${wallet.index + 1} ${wallet.name}`}
                                     checked={selectedWalletIndex.indexOf(wallet.index) > -1}
                                     disabled={wallet.index === activeDerivationIndex}

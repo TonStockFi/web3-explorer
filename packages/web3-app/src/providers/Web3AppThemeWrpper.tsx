@@ -74,8 +74,8 @@ export const Web3AppThemeWrpper = ({ children }: { children: ReactNode }) => {
                         color: theme.textPrimary
                     },
                     body1: {
-                        color: theme.textPrimary,
-                        paddingTop: '2px'
+                        color: theme.textPrimary
+                        // paddingTop: '2px'
                     }
                 }
             },
