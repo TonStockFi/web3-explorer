@@ -285,6 +285,7 @@ export interface ExtenssionPublishDataRow {
 
 export interface ExtenssionPublishData {
     extensionId: string;
+    host: string;
     mainId: string;
     createTs: number;
     version: string;

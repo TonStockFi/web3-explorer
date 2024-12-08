@@ -234,35 +234,33 @@ export default class WebviewMainEventService {
     static getPlaygroundWindowProps({
         isDev,
         index,
-        tabId,
         initMessage,
-        resizable
+        tab
     }: {
         initMessage:string;
         isDev: boolean;
         index: number;
-        resizable?:boolean;
-        tabId: string;
+        tab: BrowserTab;
     }) {
+        const {tabId,twa} = tab;
         const topColor = getTopColor(index);
 
-        let height = PLAYGROUND_WIN_HEIGHT;
         let resizable_ = true;
-        const minWidth = 368;
-        let y = 12;
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
 
         const playgroundUrl = `${getDiscoverHost(isDev)}&winId=${winId}&initMessage=${initMessage}&topColor=${encodeURIComponent(
             topColor
         )}#${winId}`;
-        let width = minWidth;
-        let x = window.screen.width - width - 12;
 
+        const minWidth = twa ? 368 : 368* 3;
+        let height = PLAYGROUND_WIN_HEIGHT;
+        let x = window.screen.width - minWidth - 12;
+        let y = 12;
         return {
             winId,
             playgroundUrl,
             options: {
-                width: width,
+                width: minWidth,
                 minWidth,
                 minHeight: height,
                 resizable:resizable_,
@@ -326,9 +324,8 @@ export default class WebviewMainEventService {
         const { options, winId, playgroundUrl } = WebviewMainEventService.getPlaygroundWindowProps({
             index:account.index,
             isDev,
-            tabId: tab.tabId,
+            tab,
             initMessage,
-            resizable:!tab.twa
         });
 
         await this.openWindow(winId, playgroundUrl, options, isDev);
@@ -349,9 +346,8 @@ export default class WebviewMainEventService {
         const { options, winId, playgroundUrl } = WebviewMainEventService.getPlaygroundWindowProps({
             index,
             isDev,
-            tabId: tab.tabId,
+            tab,
             initMessage,
-            resizable:!tab.twa
         });
 
         await this.openWindow(winId, playgroundUrl, options, isDev);
