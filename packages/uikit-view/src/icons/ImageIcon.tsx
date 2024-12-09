@@ -1,3 +1,4 @@
+import Avatar from '@web3-explorer/uikit-mui/dist/mui/Avatar';
 import { View } from '../View';
 
 export const ImageIconTg_32 = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAvVBMVEUAAABHt/Qwpd4wpt8vpd8totoqn9cqndQvo98ontYvn9k6r+k3ruo4sOgqntUnn9Mzq+c3sOw3p+c0p+Q3r+c3sOc/tO84r+g4qOg4rOk1rOg0quYzqOQyqOIxpuEwpOAwpd4uo90todssoNkrn9gqntYqndUonNQom9MooNjA4POg0/Dw+Px4w+puwOf4///////i8PhfuOMwoOAwoNhMsOAwqOBTsOaV0O7Y8Piw3PBArOCDyOi44PDM6PjK/OOTAAAAGXRSTlMACEiY8NjEmBjgMDDe8PCAwJiA8ICYGMjISLaHtQAAAbdJREFUeAFt0AXa4kAMBuBMFXd3qjh1nPsfa5NOdfnfZzRfkBZyTOh2Gs1mo9MVGPwaDZvTTHM4gjI2wHiGprOkZcBKHx9TXDYeQabe4HHJtFGHRKUxn8/mvIwHHHxvVHjOJvO/LSYMSC++zBc40iQ99ABV+hRgmouiaB5RrU8/Ii7+F93uj8dtQUQAJi2WiyWOBe3k8nXQOa5JDITVarla4uB7eDw5scsyJoC4ykSry8FJhbwmQifLX3eXktP5g+s1Wq9X69WqA/J6vVkj73l1yPN1oYMbUX2zkUHabDbr6P1wYq4XYY4O/oasJWrY+kl8PS59ytGRGpAE8na79b0n/fev5/tvhzv725gMCj/44cXT/IDnyEsaFBA1jQ4YapoWOqklXZEIgsbpGgo+DucGW14WgLUw04lGzvxFHqiGQYsBqHrJ5umgu86pAFBpGQVBEHj4Qm+Bjhe9VQHUNop0PQjOl71u6DjaQJhicoaJOQbmnt/3CoNYpWpZpmXisEh2rlYgUatatmXjsGgntFVrkKko9g+lAgWs3cLazt6lWm0GZRW1tcu01Ar8YoKqyK2WrKgCg8w/9ittdNuS5KEAAAAASUVORK5CYII=`;
@@ -48,7 +49,7 @@ export function ImageIcon({
     }
     if (!icon || icon.startsWith('http') || icon.startsWith('icon_')) {
         let zoom = 1;
-        if (icon.startsWith('icon_')) {
+        if (icon && icon.startsWith('icon_')) {
             const k = icon.substring('icon_'.length);
             if (Object.keys(ImageIconMap).indexOf(k) > -1) {
                 //@ts-ignore
@@ -61,16 +62,23 @@ export function ImageIcon({
         return (
             <View wh={size} relative center>
                 <View wh={size} absFull zIdx={0} bgColor={'#e9e9e9'} borderRadius={10} />
-                <View
-                    wh={size}
-                    center
-                    sx={{ zoom }}
-                    avatar={{
-                        variant: variant || 'rounded',
-                        src: icon,
-                        sx: { width: size, height: size }
-                    }}
-                ></View>
+
+                {icon ? (
+                    <View
+                        wh={size}
+                        center
+                        sx={{ zoom }}
+                        avatar={{
+                            variant: variant || 'rounded',
+                            src: icon,
+                            sx: { width: size, height: size }
+                        }}
+                    ></View>
+                ) : (
+                    <Avatar variant={variant || 'rounded'} sx={{ zoom, width: size, height: size }}>
+                        {''}
+                    </Avatar>
+                )}
             </View>
         );
     } else {

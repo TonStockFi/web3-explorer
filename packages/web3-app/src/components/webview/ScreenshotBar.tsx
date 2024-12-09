@@ -4,7 +4,7 @@ import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import { isPlaygroundMaster } from '../../common/helpers';
+import { isPlaygroundMaster, showGlobalLoading } from '../../common/helpers';
 import { downloadImage } from '../../common/image';
 import { urlToBlob } from '../../common/opencv';
 import { currentTs } from '../../common/utils';
@@ -81,6 +81,7 @@ export function ScreenshotBar({
                                     if (!size) {
                                         return;
                                     }
+                                    showGlobalLoading(true);
                                     const screenImgUrl = await ws.getScreenImageUrl(size);
                                     if (screenImgUrl) {
                                         const blob = await urlToBlob(screenImgUrl);
@@ -90,6 +91,8 @@ export function ScreenshotBar({
                                     }
                                 } catch (error) {
                                     console.error(error);
+                                } finally {
+                                    showGlobalLoading(false, 1);
                                 }
                             }
                             onCut(false);

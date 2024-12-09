@@ -1,3 +1,4 @@
+import { showGlobalLoading } from '../common/helpers';
 import { copyImageToClipboard } from '../common/image';
 import { base64ToBlob, urlToBlob } from '../common/opencv';
 import { sleep } from '../common/utils';
@@ -47,6 +48,7 @@ export default class LLMGeminiService extends LLMService {
         const ws = new WebviewService(this.tabId);
         const webview = await ws.waitwebviewIsReady();
         const rect = await this.getPromptInputRect();
+        showGlobalLoading(true)
         await ws.sendClickEvent(rect!.left + rect.width / 2, rect!.top + rect.height / 2);
     
         if (image) {
@@ -71,7 +73,7 @@ export default class LLMGeminiService extends LLMService {
         await sleep(200);
         await webview!.insertText(prompt);
         await sleep(200);
-    
+        
         const rect1 = (await ws.waitForExecJsResult(
             `const sendBtn = document.querySelector(".send-button")
             const isDisabled = sendBtn.getAttribute("aria-disabled") === "true";
@@ -84,6 +86,7 @@ export default class LLMGeminiService extends LLMService {
         )) as any;
         console.log('send-button', rect1);
         await ws.sendClickEvent(rect1!.left + rect1.width / 2, rect1!.top + rect1.height / 2);
+        showGlobalLoading(false)
         return true;
     };
 

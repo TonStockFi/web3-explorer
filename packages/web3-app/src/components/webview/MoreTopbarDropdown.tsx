@@ -7,7 +7,9 @@ import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { isPlaygroundWebApp } from '../../common/helpers';
 import { BrowserTab } from '../../providers/BrowserProvider';
+import { usePlayground } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
@@ -27,6 +29,7 @@ export default function MoreTopbarDropdown({
     tabId: string;
 }) {
     const [isMute, setIsMute] = React.useState(false);
+    const { tab } = usePlayground();
     const { isCutEnable, onCut } = useScreenshotContext();
     const { t } = useTranslation();
     const theme = useTheme();
@@ -57,9 +60,10 @@ export default function MoreTopbarDropdown({
             sx: {
                 bgcolor: theme.backgroundContentAttention,
                 overflow: 'visible',
+                width: '180px',
                 filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                 mt: 2.5,
-                ml: -0.5,
+                ml: 1,
                 '& li': {
                     paddingTop: '0px!important',
                     paddingBottom: '0px!important',
@@ -70,7 +74,7 @@ export default function MoreTopbarDropdown({
                     display: 'block',
                     position: 'absolute',
                     top: 0,
-                    right: 8,
+                    right: 12,
                     width: 10,
                     height: 10,
                     bgcolor: theme.backgroundContentAttention,
@@ -116,23 +120,38 @@ export default function MoreTopbarDropdown({
                 TransitionComponent={Fade}
             >
                 <View
+                    hide={!isPlaygroundWebApp()}
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);
-                        new WebviewMainEventService().openOcrWindow({
-                            site: 'Gemini'
+                        new WebviewMainEventService().openFeatureWindow({
+                            tab,
+                            account: currentAccount!
                         });
                     }}
                 >
                     <ListItemIcon>
-                        <View
-                            icon={<ImageIcon size={16} icon="icon_gemini"></ImageIcon>}
-                            iconSmall
-                        />
+                        <View icon={'PrecisionManufacturing'} iconSmall />
                     </ListItemIcon>
-                    <View text={t(`图文识别`)} textFontSize="0.9rem" />
+                    <View text={t(`控制中心`)} textFontSize="0.9rem" />
                 </View>
-
+                <View divider hide={!isPlaygroundWebApp()}></View>
+                <View
+                    hide={!isPlaygroundWebApp()}
+                    menuItem
+                    onClick={async () => {
+                        setAnchorEl(null);
+                        new WebviewMainEventService().openLLMWindow({
+                            site: 'ChatGpt'
+                        });
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={<ImageIcon icon={'icon_chatgpt'} size={16} />} iconSmall />
+                    </ListItemIcon>
+                    <View text={t(`ChatGpt`)} textFontSize="0.9rem" />
+                </View>
+                <View divider hide={!isPlaygroundWebApp()}></View>
                 <View
                     hide
                     menuItem

@@ -54,7 +54,7 @@ const config: ForgeConfig = {
                 schemes: schemes
             }
         ],
-        appBundleId: IsDev ? 'com.web3.explorer.dev' : 'com.beta.web3.explorer',
+        appBundleId: IsDev ? 'com.web3.explorer.dev' : 'com.web3.explorer',
         ...(process.env.APPLE_API_KEY
             ? {
                   osxSign: {

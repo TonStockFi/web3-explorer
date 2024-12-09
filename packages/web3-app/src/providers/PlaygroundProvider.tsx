@@ -62,6 +62,10 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         const res = JSON.parse(Buffer.from(initMessage, 'hex').toString());
         if (res) {
             tabInit = res.tab as BrowserTab;
+            const tab = browserTabs.get(tabInit.tabId);
+            if (!tabInit.icon && tab?.icon) {
+                tabInit.icon = tab?.icon;
+            }
             account = res.account;
         }
     }
@@ -77,7 +81,9 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
 
     useEffect(() => {
         if (tabInit) {
-            newTab(tabInit);
+            newTab({
+                ...tabInit
+            });
         }
     }, []);
 

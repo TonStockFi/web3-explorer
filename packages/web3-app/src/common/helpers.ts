@@ -53,6 +53,10 @@ export function getWinId() {
 export function isPlaygroundMaster() {
     return location.hash === `#${SUB_WIN_ID.PLAYGROUND}`;
 }
+
+export function isPlaygroundWebApp() {
+    return !isPlaygroundMaster() && location.hash.indexOf(`${SUB_WIN_ID.PLAYGROUND}_`) > -1;
+}
 export function getDropdownMenuOptions(id:string){
     return {
         id,
