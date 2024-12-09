@@ -409,3 +409,8 @@ export interface WebAppListItem {
     children: WebAppListItem[];
     apps?: WebApp[];
 }
+
+export enum Network {
+    MAINNET = -239,
+    TESTNET = -3
+}

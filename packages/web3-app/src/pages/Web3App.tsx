@@ -139,8 +139,11 @@ export function MainMessageDispatcher() {
     useEffect(() => {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(async (e: any) => {
-                if (e.action === 'manageConnectedApps') {
-                    openTab(MAIN_NAV_TYPE.CONNECTED_APPS);
+                if (e.action === 'openMainTab') {
+                    let { tabId } = e.payload as {
+                        tabId: string;
+                    };
+                    openTab(tabId);
                 }
                 if (e.action === 'getNetwork') {
                     let { fromWinId } = e.payload as {
