@@ -16,6 +16,7 @@ import WebViewBrowser from '../webview/WebViewBrowser';
 
 export function PayCommentOrderBackgroundPage() {
     const address = useAccountAddress();
+    const { onCheckPayCommentOrder } = usePro();
     const { env } = useIAppContext();
     const network = useActiveTonNetwork();
     const baseUrl = useBlockChainExplorer(env.isDev ? network : Network.MAINNET);
@@ -78,15 +79,16 @@ export function PayCommentOrderBackgroundPage() {
                 ts1: currentTs(),
                 isOk: true
             });
+            onCheckPayCommentOrder(false);
             if (checkProLevel) {
-                handleProLevel(comment);
+                handleProLevel(order.id, comment);
             }
 
             return res;
         }
     };
     const { onChangeProInfo } = usePro();
-    const handleProLevel = async (orderComment: string) => {
+    const handleProLevel = async (orderId: string, orderComment: string) => {
         const [level, amount1, accountIndex, ts, id] = orderComment.split('/');
 
         const proInfo: ProInfoProps = {
@@ -97,6 +99,7 @@ export function PayCommentOrderBackgroundPage() {
             id
         };
         onChangeProInfo(proInfo);
+        await new PayCommentOrderService().remove(orderId);
         onAction('subWin', {
             toWinId: SUB_WIN_ID.PLAYGROUND,
             action: 'onChangeProInfo',

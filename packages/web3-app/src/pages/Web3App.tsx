@@ -16,14 +16,21 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useMutateDevSettings } from '@tonkeeper/uikit/dist/state/dev';
-import { useActiveAccount, useMutateActiveTonWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveWalletTonConnectConnections } from '@tonkeeper/uikit/dist/state/tonConnect';
+import {
+    useActiveAccount,
+    useActiveTonNetwork,
+    useMutateActiveTonWallet
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect, useState } from 'react';
 import { onAction } from '../common/electron';
 import { genId } from '../common/helpers';
 import { currentTs } from '../common/utils';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
 import { ProHandler } from '../components/ProHandler';
+import { PayCommentOrderBackgroundPage } from '../components/webview-background/PayCommentOrderBackgroundPage';
 import { ControlsView } from '../components/webview/ControlsView';
+import { getSessionCacheInfo } from '../components/webview/WebviewDiscoverApps';
 import { useAccountInfo, usePublicAccountsInfo } from '../hooks/wallets';
 import { PlaygroundProvider } from '../providers/PlaygroundProvider';
 import { ProProvider, usePro } from '../providers/ProProvider';
@@ -79,18 +86,37 @@ function Pages() {
 }
 
 export function MainMessageDispatcher() {
-    const { onShowProBuyDialog } = usePro();
-    const { openUrl } = useBrowserContext();
+    const { onShowProBuyDialog, checkPayCommentOrder, onCheckPayCommentOrder } = usePro();
+    const { openUrl, openTab } = useBrowserContext();
     const accounts = usePublicAccountsInfo();
     const { id: accountId } = useAccountInfo();
     const activeAcount = useActiveAccount();
+    const network = useActiveTonNetwork();
+    const { data: connections } = useActiveWalletTonConnectConnections();
     const { mutateAsync: setActiveAccount } = useMutateActiveTonWallet();
     const { onOpen: sendTransfer } = useSendTransferNotification();
     const format = useFormatCoinValue();
     const [_, setPayCommentOrder] = useState<null | PayCommentOrder>(null);
     const { mutate: mutateDevSettings } = useMutateDevSettings();
     useEffect(() => {
+        sessionStorage.setItem(
+            'cacheInfo',
+            JSON.stringify({
+                network,
+                connections: connections
+                    ? connections.map(row => {
+                          return {
+                              url: row.manifest.url,
+                              clientSessionId: row.clientSessionId
+                          };
+                      })
+                    : []
+            })
+        );
+    }, [network, connections]);
+    useEffect(() => {
         function finishPay(e: any) {
+            onCheckPayCommentOrder(true);
             setPayCommentOrder(payCommentOrder => {
                 if (payCommentOrder) {
                     new PayCommentOrderService().save(payCommentOrder.id, payCommentOrder);
@@ -113,6 +139,36 @@ export function MainMessageDispatcher() {
     useEffect(() => {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(async (e: any) => {
+                if (e.action === 'manageConnectedApps') {
+                    openTab(MAIN_NAV_TYPE.CONNECTED_APPS);
+                }
+                if (e.action === 'getNetwork') {
+                    let { fromWinId } = e.payload as {
+                        fromWinId: string;
+                    };
+                    const { network } = getSessionCacheInfo('cacheInfo');
+                    onAction('subWin', {
+                        toWinId: fromWinId,
+                        action: 'onGetNetwork',
+                        payload: {
+                            network
+                        }
+                    });
+                }
+                if (e.action === 'getConnectedApps') {
+                    const { connections } = getSessionCacheInfo('cacheInfo');
+                    let { fromWinId } = e.payload as {
+                        fromWinId: string;
+                    };
+                    console.log('getPayCommentOrder', fromWinId);
+                    onAction('subWin', {
+                        toWinId: fromWinId,
+                        action: 'onGetConnectedApps',
+                        payload: {
+                            connections: connections || []
+                        }
+                    });
+                }
                 if (e.action === 'getPayCommentOrder') {
                     let { payCommentOrderId, fromWinId } = e.payload as {
                         payCommentOrderId: string;
@@ -120,6 +176,11 @@ export function MainMessageDispatcher() {
                     };
                     console.log('getPayCommentOrder', payCommentOrderId);
                     const order = await new PayCommentOrderService().get(payCommentOrderId);
+                    if (!order?.isOk) {
+                        window.dispatchEvent(new CustomEvent('finishPay', {}));
+                    } else {
+                        onCheckPayCommentOrder(false);
+                    }
                     onAction('subWin', {
                         toWinId: fromWinId,
                         action: 'onGetPayCommentOrder',
@@ -207,7 +268,7 @@ export function MainMessageDispatcher() {
             });
     }, []);
 
-    return null;
+    return <>{checkPayCommentOrder && <PayCommentOrderBackgroundPage />}</>;
 }
 export const Web3AppInner = () => {
     const { env, isFullScreen } = useIAppContext();

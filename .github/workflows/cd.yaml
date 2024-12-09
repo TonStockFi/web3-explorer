@@ -20,15 +20,15 @@ jobs:
                       command: make:intel
                       tag: x64
                       dist: /apps/desktop/out/make/squirrel.windows/x64/*Setup.exe
-        #          - os: macos-13
-        #            tag: x64
-        #            command: publish:intel
-        #          - os: macos-13
-        #            tag: arm
-        #            command: publish:arm
-        #          - os: macos-13
-        #            tag: universal
-        #            command: publish:universal
+                    - os: macos-13
+                      tag: x64
+                      command: publish:intel
+                    - os: macos-13
+                      tag: arm
+                      command: publish:arm
+                    - os: macos-13
+                      tag: universal
+                      command: publish:universal
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:

@@ -11,6 +11,8 @@ interface AppContextType {
     isLongProLevel: boolean;
     proInfo: ProInfoProps | null;
     proInfoList: ProInfoProps[];
+    checkPayCommentOrder: boolean;
+    onCheckPayCommentOrder: (v: boolean) => void;
     updateProPlans: (v: { proRecvAddress: string; proPlans: ProPlan[] }) => void;
     onShowProBuyDialog: (v: boolean) => void;
     onChangeProInfo: (v: ProInfoProps) => void;
@@ -21,6 +23,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const ProProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
+    const [checkPayCommentOrder, setCheckPayCommentOrder] = useState(false);
+
     const [showProBuyDialog, setShowProBuyDialog] = useState(false);
     const [proInfo, setProInfo] = useState<null | ProInfoProps>(null);
     const [proInfoList, setProInfoList] = useState<ProInfoProps[]>([]);
@@ -30,6 +34,9 @@ export const ProProvider = (props: { children: ReactNode }) => {
     );
     const [proPlans, setProPlans] = useLocalStorageState<ProPlan[]>('proPlans', []);
 
+    const onCheckPayCommentOrder = (v: boolean) => {
+        setCheckPayCommentOrder(v);
+    };
     const onChangeProInfo = (proInfo: ProInfoProps) => {
         setProInfo(proInfo);
         new ProService(proInfo.id).save(proInfo.index, proInfo);
@@ -58,6 +65,8 @@ export const ProProvider = (props: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
+                onCheckPayCommentOrder,
+                checkPayCommentOrder,
                 proInfoList,
                 isLongProLevel,
                 updateProInfo,

@@ -122,7 +122,7 @@ export const ProSettings: FC<{
         }
     }, [network]);
 
-    const { proPlans, proInfoList, proRecvAddress } = usePro();
+    const { proPlans, onCheckPayCommentOrder, proInfoList, proRecvAddress } = usePro();
     let plans: ProPlan[] = proPlans.map(proPlan => {
         let { description } = proPlan;
         description = description?.replace('{accountTitle}', accountTitle);
@@ -149,6 +149,7 @@ export const ProSettings: FC<{
     const format = useFormatCoinValue();
     useEffect(() => {
         function finishPay(e: any) {
+            onCheckPayCommentOrder(true);
             setOrderComment(text => {
                 const [comment, amount] = text.split('|');
                 const id = genId();

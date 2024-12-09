@@ -56,7 +56,50 @@ function getTopColor(index: number) {
     return topColor;
 }
 
+
+
 export default class WebviewMainEventService {
+    static checkCacheMessage(action:string,payload?: Record<string, any> ,CacheMessage?:Map<number,boolean>){
+        if(CacheMessage){
+            if (payload?.__msg_id) {
+                const flag = CacheMessage.has(payload.__msg_id);
+                if (flag) {
+                    return false;
+                }
+                CacheMessage.set(payload.__msg_id, true);
+            }
+        }
+        
+        if (['accountsPublic', 'onBlur', 'onFocus'].indexOf(action) === -1) {
+            console.debug('> _ET onMainMessage', action, payload);
+        }
+        return true
+    }
+    static onMainMessage(cb: ({ action, payload }: { action: string; payload?: Record<string, any> }) => Promise<void>) {
+        window.backgroundApi &&
+            window.backgroundApi.onMainMessage(
+                async ({ action, payload }: { action: string; payload?: Record<string, any> }) => {
+                    
+                    await cb({action, payload})
+                }
+            );
+    }
+    static onSiteMessage(cb?: (event: {
+        senderWebContentsId: number;
+        message: { action: string; payload?: Record<string, any> };
+    }) => Promise<void>) {
+        window.backgroundApi &&
+            window.backgroundApi.onSiteMessage(
+                async (event: {
+                    senderWebContentsId: number;
+                    message: { action: string; payload?: Record<string, any> };
+                }) => {
+                    if(cb){
+                        await cb(event)
+                    }
+                }
+            );
+    }
     constructor() {
         if (!window.backgroundApi) {
             throw new Error('backgroundApi API is not available');

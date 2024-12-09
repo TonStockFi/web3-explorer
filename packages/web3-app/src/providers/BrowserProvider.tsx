@@ -4,7 +4,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { useTranslation } from 'react-i18next';
 import { DefaultTheme, useTheme } from 'styled-components';
 import { currentTs } from '../common/utils';
-import { getCurrentAccount } from '../components/webview/WebviewDiscoverApps';
+import { getSessionCacheInfo } from '../components/webview/WebviewDiscoverApps';
 import LLMService, { MessageLLM } from '../services/LLMService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { MAIN_NAV_TYPE } from '../types';
@@ -160,7 +160,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     };
 
     const openUrl = async (url: string) => {
-        const account = getCurrentAccount();
+        const account = getSessionCacheInfo();
         if (!account) {
             ('account is null');
             return;

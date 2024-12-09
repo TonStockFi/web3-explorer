@@ -14,11 +14,10 @@ import { MAIN_NAV_TYPE, ProPlan, WebApp } from '../../types';
 import { LoadingView } from '../LoadingView';
 
 import WebviewMainEventService from '../../services/WebviewMainEventService';
-import { PayCommentOrderBackgroundPage } from '../webview-background/PayCommentOrderBackgroundPage';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
 
-export const getCurrentAccount = (key?: string) => {
+export const getSessionCacheInfo = (key?: string) => {
     const res = sessionStorage.getItem(key || 'currentAccount');
     if (res) {
         return JSON.parse(res);
@@ -76,7 +75,7 @@ export function WebviewDiscoverApps({
         }
 
         if (action === 'onOpenTab') {
-            const account = getCurrentAccount();
+            const account = getSessionCacheInfo();
             const { item } = payload as { item: WebApp };
             const { id, url, ...item1 } = item;
             const ts = currentTs();
@@ -117,9 +116,6 @@ export function WebviewDiscoverApps({
                     />
                 </View>
             </View>
-
-            {isGames && <PayCommentOrderBackgroundPage />}
-
             <View
                 abs
                 borderRadius={8}
