@@ -64,6 +64,7 @@ const config: ForgeConfig = {
                           };
                       }
                   },
+                  // https://www.electronforge.io/guides/code-signing/code-signing-macos
                   osxNotarize: {
                       appleApiKey: process.env.APPLE_API_KEY,
                       appleApiKeyId: process.env.APPLE_API_KEY_ID,
