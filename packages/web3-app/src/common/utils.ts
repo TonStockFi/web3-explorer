@@ -2,6 +2,12 @@ export function getPartitionKey(key: string) {
     return `persist:${key}`;
 }
 
+export function getUrlIsDev(){
+    const uri = new URL(location.href);
+    const isDev = !!uri.searchParams.get('isDev');
+    return isDev
+}
+
 export function waitForResult(
     cb: () => any | Promise<any>,
     timeout: number = -1,

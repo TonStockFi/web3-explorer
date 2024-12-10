@@ -10,7 +10,7 @@ import { currentTs } from '../../common/utils';
 import { DISCOVER_PID, START_URL } from '../../constant';
 import { usePro } from '../../providers/ProProvider';
 import WebviewService from '../../services/WebviewService';
-import { MAIN_NAV_TYPE, ProPlan, WebApp } from '../../types';
+import { InitConfig, MAIN_NAV_TYPE, WebApp } from '../../types';
 import { LoadingView } from '../LoadingView';
 
 import WebviewMainEventService from '../../services/WebviewMainEventService';
@@ -35,7 +35,7 @@ export function WebviewDiscoverApps({
 }) {
     const isGames = winId === 'Games';
     const { env } = useIAppContext();
-    const { theme, currentTabId, browserTabs } = useBrowserContext();
+    const { theme, currentTabId, onChangeLeftSideActions, browserTabs } = useBrowserContext();
     let tab: BrowserTab | undefined = browserTabs.get(tabId);
 
     if (!tab) {
@@ -57,7 +57,7 @@ export function WebviewDiscoverApps({
         }
     }, [currentTabId]);
     const url = `${getDiscoverHost(env.isDev)}#${winId}`;
-    console.log({ tab, currentTabId, firstLoad });
+    // console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({
         action,
@@ -66,12 +66,10 @@ export function WebviewDiscoverApps({
         action: string;
         payload?: Record<string, any> | undefined;
     }) => {
-        if (action === 'updateProPlan') {
-            const { proPlans, proRecvAddress } = payload as {
-                proPlans: ProPlan[];
-                proRecvAddress: string;
-            };
+        if (action === 'initConfig') {
+            const { proPlans, proRecvAddress, leftSideActions } = payload as InitConfig;
             updateProPlans({ proPlans, proRecvAddress });
+            onChangeLeftSideActions(leftSideActions);
         }
 
         if (action === 'onOpenTab') {

@@ -9,7 +9,7 @@ export function genId() {
 }
  
 export function getDiscoverHost(isDev: boolean) {
-    if(isDev){
+    if(false){
         return `${DISCOVER_HOST_DEV}?isDev=true`
     }else{
         return `${DISCOVER_HOST}?`

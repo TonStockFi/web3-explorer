@@ -1,13 +1,14 @@
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
-import { useSessionStorageState } from '@web3-explorer/utils';
+import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DefaultTheme, useTheme } from 'styled-components';
 import { currentTs } from '../common/utils';
 import { getSessionCacheInfo } from '../components/webview/WebviewDiscoverApps';
+import { LeftSideActions } from '../constant';
 import LLMService, { MessageLLM } from '../services/LLMService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { MAIN_NAV_TYPE } from '../types';
+import { MAIN_NAV_TYPE, MainNavListItem } from '../types';
 import { useIAppContext } from './IAppProvider';
 
 export interface BrowserTab {
@@ -46,8 +47,11 @@ interface BrowserContextType {
     newTab: (tab: BrowserTab) => void;
     saveTab: (tabId: string, tab: BrowserTab) => void;
     editTab: (tab: BrowserTab) => void;
-    openTab: (tabId: string) => void;
+    openTab: (tabId: string, url?: string, icon?: string) => void;
     closeTab: (tabId: string) => void;
+
+    onChangeLeftSideActions: (v: MainNavListItem[]) => void;
+    leftSideActions: MainNavListItem[];
     tabs: BrowserTab[];
     currentTabId: string;
     browserTabs: Map<string, BrowserTab>;
@@ -87,6 +91,10 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     const [sideWeb, setSideWeb] = useSessionStorageState<null | SideWebProps>('sideWeb', null);
     const [updateAt, setUpdateAt] = useState(currentTs());
 
+    const [leftSideActions, setLeftSideActions] = useLocalStorageState<MainNavListItem[]>(
+        'LeftSideActions_1',
+        LeftSideActions
+    );
     const [currentTabId, setCurentTabId] = useSessionStorageState<string>(
         'currentTabId',
         MAIN_NAV_TYPE.GAME_FI
@@ -145,6 +153,9 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         }
     }, []);
 
+    const onChangeLeftSideActions = (actions: MainNavListItem[]) => {
+        setLeftSideActions(actions);
+    };
     const openSideWeb = (sideWeb: SideWebProps | null) => {
         setSideWeb(sideWeb);
     };
@@ -170,7 +181,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         const tab = {
             tabId,
             ts,
-            url: url
+            url
         };
 
         new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
@@ -198,42 +209,29 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         setUpdateAt(currentTs());
     };
 
-    const openTab = (tabId: string | MAIN_NAV_TYPE) => {
+    const openTab = (tabId: string | MAIN_NAV_TYPE, url?: string, icon?: string) => {
         if (tabId === currentTabId) {
             return;
         }
         let tab = BrowserTabs.get(tabId);
         if (!tab) {
             const ts = currentTs();
-            if (tabId === MAIN_NAV_TYPE.GAME_FI) {
+            tab = {
+                tabId,
+                url,
+                icon,
+                ts
+            };
+            newTab(tab);
+        } else {
+            if (url) {
                 tab = {
+                    ...tab,
                     tabId,
-                    url: 'https://web.telegram.org/a/',
-                    name: 'Games',
-                    icon: 'SportsEsports',
-                    ts
-                };
-            } else if (tabId === MAIN_NAV_TYPE.MARKET) {
-                tab = {
-                    tabId,
-                    url: 'https://www.coingecko.com/',
-                    ts,
-                    name: 'Market'
-                };
-            } else if (tabId === MAIN_NAV_TYPE.CHATGPT) {
-                tab = {
-                    tabId,
-                    url: 'https://chatgpt.com/',
-                    ts,
-                    name: 'ChatGpt'
-                };
-            } else {
-                tab = {
-                    tabId,
-                    ts
+                    url,
+                    icon
                 };
             }
-            newTab(tab);
         }
 
         setCurentTabId(tabId);
@@ -281,6 +279,8 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     return (
         <BrowserContext.Provider
             value={{
+                onChangeLeftSideActions,
+                leftSideActions,
                 tabs: Tabs,
                 openUrl,
                 saveTab,

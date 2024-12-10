@@ -1,4 +1,5 @@
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatFiatCurrency, formatter } from '@tonkeeper/uikit/dist/hooks/balance';
 import {
@@ -7,6 +8,7 @@ import {
     useWalletTotalBalance
 } from '@tonkeeper/uikit/dist/state/asset';
 import { useUserFiat } from '@tonkeeper/uikit/dist/state/fiat';
+import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
@@ -46,7 +48,7 @@ const DashboardPage = () => {
     const { theme, browserTabs } = useBrowserContext();
     const [loading, setLoading] = useState<boolean>(true);
     let tab: BrowserTab | undefined = browserTabs.get(MAIN_NAV_TYPE.DASHBOARD);
-
+    const network = useActiveTonNetwork();
     const tabId = MAIN_NAV_TYPE.DASHBOARD;
     useEffect(() => {
         function updatePayPlan() {
@@ -84,7 +86,7 @@ const DashboardPage = () => {
                 index: currentAccount.index
             };
             console.log('accountAssetBalance', accountAssetBalance);
-            new AssetBalanceService(currentAccount.id)
+            new AssetBalanceService(currentAccount.id, network === Network.MAINNET)
                 .save(currentAccount.index, accountAssetBalance)
                 .then(() => {
                     getAccountsBalance();
@@ -99,7 +101,10 @@ const DashboardPage = () => {
             return;
         }
         const { currentAccount, currentPlan, accounts } = JSON.parse(res);
-        const accountAssetBalance1 = await new AssetBalanceService(currentAccount.id).getAll();
+        const accountAssetBalance1 = await new AssetBalanceService(
+            currentAccount.id,
+            network === Network.MAINNET
+        ).getAll();
         const accountAssetBalance: Map<string, AccountAssetBalance> = new Map();
         accountAssetBalance1.forEach(row => {
             accountAssetBalance.set(row.id + row.index, row);

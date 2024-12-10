@@ -11,7 +11,8 @@ export enum MAIN_NAV_TYPE {
     BROWSER_HISTORY = 'BROWSER_HISTORY',
     CONNECTED_APPS = 'CONNECTED_APPS',
     MULTI_SEND = 'MULTI_SEND',
-    DASHBOARD = 'DASHBOARD',
+    DASHBOARD = 'tab_DASHBOARD',
+    ASSETS = 'tab_ASSETS',
     SETTING = 'SETTING',
     GAME_FI = 'tab_GAME_FI',
     CHATGPT = 'tab_CHATGPT',
@@ -398,13 +399,14 @@ export interface WebApp {
     icon: string;
     url: string;
     id?: string;
+    isDev?: boolean;
     iframeBaseUrl?: string;
     twa?: boolean;
 }
 
 export interface WebAppListItem {
     id: string;
-    hide?:boolean;
+    hide?: boolean;
     title: string;
     children: WebAppListItem[];
     apps?: WebApp[];
@@ -413,4 +415,19 @@ export interface WebAppListItem {
 export enum Network {
     MAINNET = -239,
     TESTNET = -3
+}
+
+export interface MainNavListItem {
+    name: string;
+    tabId: MAIN_NAV_TYPE |string;
+    icon?: string;
+    hide?: boolean;
+    side?: boolean;
+    url?: string;
+}
+
+export interface InitConfig {
+    leftSideActions:MainNavListItem[];
+    proPlans: ProPlan[];
+    proRecvAddress: string;
 }

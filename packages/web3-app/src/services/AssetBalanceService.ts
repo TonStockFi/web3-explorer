@@ -4,11 +4,11 @@ import { AccountAssetBalance } from '../types';
 export default class AssetBalanceService {
     indexedDb: IndexedDbCache;
 
-    constructor(id: string) {
-        this.indexedDb = AssetBalanceService.getIndexedDbCache(id);
+    constructor(id: string,isMain:boolean) {
+        this.indexedDb = AssetBalanceService.getIndexedDbCache(id,isMain);
     }
-    static getIndexedDbCache(id: string) {
-        return new IndexedDbCache().init(`asset/${id}`);
+    static getIndexedDbCache(id: string,isMain:boolean) {
+        return new IndexedDbCache().init(`asset/${id}_${isMain?1:0}`);
     }
 
     async getAll() {

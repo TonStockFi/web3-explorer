@@ -1,4 +1,4 @@
-import { ProPlan, SUB_WIN_ID } from '../types';
+import { InitConfig, SUB_WIN_ID } from '../types';
 
 export default class WebviewSiteEventService {
     constructor() {
@@ -66,12 +66,11 @@ export default class WebviewSiteEventService {
             checkWinReady();
         });
     }
-    updateProPlan({proPlans, proRecvAddress}:{proPlans:ProPlan[], proRecvAddress:string}){
-      
+    initConfig(config:InitConfig){
         return window.__appApi.message({
-            action: 'updateProPlan',
+            action: 'initConfig',
             payload: {
-                proRecvAddress,proPlans
+                ...config
             }
         });
     }

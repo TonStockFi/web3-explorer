@@ -47,7 +47,7 @@ export function ImageIcon({
     if (!size) {
         size = 32;
     }
-    if (!icon || icon.startsWith('http') || icon.startsWith('icon_')) {
+    if (!icon || icon.startsWith('data:') || icon.startsWith('http') || icon.startsWith('icon_')) {
         let zoom = 1;
         if (icon && icon.startsWith('icon_')) {
             const k = icon.substring('icon_'.length);

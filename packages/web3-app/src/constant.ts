@@ -1,4 +1,4 @@
-import { MAIN_NAV_TYPE, ProPlan } from './types';
+import { MAIN_NAV_TYPE, MainNavListItem, ProPlan } from './types';
 export const PRO_RECV_ADDRESS="UQAonoXuQ_1WzZhwbuoIHYFwBqkVCmZSf-yr0DQ1uhnIz53g"
 
 export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdYGAl8I2,0|TK1z-z7apmAbgW_o6toLWx1T,0"
@@ -63,14 +63,16 @@ export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;
 export const WEBVIEW_BORDERRADIUS = 8;
 export const BG_COLOR_ACE = "#272822";
 
-export const MainNavList = [
+export const LeftSideActions : MainNavListItem[] = [
     {
-        name: 'ChatGpt',
-        tabId: MAIN_NAV_TYPE.CHATGPT,
-        icon: 'icon_chatgpt',
-        // side: true
-    },
-
+        icon: 'BubbleChart',
+        name: 'Market',
+        url: 'https://www.coingecko.com/',
+        tabId: MAIN_NAV_TYPE.MARKET,
+        side: true
+    }
+]
+export const MainNavList : MainNavListItem[] = [
     {
         name: 'Games',
         tabId: MAIN_NAV_TYPE.GAME_FI,
@@ -83,29 +85,10 @@ export const MainNavList = [
         icon: 'Explore',
         side: true
     },
-    
-    {
-        name: 'Gemini',
-        tabId: MAIN_NAV_TYPE.GENIMI,
-        icon: 'icon_gemini',
-        // side: true
-    },
     {
         name: 'wallet_title',
         tabId: MAIN_NAV_TYPE.WALLET,
         icon: 'AccountBalanceWallet',
-        side: true
-    },
-    {
-        name: '资产分析',
-        tabId: MAIN_NAV_TYPE.DASHBOARD,
-        icon: 'Insights',
-        side: true
-    },
-    {
-        icon: 'BubbleChart',
-        name: 'Market',
-        tabId: MAIN_NAV_TYPE.MARKET,
         side: true
     },
     {

@@ -3,16 +3,15 @@ import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { HomHeaderHeight, MainNavList, SiderBarWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
-import WebviewMainEventService from '../../services/WebviewMainEventService';
-import { MAIN_NAV_TYPE } from '../../types';
 import SideProIcon from './SideProIcon';
 import SideSettingIcon from './SideSettingIcon';
 
 export const SideBarVert = () => {
     const { env, isFullScreen } = useIAppContext();
 
-    const { t, theme, openTab, currentTabId } = useBrowserContext();
+    const { t, theme, leftSideActions, openTab, currentTabId } = useBrowserContext();
     const actions = MainNavList.filter(row => row.side);
+
     const currentTabNav = currentTabId;
     let top = HomHeaderHeight;
     if (env.isMac && isFullScreen) {
@@ -35,53 +34,48 @@ export const SideBarVert = () => {
             }}
         >
             <View w100p column jStart aCenter pt12>
-                {actions.map(action => {
-                    return (
-                        <View
-                            py={4}
-                            pointer
-                            borderBox
-                            height={48}
-                            onClick={() => {
-                                if (
-                                    action.tabId === MAIN_NAV_TYPE.CHATGPT ||
-                                    action.tabId === MAIN_NAV_TYPE.GENIMI
-                                ) {
-                                    new WebviewMainEventService().openLLMWindow({
-                                        site:
-                                            action.tabId === MAIN_NAV_TYPE.CHATGPT
-                                                ? 'ChatGpt'
-                                                : 'Gemini'
-                                    });
-                                } else {
-                                    openTab(action.tabId);
-                                }
-                            }}
-                            tips={t(action.name)}
-                            tipsPlacement="right"
-                            key={action.name}
-                            w100p
-                            hoverBgColor={theme.backgroundContentTint}
-                            center
-                        >
+                {[
+                    ...actions,
+                    ...leftSideActions.map(row => {
+                        return row;
+                    })
+                ]
+                    .filter(row => !row.hide)
+                    .map(action => {
+                        return (
                             <View
-                                pl={action.tabId === currentTabNav ? 0 : 3}
-                                sx={{
-                                    borderLeft:
-                                        action.tabId === currentTabNav
-                                            ? `3px solid ${theme.buttonPrimaryBackgroundDisabled}`
-                                            : undefined
-                                }}
-                                height={32}
-                                center
+                                py={4}
+                                pointer
                                 borderBox
-                                wh100p
+                                height={48}
+                                onClick={() => {
+                                    openTab(action.tabId, action.url, action.icon);
+                                }}
+                                tips={t(action.name)}
+                                tipsPlacement="right"
+                                key={action.name}
+                                w100p
+                                hoverBgColor={theme.backgroundContentTint}
+                                center
                             >
-                                <ImageIcon icon={action.icon!} size={28} />
+                                <View
+                                    pl={action.tabId === currentTabNav ? 0 : 3}
+                                    sx={{
+                                        borderLeft:
+                                            action.tabId === currentTabNav
+                                                ? `3px solid ${theme.buttonPrimaryBackgroundDisabled}`
+                                                : undefined
+                                    }}
+                                    height={32}
+                                    center
+                                    borderBox
+                                    wh100p
+                                >
+                                    <ImageIcon icon={action.icon!} size={28} />
+                                </View>
                             </View>
-                        </View>
-                    );
-                })}
+                        );
+                    })}
             </View>
             <View pb12 w100p>
                 <View w100p center column>
