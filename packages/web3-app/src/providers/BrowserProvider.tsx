@@ -66,7 +66,7 @@ interface BrowserContextType {
 export function formatTabIdByUrl(url: string) {
     const id = md5(url);
     const { hostname } = new URL(url);
-    const hostName = hostname.replace(/\./g, '_');
+    const hostName = hostname.replace(/\./g, '');
     return `tab_${hostName}${id}`;
 }
 

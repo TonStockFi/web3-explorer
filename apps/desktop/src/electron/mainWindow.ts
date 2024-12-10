@@ -13,6 +13,7 @@ import {
 } from 'electron';
 import contextMenu from 'electron-context-menu';
 import isDev from 'electron-is-dev';
+import * as fs from 'fs';
 import i18n from 'i18next';
 import path from 'path';
 import { Cookie, CookieJar } from 'tough-cookie';
@@ -23,7 +24,6 @@ import './i18n';
 import { handleActionMessage } from './onAction';
 import { delay } from './utils';
 import { getLocalIPAddress, WebSocketServerWrapper } from './ws-server/server';
-
 const publicDir = path.resolve(__dirname, isDev ? '../../' : '../../../', 'public');
 
 export function t(key: string) {
@@ -219,12 +219,12 @@ export class MainWindow {
         //         console.error('Error reading file:', err);
         //     }
         // }
-        // try {
-        //     const data = fs.readFileSync(path.resolve(publicDir, 'opencv.js'), 'utf8');
-        //     openCvData = data.trim();
-        // } catch (err) {
-        //     console.error('Error reading file: opencv.js', err);
-        // }
+        try {
+            const data = fs.readFileSync(path.resolve(publicDir, 'opencv.js'), 'utf8');
+            openCvData = data.trim();
+        } catch (err) {
+            console.error('Error reading file: opencv.js', err);
+        }
 
         this.mainWindow.loadURL(this.currentUrl);
         const menu = Menu.buildFromTemplate([

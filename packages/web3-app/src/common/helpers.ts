@@ -1,11 +1,23 @@
 import { MenuProps } from "@mui/material/Menu/Menu";
-import { DISCOVER_HOST, DISCOVER_HOST_DEV } from "../constant";
+import { DISCOVER_HOST, DISCOVER_HOST_DEV, PLAYGROUND_WEBVIEW_HEIGHT, PLAYGROUND_WEBVIEW_WIDTH } from "../constant";
 
 import { v4 as uuidv4 } from 'uuid';
+import { BrowserTab } from "../providers/BrowserProvider";
 import { RoiInfo, SUB_WIN_ID } from "../types";
 
 export function genId() {
     return uuidv4();
+}
+
+
+export function getPlaygroundScreenSize(tab: BrowserTab) {
+    let width = `${PLAYGROUND_WEBVIEW_WIDTH}px`;
+    let height = `${PLAYGROUND_WEBVIEW_HEIGHT}px`;
+    if (!tab.twa) {
+        width = 'calc(100% - 8px)';
+        height = 'calc(100% - 4px)';
+    }
+    return { width, height };
 }
  
 export function getDiscoverHost(isDev: boolean) {
