@@ -19,17 +19,15 @@ import Skeleton from '@web3-explorer/uikit-mui/dist/mui/Skeleton';
 import Snackbar from '@web3-explorer/uikit-mui/dist/mui/Snackbar';
 
 import Loading from '@web3-explorer/uikit-mui/dist/components/Loading';
+import Alert from '@web3-explorer/uikit-mui/dist/mui/Alert';
 import Tooltip from '@web3-explorer/uikit-mui/dist/mui/Tooltip';
 import Typography from '@web3-explorer/uikit-mui/dist/mui/Typography';
 import React, { useState } from 'react';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import DialogView from '../components/DialogView';
 import Prompt from '../components/Prompt';
-import { DebugView } from './DebugView';
 import { ViewProps } from './types';
 import { handleProps } from './utils';
-
-declare const IS_DEV: string;
 
 const handleDrawer = (props: DrawerProps) => {
     return {
@@ -42,6 +40,8 @@ const handleDrawer = (props: DrawerProps) => {
 //@ts-ignore
 export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     const {
+        alert,
+        alertProps,
         loading,
         label,
         labelWidth,
@@ -110,17 +110,6 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     const [showDrawer, setShowDrawer] = useState(false);
     if (hide) return null;
 
-    if (_D !== undefined && _D0 === undefined) {
-        if (IS_DEV) {
-            return (
-                <>
-                    <Box {...handleProps(props_)} />
-                    <DebugView value={_D} />
-                </>
-            );
-        }
-        console.debug('_D', _D);
-    }
     if (loading) {
         return (
             <Box {...handleProps(props_)}>
@@ -128,6 +117,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
             </Box>
         );
     }
+
     if (button || buttonOutlined || buttonContained) {
         if (drawer) {
         }
@@ -305,6 +295,16 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         );
     }
 
+    if (alert) {
+        const { children, ...p1 } = props_;
+        return (
+            <Box {...handleProps(p1)}>
+                <Alert {...alertProps} security={alert}>
+                    {children}
+                </Alert>
+            </Box>
+        );
+    }
     if (avatar) {
         return (
             <Box {...handleProps(props_)}>

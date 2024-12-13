@@ -7,9 +7,10 @@
     },
     "scripts": {
         "build": "npx turbo build",
-        "build:desktop": "npx turbo build:desktop",
         "build:pkg": "npx turbo build:pkg",
-        "dev:desktop": "sh tools/runDesktop.sh"
+        "make:mac": "yarn workspace @web3-explorer/desktop make:mac",
+        "start:desktop": "yarn workspace @web3-explorer/desktop start",
+        "show_cmd": "cat ./tools/desktop.sh"
     },
     "private": true,
     "devDependencies": {

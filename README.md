@@ -21,7 +21,8 @@ yarn
 # Build desktop for current OS
 cp apps/desktop/.env.example apps/desktop/.env
 yarn build:pkg
-yarn build:desktop
+cd apps/desktop
+yarn make:mac
 ```
 
 Application for your platform could be found in `/apps/desktop/out` once they're built.

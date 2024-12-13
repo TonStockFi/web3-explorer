@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('__appApi', {
         ipcRenderer.on('render', (_event, value) => callback(value))
 });
 
-console.log('preload site init!');
+// console.log('preload site init!');
 
 document.addEventListener(
     'DOMContentLoaded',

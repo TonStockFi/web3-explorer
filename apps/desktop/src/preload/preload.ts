@@ -13,13 +13,13 @@ const observeBody1 = ()=>{
     }
 }
 export function observeBody() {
-    console.debug('observeBody');
+    // console.debug('observeBody');
     tonViewer()
     observeTMEWebSite();
     observeBody1()
     new MutationObserver((mutationsList: any[]) => {
         for (const mutation of mutationsList) {
-            console.debug('observeBody', mutation.type,location.hostname);
+            // console.debug('observeBody', mutation.type,location.hostname);
             if (mutation.type === 'childList') {
                 observeBody1()
             }
@@ -31,7 +31,7 @@ export function observeBody() {
 }
 
 export const callback = (message: { action: string; payload: never }) => {
-    console.debug('render callback', message);
+    // console.debug('render callback', message);
     switch (message.action){
         case "tgLogged":
         case "tgLogout":

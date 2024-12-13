@@ -6,9 +6,11 @@ export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
 export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
 
 export const P2E_ChatId = '7363481027';
+export const SERVICE_ChatId = '7187821521';
 export const BOT_ID_EXTESSION_CENTER = '7168826112';
 export const BOT_ID_SERVICE_CENTER = '7853783224';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
+export const T_ME_WEB = 'https://t.me';
 export const TELEGRAME_WEB_P2E = `${TELEGRAME_WEB}#${P2E_ChatId}`
 export const TWA_URL_PREFIX = "https://t.me/"
 export const SERVER_URL = 'https://desk.web3r.site/api';
@@ -174,11 +176,11 @@ export const DropDownMenuSx = {
     }
 };
 
-export const ENTRY_ID_ROI = "#99"
+export const ENTRY_ID_ROI = "#100"
 export const MARK_ID_ROI = "#1"
 export const TASK_ID_ROI = "#2"
 export const ALL_ID_ROI = ""
-export const NOT_SHOW_IDS_ROI = [ALL_ID_ROI,MARK_ID_ROI,TASK_ID_ROI]
+export const NOT_SHOW_IDS_ROI = [ALL_ID_ROI,MARK_ID_ROI,TASK_ID_ROI,ENTRY_ID_ROI]
 export const DEFAULT_CUT_AREA = {
    
     x: 0,

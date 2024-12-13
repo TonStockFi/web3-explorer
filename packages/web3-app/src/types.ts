@@ -308,9 +308,10 @@ export interface RoiInfo {
     name?: string;
     priority: number;
     jsCode?: string;
-    type?: 'mark' | 'task' | 'reco' | string;
+    periodSecond?: boolean;
+    type?: 'task' | 'reco' | string;
     crontab?: string;
-    action?: 'click' | 'invokeCode' | 'finishLoop' | 'cron' | string;
+    action?: 'click' | 'invokeCode' | 'cron' | string;
     icon?: string;
     extensionId?: string;
     extensionTs?: number;
@@ -419,7 +420,7 @@ export enum Network {
 
 export interface MainNavListItem {
     name: string;
-    tabId: MAIN_NAV_TYPE |string;
+    tabId: MAIN_NAV_TYPE | string;
     icon?: string;
     hide?: boolean;
     side?: boolean;
@@ -427,7 +428,20 @@ export interface MainNavListItem {
 }
 
 export interface InitConfig {
-    leftSideActions:MainNavListItem[];
+    leftSideActions: MainNavListItem[];
     proPlans: ProPlan[];
     proRecvAddress: string;
+}
+
+export enum PlaygroundMasterSideAction {
+    FEATURE = 'FEATURE',
+    TASK = 'TASK',
+    EXTENSION = 'EXTENSION',
+    WIN_COPY = 'WIN_COPY'
+}
+
+export enum WinControlType {
+    ALL = 'ALL',
+    CURRENT_APP = 'CURRENT_APP',
+    CURRENT_ACCOUNT = 'CURRENT_ACCOUNT',
 }

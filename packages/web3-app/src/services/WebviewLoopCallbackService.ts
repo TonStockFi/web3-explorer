@@ -272,7 +272,7 @@ export default class WebviewLoopCallbackService extends WebviewService {
         const ws = this;
         if (ws.webviewIsReady()) {
             const __Actions: ActionType = await ws.execJs(`
-                console.debug("> loop action...",!window.__Actions ? "" :window.__Actions.size)
+                //console.debug("> loop action...",!window.__Actions ? "" :window.__Actions.size)
                 return window.__Actions;`);
 
             if (__Actions && __Actions.size > 0) {

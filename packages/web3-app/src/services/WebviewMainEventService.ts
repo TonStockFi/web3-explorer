@@ -24,7 +24,7 @@ import { currentTs, getPartitionKey } from '../common/utils';
 import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
-import { AccountPublic, RoiInfo, SUB_WIN_ID } from '../types';
+import { AccountPublic, RoiInfo, SUB_WIN_ID, WinControlType } from '../types';
 import LLMService, { MessageLLM } from './LLMService';
 
 const colors = [
@@ -56,11 +56,13 @@ function getTopColor(index: number) {
     return topColor;
 }
 
-
-
 export default class WebviewMainEventService {
-    static checkCacheMessage(action:string,payload?: Record<string, any> ,CacheMessage?:Map<number,boolean>){
-        if(CacheMessage){
+    static checkCacheMessage(
+        action: string,
+        payload?: Record<string, any>,
+        CacheMessage?: Map<number, boolean>
+    ) {
+        if (CacheMessage) {
             if (payload?.__msg_id) {
                 const flag = CacheMessage.has(payload.__msg_id);
                 if (flag) {
@@ -69,33 +71,42 @@ export default class WebviewMainEventService {
                 CacheMessage.set(payload.__msg_id, true);
             }
         }
-        
+
         if (['accountsPublic', 'onBlur', 'onFocus'].indexOf(action) === -1) {
             console.debug('> _ET onMainMessage', action, payload);
         }
-        return true
+        return true;
     }
-    static onMainMessage(cb: ({ action, payload }: { action: string; payload?: Record<string, any> }) => Promise<void>) {
+    static onMainMessage(
+        cb: ({
+            action,
+            payload
+        }: {
+            action: string;
+            payload?: Record<string, any>;
+        }) => Promise<void>
+    ) {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(
                 async ({ action, payload }: { action: string; payload?: Record<string, any> }) => {
-                    
-                    await cb({action, payload})
+                    await cb({ action, payload });
                 }
             );
     }
-    static onSiteMessage(cb?: (event: {
-        senderWebContentsId: number;
-        message: { action: string; payload?: Record<string, any> };
-    }) => Promise<void>) {
+    static onSiteMessage(
+        cb?: (event: {
+            senderWebContentsId: number;
+            message: { action: string; payload?: Record<string, any> };
+        }) => Promise<void>
+    ) {
         window.backgroundApi &&
             window.backgroundApi.onSiteMessage(
                 async (event: {
                     senderWebContentsId: number;
                     message: { action: string; payload?: Record<string, any> };
                 }) => {
-                    if(cb){
-                        await cb(event)
+                    if (cb) {
+                        await cb(event);
                     }
                 }
             );
@@ -105,32 +116,29 @@ export default class WebviewMainEventService {
             throw new Error('backgroundApi API is not available');
         }
     }
-    async onSelectFeature(payload:{roiInfo:RoiInfo,account:AccountPublic,tab:BrowserTab}){
-        const res = await this.isWinReady(
-            SUB_WIN_ID.PLAYGROUND
-        );
+    async onSelectFeature(payload: { roiInfo: RoiInfo; account: AccountPublic; tab: BrowserTab }) {
+        const res = await this.isWinReady(SUB_WIN_ID.PLAYGROUND);
         if (!res) {
-            await this.openFeatureWindow(
-                {
-                    tab:payload.tab,
-                    account: payload.account
-                }
-            );
+            await this.openFeatureWindow({
+                tab: payload.tab,
+                account: payload.account
+            });
         }
-        await this.sendMessageToSubWin(
-            SUB_WIN_ID.PLAYGROUND,
-            'onSelectRoiArea',
-            payload
-        );
+        await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, 'onSelectRoiArea', payload);
     }
-    async openFeatureWindow(payload?:{tab:BrowserTab,account:AccountPublic}) {
+    async openFeatureWindow(payload?: {
+        tab: BrowserTab;
+        account: AccountPublic;
+        isTask?: boolean;
+    }) {
         const isDev = this.getIsDev();
-        const initMessage  = this.getInitMessage()
+        const {height:winHeight} = window.screen
+        const initMessage = this.getInitMessage();
         const url = `${getDiscoverHost(isDev)}&initMessage=${initMessage}#${SUB_WIN_ID.PLAYGROUND}`;
         const width = 910;
-        const height = 500;
-        const x = 100;
-        const y = 100 ;
+        const height = 720;
+        const x = 12;
+        const y = winHeight - height - 12;
         await this.openWindow(
             SUB_WIN_ID.PLAYGROUND,
             url,
@@ -150,33 +158,37 @@ export default class WebviewMainEventService {
                     partition: getPartitionKey(DISCOVER_PID)
                 }
             },
-            isDev
+            false
         );
         const res = await this.waitForIsWinReady(SUB_WIN_ID.PLAYGROUND);
         if (res && payload) {
-            await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, "onOpenFeatureView", payload || {});
+            await this.sendMessageToSubWin(
+                SUB_WIN_ID.PLAYGROUND,
+                'onOpenFeatureView',
+                payload || {}
+            );
         }
     }
 
-    getIsDev(){
-        const uri = new URL(location.href)
+    getIsDev() {
+        const uri = new URL(location.href);
         return !!uri.searchParams.get('isDev');
     }
 
-    getInitMessage(){
-        const uri = new URL(location.href)
+    getInitMessage() {
+        const uri = new URL(location.href);
         return uri.searchParams.get('initMessage');
     }
 
     async openOcrWindow(sideWeb?: SideWebProps) {
         const isDev = this.getIsDev();
-        const winId = SUB_WIN_ID.OCR
+        const winId = SUB_WIN_ID.OCR;
         const url = `${getDiscoverHost(isDev)}#${winId}`;
         const width = 386;
         const height = 860;
         const x = window.screen.width - width - 12;
         const y = 12;
-        
+
         await this.openWindow(
             winId,
             url,
@@ -196,10 +208,10 @@ export default class WebviewMainEventService {
                     partition: getPartitionKey(DISCOVER_PID)
                 }
             },
-            true
+            false
         );
         await this.waitForIsWinReady(winId);
-        if(sideWeb){
+        if (sideWeb) {
             await this.sendMessageToSubWin(
                 winId,
                 'openSideWeb',
@@ -210,19 +222,17 @@ export default class WebviewMainEventService {
                       }
             );
         }
-      
     }
-    async openLLMWindow(sideWeb?: SideWebProps,message?:Partial<MessageLLM>) {
-
-        const uri = new URL(location.href)
+    async openLLMWindow(sideWeb?: SideWebProps, message?: Partial<MessageLLM>) {
+        const uri = new URL(location.href);
         const isDev = !!uri.searchParams.get('isDev');
-        
+
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.LLM}`;
         const width = 420;
         const height = 860;
         const x = window.screen.width - width - 12;
         const y = 12;
-        
+
         await this.openWindow(
             SUB_WIN_ID.LLM,
             url,
@@ -242,33 +252,29 @@ export default class WebviewMainEventService {
                     partition: getPartitionKey(DISCOVER_PID)
                 }
             },
-            true
+            false
         );
         await this.waitForIsWinReady(SUB_WIN_ID.LLM);
-        if(sideWeb || message){
+        if (sideWeb || message) {
             let sideWeb1 = {
                 site: 'ChatGpt',
-                ...sideWeb,
-            }
-            if(message){
-                let id = message.id || LLMService.genId()
-                let prompt = message.prompt || "";
-                if(!prompt){
+                ...sideWeb
+            };
+            if (message) {
+                let id = message.id || LLMService.genId();
+                let prompt = message.prompt || '';
+                if (!prompt) {
                     return;
                 }
                 sideWeb1.message = {
                     ...message,
                     prompt,
-                    id,ts:currentTs()
-                }
+                    id,
+                    ts: currentTs()
+                };
             }
-            await this.sendMessageToSubWin(
-                SUB_WIN_ID.LLM,
-                'openSideWeb',
-                sideWeb1
-            );
+            await this.sendMessageToSubWin(SUB_WIN_ID.LLM, 'openSideWeb', sideWeb1);
         }
-        
     }
     static getPlaygroundWinId({ index, tabId }: { index: number; tabId: string }) {
         const winId = 'PLAYGROUND_' + index + '_' + encodeURIComponent(tabId);
@@ -280,33 +286,37 @@ export default class WebviewMainEventService {
         initMessage,
         tab
     }: {
-        initMessage:string;
+        initMessage: string;
         isDev: boolean;
         index: number;
         tab: BrowserTab;
     }) {
-        const {tabId,twa} = tab;
+        const { tabId, twa } = tab;
         const topColor = getTopColor(index);
 
         let resizable_ = true;
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
 
-        const playgroundUrl = `${getDiscoverHost(isDev)}&winId=${winId}&initMessage=${initMessage}&topColor=${encodeURIComponent(
+        const playgroundUrl = `${getDiscoverHost(
+            isDev
+        )}&winId=${winId}&initMessage=${initMessage}&topColor=${encodeURIComponent(
             topColor
         )}#${winId}`;
 
-        const minWidth = twa ? 368 : 368* 3;
+        const {width:winWidth} = window.screen
+
+        const minWidth = twa ? 368 : 368 * 3;
         let height = PLAYGROUND_WIN_HEIGHT;
-        let x = window.screen.width - minWidth - 12;
+        let x = winWidth - minWidth - 12;
         let y = 12;
         return {
             winId,
             playgroundUrl,
             options: {
                 width: minWidth,
-                minWidth,
+                minWidth: 368,
                 minHeight: height,
-                resizable:resizable_,
+                resizable: resizable_,
                 height: height,
                 x,
                 y,
@@ -326,75 +336,60 @@ export default class WebviewMainEventService {
             winId
         });
     }
-    async closePlaygroundWindow({ index ,tabId}: {index:number,tabId:string}) {
-        const winId = WebviewMainEventService.getPlaygroundWinId({index,tabId})
+    async closePlaygroundWindow({ index, tabId }: { index: number; tabId: string }) {
+        const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
         const r = await this.isWinReady(winId);
         console.log({ winId }, r);
         await this.closeWindow(winId);
     }
 
-    async makeWindowToTopRight(index: number,tabId:string) {
-        const winId = WebviewMainEventService.getPlaygroundWinId({index,tabId})
-        let width = 368;
-        let x = window.screen.width - width - 12;
-
-        onAction('setBounds', {
-            winId,
-            bounds: {
-                width,
-                y: 12,
-                x
-            },
-            animate: true
-        });
-    }
-    async openTelegramWindow(account: AccountPublic){
-        const url = TELEGRAME_WEB
-        const uri = new URL(url)
-        const tabId = uri.hostname.replace(/\./g,"_")
-        const tab:BrowserTab = {
+    async openTelegramWindow(account: AccountPublic) {
+        const url = TELEGRAME_WEB;
+        const uri = new URL(url);
+        const tabId = uri.hostname.replace(/\./g, '_');
+        const tab: BrowserTab = {
             tabId,
             ts: currentTs(),
             url,
             ts1: 0
-        }
+        };
         const isDev = this.getIsDev();
 
-        const initMessage = Buffer.from(JSON.stringify({
-            account,tab
-        })).toString("hex")
-        
+        const initMessage = Buffer.from(
+            JSON.stringify({
+                account,
+                tab
+            })
+        ).toString('hex');
+
         const { options, winId, playgroundUrl } = WebviewMainEventService.getPlaygroundWindowProps({
-            index:account.index,
+            index: account.index,
             isDev,
             tab,
-            initMessage,
+            initMessage
         });
 
-        await this.openWindow(winId, playgroundUrl, options, isDev);
-        
+        await this.openWindow(winId, playgroundUrl, options, false);
     }
-    async openPlaygroundWindow(
-        tab: BrowserTab,
-        account: AccountPublic,
-        env: AppEnv
-    ) {
+    async openPlaygroundWindow(tab: BrowserTab, account: AccountPublic, env: AppEnv) {
         const { index } = account;
         const { isDev } = env;
 
-        const initMessage = Buffer.from(JSON.stringify({
-            account,tab
-        })).toString("hex")
+        const initMessage = Buffer.from(
+            JSON.stringify({
+                account,
+                tab
+            })
+        ).toString('hex');
 
         const { options, winId, playgroundUrl } = WebviewMainEventService.getPlaygroundWindowProps({
             index,
             isDev,
             tab,
-            initMessage,
+            initMessage
         });
 
-        await this.openWindow(winId, playgroundUrl, options, isDev);
-       
+        await this.openWindow(winId, playgroundUrl, options, false);
     }
     async openWindow(
         winId: SUB_WIN_ID | string,
@@ -440,7 +435,7 @@ export default class WebviewMainEventService {
         return new Promise((resolve, reject) => {
             const checkWinReady = async () => {
                 const isReady = await this.isWinReady(winId);
-                console.debug({isReady},winId)
+                console.debug({ isReady }, winId);
                 if (isReady) {
                     resolve(true); // Resolve the promise if the window is ready
                 } else if (timeout > 0 && Date.now() - startTime >= timeout) {
@@ -487,16 +482,185 @@ export default class WebviewMainEventService {
             });
         });
     }
-    async getWindowStatus(accounts: AccountPublic[],tabId:string) {
+    async getWindowStatus(accounts: AccountPublic[], tabId: string) {
         let rows = new Map();
         for (let i = 0; i < accounts.length; i++) {
             const { index } = accounts[i];
             const winId = WebviewMainEventService.getPlaygroundWinId({
-                index,tabId
-            })
+                index,
+                tabId
+            });
             const res = await this.isWinOpen(winId);
             rows.set(index, res);
         }
         return rows;
+    }
+    
+    async getAllReadyWin() {
+        return onAction('getAllReadyWin', {  });
+    }
+    async notifySubWinAction(action: "windowsOpen" | "windowsClose" | string, payload: any, tab:BrowserTab,account:AccountPublic,type: WinControlType) {
+        const windowsReady = await new WebviewMainEventService().getAllReadyWin();
+        
+        (windowsReady as string[][]).forEach(element => {
+            const [winId, isReady] = element;
+            if (isReady) {
+                if (type === WinControlType.CURRENT_APP && winId.endsWith(tab.tabId)) {
+                    if(action === "windowsOpen" || action === "windowsClose"){
+                        onAction(action === "windowsOpen" ? 'shoWin':"closeWin", {
+                            winId,
+                        });
+                        return;
+                    }
+                    
+                    onAction('subWin', {
+                        toWinId: winId,
+                        action,
+                        payload:{
+                            ...payload,
+                            tabId:tab.tabId
+                        }
+                    });
+                }
+                if (
+                    type === WinControlType.CURRENT_ACCOUNT &&
+                    winId.startsWith(`${SUB_WIN_ID.PLAYGROUND}_${account.index}_`)
+                ) {
+                    if(action === "windowsOpen" || action === "windowsClose"){
+                        onAction(action === "windowsOpen" ? 'shoWin':"closeWin", {
+                            winId,
+                        });
+                        return;
+                    }
+                    const tabId = winId.replace(`${SUB_WIN_ID.PLAYGROUND}_${account.index}_`,"")
+                    onAction('subWin', {
+                        toWinId: winId,
+                        action,
+                        payload:{
+                            ...payload,
+                            tabId
+                        }
+                    });
+                }
+                if (
+                    type === WinControlType.ALL &&
+                    winId.startsWith(`${SUB_WIN_ID.PLAYGROUND}_`)
+                ) {
+                    if(action === "windowsOpen" || action === "windowsClose"){
+                        onAction(action === "windowsOpen" ? 'shoWin':"closeWin", {
+                            winId,
+                        });
+                        return;
+                    }
+                    const tabId = winId.replace(`${SUB_WIN_ID.PLAYGROUND}_`,"")
+
+                    onAction('subWin', {
+                        toWinId: winId,
+                        action,
+                        payload:{
+                            ...payload,
+                            tabId
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    async makeWindowsAlign(
+        action: "rightTopAlignTile"|'leftAlignTile' | 'rightAlignTile' | 'rightTop' | 'rightBottom' | 'leftTop' | 'leftBottom',
+        tab:BrowserTab,
+        account: AccountPublic,
+        type: WinControlType
+    ) {
+
+        const windowsReady = await new WebviewMainEventService().getAllReadyWin();
+        const winIds = (windowsReady as string[][]).map(row=>row[0])
+        const { width: screenWidth, height: screenHeight } = window.screen;
+
+        let x = 12,
+            y = 12,
+            tileMargin = 12; 
+
+        for (let index = 0; index < winIds.length; index++) {
+            let winId = winIds[index];
+            let winId1 = null
+            if (type === WinControlType.CURRENT_APP && winId.endsWith(tab.tabId)) {
+                winId1 = winId
+            }
+            if (
+                type === WinControlType.CURRENT_ACCOUNT &&
+                winId.startsWith(`${SUB_WIN_ID.PLAYGROUND}_${account.index}_`)
+            ) {
+                winId1 = winId
+            }
+            if (
+                type === WinControlType.ALL &&
+                winId.startsWith(`${SUB_WIN_ID.PLAYGROUND}_`)
+            ) {
+                winId1 = winId
+            }
+            if(!winId1){
+                continue
+            }
+            const bounds = await onAction('getBounds', {
+                winId:winId1
+            });
+
+            const { width: subWinWidth, height: subWinHeight } = bounds as {
+                width: number;
+                height: number;
+            };
+            const maxColumns = Math.floor(screenWidth / (subWinWidth + tileMargin));
+
+            switch (action) {
+                case 'rightTopAlignTile': {
+                    x = screenWidth - subWinWidth - 12 - index * 64; 
+                    y = 12 + index * 64; 
+                    break;
+                }
+                case 'leftAlignTile': {
+                    const column = index % maxColumns;
+                    const row = Math.floor(index / maxColumns);
+                    x = column * (subWinWidth + tileMargin);
+                    y = row * (subWinHeight + tileMargin);
+                    break;
+                }
+                case 'rightAlignTile': {
+                    const column = index % maxColumns;
+                    const row = Math.floor(index / maxColumns);
+                    x = screenWidth - subWinWidth - (column * (subWinWidth + tileMargin) + tileMargin);
+                    y = row * (subWinHeight + tileMargin);
+                   
+                    break;
+                }
+                case 'rightTop': {
+                    x = screenWidth - subWinWidth - 12;
+                    break;
+                }
+                case 'rightBottom': {
+                    x = screenWidth - subWinWidth - 12;
+                    y = screenHeight - subWinHeight - 12;
+                    break;
+                }
+                case 'leftTop': {
+                    break;
+                }
+                case 'leftBottom': {
+                    y = screenHeight - subWinHeight - 12;
+                    break;
+                }
+            }
+            onAction('setBounds', {
+                winId:winId1,
+                bounds: {
+                    y,
+                    x
+                },
+                animate: true
+            });
+        }
+
+        
     }
 }

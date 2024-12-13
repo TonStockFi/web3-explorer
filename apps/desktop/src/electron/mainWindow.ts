@@ -195,7 +195,7 @@ export class MainWindow {
             ...this.getOptions(),
             x: isDev ? 0 : undefined,
             y: isDev ? 0 : undefined,
-            width: isDev ? 1280 : 1280,
+            width: isDev ? 1140 : 1140,
             minWidth: 380,
             height: 840,
             minHeight: 840,
@@ -246,7 +246,7 @@ export class MainWindow {
           Menu.setApplicationMenu(menu);
 
         if (flagDev) {
-            this.mainWindow.webContents.openDevTools({ mode: 'right' });
+            //this.mainWindow.webContents.openDevTools({ mode: 'right' });
         }
 
         this.mainWindow.on('closed', () => {
@@ -618,9 +618,12 @@ export class MainWindow {
                 return win.setBounds(bounds, animate);
             }
             return false
+        
         } else if ('winReady' === messageAction) {
             const { winId } = messageValue;
             this.windowsReady.set(winId, true);
+        } else if ('getAllReadyWin' === messageAction) {
+            return Array.from(this.windowsReady).map(row=>row)
         } else if ('isWinReady' === messageAction) {
             const { winId } = messageValue;
             return !!this.windowsReady.get(winId);

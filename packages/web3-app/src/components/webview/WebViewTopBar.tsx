@@ -62,7 +62,6 @@ export function WebviewTopBar({
                         }
                     }}
                     iconButton={{
-                        disabled: !canGoBack,
                         sx: {
                             width: 24,
                             height: 24

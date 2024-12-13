@@ -1,7 +1,7 @@
 
 import { TelegramApiAction } from '@web3-explorer/lib-telegram';
-import { showAlertMessage } from '../common/helpers';
-import { BOT_ID_EXTESSION_CENTER, BOT_ID_SERVICE_CENTER } from '../constant';
+import { showAlertMessage, showGlobalLoading } from '../common/helpers';
+import { BOT_ID_EXTESSION_CENTER, SERVICE_ChatId } from '../constant';
 
 import { addressToShortValue, formatTsToDate } from '../common/utils';
 import { ExtenssionPublishData } from '../types';
@@ -67,14 +67,13 @@ ${desc}
 
 `;
 
-        const res = await api.request(TelegramApiAction.PublishExtension, {
+        await api.request(TelegramApiAction.PublishExtension, {
             chatId: userId,
             filename,
             data,
             fileType,
             caption
         });
-        // alert(JSON.stringify(res,null))
     }
     async openExtensionCenter(){
         const isReady = await this.waitwebviewIsReady()
@@ -89,9 +88,10 @@ ${desc}
 
         const {uri:{hash}} = this.getWebviewUrlUri()
         const chatId = BOT_ID_EXTESSION_CENTER
-
         if(hash !== `#${chatId}`){
             await this.goToTgChat(chatId)
+        }else{
+            showGlobalLoading(true,2)
         }
         await this.waitForExecJsResult(`return location.hash === "#${chatId}"`)
         const res = await this.waitForElemenBoundingClientRect(`#editable-message-text`);
@@ -111,10 +111,13 @@ ${desc}
         }
 
         const {uri:{hash}} = this.getWebviewUrlUri()
-        const chatId = BOT_ID_SERVICE_CENTER
+        
+        const chatId = SERVICE_ChatId
 
         if(hash !== `#${chatId}`){
             await this.goToTgChat(chatId)
+        }else{
+            showGlobalLoading(true,2)
         }
         await this.waitForExecJsResult(`return location.hash === "#${chatId}"`)
         const res = await this.waitForElemenBoundingClientRect(`#editable-message-text`);

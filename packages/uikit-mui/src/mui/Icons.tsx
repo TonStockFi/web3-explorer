@@ -12,6 +12,7 @@ import BubbleChart from '@mui/icons-material/BubbleChart';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import CloseIcon from '@mui/icons-material/Close';
 import CodeIcon from '@mui/icons-material/Code';
+import Comment from '@mui/icons-material/Comment';
 import ComputerIcon from '@mui/icons-material/Computer';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentCut from '@mui/icons-material/ContentCut';
@@ -140,6 +141,7 @@ export type IconList =
     | 'ToggleOn'
     | 'ToggleOff'
     | 'Send'
+    | 'Comment'
     | 'Visibility'
     | 'VolumeUp'
     | 'VisibilityOff'
@@ -186,6 +188,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     Info,
     Diamond,
     Remove,
+    Comment,
     AutoFixHigh,
     OpenInFull,
     EmojiEvents,

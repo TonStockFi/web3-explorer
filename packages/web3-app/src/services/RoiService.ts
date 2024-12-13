@@ -47,7 +47,7 @@ export default class RoiService {
     async getId() {
         let id = await this.indexedDbIds.get(this.tabId);
         if (!id) {
-            id = `#100`;
+            id = ENTRY_ID_ROI;
         } else {
             id = `#${id + 1}`;
         }

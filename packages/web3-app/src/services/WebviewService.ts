@@ -1,4 +1,5 @@
 import { WebviewTag } from 'electron';
+import { showGlobalLoading } from '../common/helpers';
 import { resizeImage } from '../common/image';
 import { sleep } from '../common/utils';
 import {
@@ -10,6 +11,7 @@ import {
     getWebviewContentsIdByTabId,
     TabIdWebveiwSizedMap
 } from '../components/webview/WebViewBrowser';
+import { TELEGRAME_WEB } from '../constant';
 import { BoundingClientRect } from '../types';
 
 export default class WebviewService {
@@ -121,6 +123,9 @@ export default class WebviewService {
             console.warn('webview is null when goToTelegramWebChatId ');
             return;
         }
+
+        showGlobalLoading(true)
+        showGlobalLoading(false,2)
         const code = `
     const currentUrl = window.location.href.split('#')[0];
     const newHash = '#${chatId}';
@@ -137,7 +142,13 @@ export default class WebviewService {
             return;
         }
         if (url) {
-            await webview.executeJavaScript(`location.href="${url}";`);
+            const {hash,host} = new URL(url)
+            if(TELEGRAME_WEB.indexOf(host) > -1 && hash.startsWith("#")){
+                this.goToTgChat(hash.substring(1))
+            }else{
+                await webview.executeJavaScript(`location.href="${url}";`);
+
+            }
         }
     }
 
@@ -232,12 +243,17 @@ if(element){
     }
 
     goToTgChat(chatId: string) {
-        const code = `
-const currentUrl = window.location.href.split('#')[0];
-const newHash = '#${chatId}';
-history.replaceState(null, '',currentUrl + newHash);
-location.reload()
-return {url:currentUrl + newHash}
+        showGlobalLoading(true)
+        showGlobalLoading(false,2)
+        const code = `  
+const [currentUrl,hash] = window.location.href.split('#');
+if(hash){
+    const newHash = '#${chatId}';
+    history.replaceState(null, '',currentUrl + newHash);
+    location.reload()
+}else{
+    window.location.href = "${TELEGRAME_WEB}#${chatId}"
+}
     `;
         return this.execJs(code);
     }

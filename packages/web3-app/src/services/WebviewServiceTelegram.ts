@@ -1,4 +1,8 @@
+import { showGlobalLoading } from '../common/helpers';
 import { sleep } from '../common/utils';
+import { isTelegramWeb } from '../providers/PlaygroundProvider';
+import { AccountPublic } from '../types';
+import TgAuthService, { TgAuthinfo } from './TgAuthService';
 import WebviewService from './WebviewService';
 
 // export const getAvatar = async (userId: string, accessKey: string, webview: WebviewTag) => {
@@ -133,6 +137,23 @@ export default class WebviewServiceTelegram extends WebviewService {
 
     }
 
+    async getAuthInfo(): Promise<null|TgAuthinfo> {
+        const webview = this.getWebview();
+        if (!webview) {
+            console.warn('webview is null when isLogged ');
+            return null;
+        }
+        const code = `
+        const user_auth = JSON.parse(localStorage.getItem("user_auth") || "{}")
+        if(user_auth.dcID){
+            const hash = JSON.parse(localStorage.getItem("dc"+user_auth.dcID+"_hash") || "")
+            const auth_key = JSON.parse(localStorage.getItem("dc"+user_auth.dcID+"_auth_key") || "")
+            return {hash,auth_key,user_auth}
+        }
+        return null`;
+        console.debug('getAuthInfo', code);
+        return this.execJs(code);
+    }
     async getAuthUserId(): Promise<null|string> {
         const webview = this.getWebview();
         if (!webview) {
@@ -142,7 +163,7 @@ export default class WebviewServiceTelegram extends WebviewService {
         const code = `
         const user_auth = JSON.parse(localStorage.getItem("user_auth") || "{}")
         return user_auth.id || null`;
-        console.debug('isLogged', code);
+        console.debug('getAuthUserId', code);
         return this.execJs(code);
     }
 
@@ -162,6 +183,29 @@ export default class WebviewServiceTelegram extends WebviewService {
         console.debug('waitForLogged', code);
         return this.waitForExecJsResult(code);
     }
+    async handleJoinConfirm(delay?:number){
+        const res1 = await this.getElemenBoundingClientRect('button.join-subscribe-button');
+        console.log('>> button.join-subscribe-button', res1);
+        if (res1) {
+            await this.sendClickEventAtRect(res1);
+            if(delay){
+                await sleep(delay)
+            }
+        }
+    }
+    async sendTextMessage(text:string){
+        const res = await this.waitForElemenBoundingClientRect(`#editable-message-text`);
+        if (res) {
+            await this.sendClickEvent(res.left + res.width / 2, res.top + res.height / 2);
+            await sleep(100);
+            this.insertText(text);
+            await sleep(100);
+            const res1 = await this.waitForElemenBoundingClientRect(`.main-button.send`);
+            if (res1) {
+                await this.sendClickEvent(res1.left + 20, res1.top + 10);
+            }
+        }
+    }
     async handleItem(){
         const ws = this;
 
@@ -171,11 +215,7 @@ export default class WebviewServiceTelegram extends WebviewService {
         await ws.execJs(
             ` document.querySelectorAll(".Message").forEach(row=>row.style.display = "none")`
         );
-        const res1 = await ws.getElemenBoundingClientRect('button.join-subscribe-button');
-        console.log('>> button.join-subscribe-button', res1);
-        if (res1) {
-            await ws.sendClickEventAtRect(res1);
-        }
+        this.handleJoinConfirm()
         const res = await ws.waitForElemenBoundingClientRect(`#editable-message-text`);
         console.log('#editable-message-text', res);
         if (res) {
@@ -196,6 +236,44 @@ export default class WebviewServiceTelegram extends WebviewService {
             }
         }
         await sleep(2000);
+    }
+    async handleAuth(currentAccount:AccountPublic,urlGoTo:string){
+        const ws = this;
+        const url = ws.getWebviewUrl();
+        
+        if (url && isTelegramWeb(url)) {
+            const tgs = new TgAuthService(currentAccount.id, currentAccount.index);
+            const authInfo = await tgs.get();
+            if (!authInfo) {
+                const userAuthInfo = await ws.getAuthInfo();
+                if (userAuthInfo) {
+                    await new TgAuthService(currentAccount.id, currentAccount.index).save(
+                        userAuthInfo
+                    );
+                }
+            } else {
+                const userAuthInfo = await ws.getAuthInfo();
+                if (!userAuthInfo) {
+                    const dcID = authInfo.user_auth.dcID;
+                    const hash = authInfo.hash;
+                    const auth_key = authInfo.auth_key;
+                    const code = `
+                        localStorage.setItem("user_auth",'${JSON.stringify(
+                            authInfo.user_auth
+                        )}');
+                        localStorage.setItem("dc${dcID}_hash",'${JSON.stringify(hash)}');
+                        localStorage.setItem("dc${dcID}_auth_key",'${JSON.stringify(
+                        auth_key
+                    )}');`;
+
+                    showGlobalLoading(true)
+                    showGlobalLoading(false,1)
+                    await ws.execJs(code);
+                    await sleep(1000);
+                    await ws.goTo(urlGoTo);
+                }
+            }
+        }
     }
     
 }

@@ -2,9 +2,10 @@ import { deepDiff, useLocalStorageState, useSessionStorageState } from '@web3-ex
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 import { onAction } from '../common/electron';
-import { getWinId } from '../common/helpers';
+import { getWinId, isPlaygroundMaster } from '../common/helpers';
+import { T_ME_WEB, TELEGRAME_WEB } from '../constant';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { AccountPublic } from '../types';
+import { AccountPublic, PlaygroundMasterSideAction } from '../types';
 import { BrowserTab, useBrowserContext } from './BrowserProvider';
 import { useIAppContext } from './IAppProvider';
 
@@ -19,6 +20,10 @@ interface AppContextType {
     currentExtension: ExtensionType;
     currentRecoAreaImage: string;
     accounts: AccountPublic[];
+    showMobile: boolean;
+    playgroundMasterSideAction: PlaygroundMasterSideAction;
+    onChangePlaygroundMasterSideAction: (v: PlaygroundMasterSideAction) => void;
+    onShowMobile: (v: boolean) => void;
     onChangeCurrentRecoAreaImage: (v: string) => void;
     onShowCodeDrawer: (v: boolean) => void;
     onShowGameListDrawer: (v: boolean) => void;
@@ -39,6 +44,25 @@ export function getRecoId(tab: Partial<BrowserTab>, account: AccountPublic) {
     return `${tab.tabId}-${account?.id}-${account?.index}`;
 }
 
+export function isTelegramWeb(url: string) {
+    let res = false;
+    if (url.startsWith(TELEGRAME_WEB)) {
+        res = true;
+    }
+    return res;
+}
+
+export function isTelegramTab(tab: BrowserTab) {
+    let res = false;
+    if (!tab.url) {
+        return res;
+    }
+    if (tab.twa || isTelegramWeb(tab.url) || tab.url.startsWith(T_ME_WEB)) {
+        res = true;
+    }
+    return res;
+}
+
 export enum ExtensionType {
     NULL = 'NULL',
     GEMINI = 'GEMINI',
@@ -52,13 +76,18 @@ export enum ExtensionType {
 export const PlaygroundProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
     const { env } = useIAppContext();
+    const [playgroundMasterSideAction, setPlaygroundMasterSideAction] =
+        useLocalStorageState<PlaygroundMasterSideAction>(
+            'selectedSideAction',
+            PlaygroundMasterSideAction.FEATURE
+        );
     const [windowStatus, setWindowStatus] = useState<Map<number, boolean>>(new Map());
     const { currentTabId, newTab, browserTabs } = useBrowserContext();
     const uri = new URL(location.href);
     const initMessage = uri.searchParams.get('initMessage');
     let account = null;
     let tabInit: BrowserTab | null = null;
-    if (initMessage) {
+    if (initMessage && !isPlaygroundMaster()) {
         const res = JSON.parse(Buffer.from(initMessage, 'hex').toString());
         if (res) {
             tabInit = res.tab as BrowserTab;
@@ -69,14 +98,24 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
             account = res.account;
         }
     }
-
-    const [currentExtension, setCurrentExtension] = useSessionStorageState<ExtensionType>(
+    let showMobileInit = !!tabInit?.twa;
+    if (
+        tabInit &&
+        tabInit.url &&
+        (tabInit.url.indexOf(TELEGRAME_WEB) > -1 || tabInit.url.indexOf('t.me/') > -1)
+    ) {
+        showMobileInit = true;
+    }
+    const [showMobile, setShowMobile] = useLocalStorageState<boolean>(
+        'showMobile_' + (account?.id || '1') + (account?.index || '1') + (tabInit?.tabId || ''),
+        showMobileInit
+    );
+    const [currentExtension, setCurrentExtension] = useLocalStorageState<ExtensionType>(
         'currentExtension_' +
             (account?.id || '1') +
-            '' +
             (account?.index || '1') +
             (tabInit?.tabId || ''),
-        ExtensionType.NULL
+        showMobileInit ? ExtensionType.GEMINI : ExtensionType.NULL
     );
 
     useEffect(() => {
@@ -98,8 +137,15 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     );
     const [currentRecoAreaImage, setCurrentRecoAreaImage] = useState('');
 
+    function onChangePlaygroundMasterSideAction(v: PlaygroundMasterSideAction) {
+        setPlaygroundMasterSideAction(v);
+    }
     function onChangeCurrentRecoAreaImage(v: string) {
         setCurrentRecoAreaImage(v);
+    }
+
+    function onShowMobile(v: boolean) {
+        setShowMobile(v);
     }
     function onShowCodeDrawer(v: boolean) {
         setShowCodeDrawer(v);
@@ -162,23 +208,16 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         setCurrentExtension(v);
     };
 
-    const tab = tabInit || browserTabs.get(currentTabId)!;
-    // console.log({ tab, tabInit });
-    // console.log(
-    //     {
-    //         tab,
-    //         initMessage,
-    //         browserTabs,
-    //         currentTabId,
-    //         tabInit,
-    //         account,
-    //         currentAccount
-    //     },
-    //     browserTabs.size
-    // );
+    let tab = tabInit;
+    if (isPlaygroundMaster()) {
+        tab = browserTabs.get(currentTabId)!;
+    }
+
     return (
         <AppContext.Provider
             value={{
+                playgroundMasterSideAction,
+                onChangePlaygroundMasterSideAction,
                 currentRecoAreaImage,
                 onChangeCurrentRecoAreaImage,
                 onChangeCurrentExtension,
@@ -191,13 +230,15 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
                 onChangeWindowStatus,
                 windowStatus,
                 currentTabId,
-                tab,
+                tab: tab!,
                 currentAccount,
                 showScreenCopy,
                 screenCopyVisible,
                 switchCurrentAccount,
                 saveAccounts,
-                accounts
+                accounts,
+                showMobile,
+                onShowMobile
             }}
         >
             {children}

@@ -1,3 +1,4 @@
+import type { AlertColor, AlertProps } from '@web3-explorer/uikit-mui/dist/mui/Alert';
 import type { AvatarProps } from '@web3-explorer/uikit-mui/dist/mui/Avatar';
 import type { BoxProps } from '@web3-explorer/uikit-mui/dist/mui/Box';
 import type { ButtonProps } from '@web3-explorer/uikit-mui/dist/mui/Button';
@@ -42,6 +43,8 @@ export interface UtilsProps {
     skeletonCircular?: boolean;
     skeletonRectangular?: boolean;
     skeletonRounded?: boolean;
+    alert?: AlertColor;
+    alertProps?: AlertProps;
     chip?: string;
     chipColor?: Color;
     chipSize?: 'small' | 'medium';

@@ -3,7 +3,7 @@ let PortalsObserved = false;
 let SelectTextInjected = false;
 
 export const tgCallback = (message: { action: string; payload: never }) => {
-    console.debug('render callback', message);
+    //console.debug('render callback', message);
     // switch (message.action){
     //     case "tgLogged":
     //         loading_getTgGlobalState = false

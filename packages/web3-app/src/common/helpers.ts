@@ -39,22 +39,24 @@ export function showAlertMessage(message:string,hideGlobalLoading?:boolean) {
     }))
 }
 
-export function showGlobalLoading(visible:boolean,delay:number  = 1) {
+export function showGlobalLoading(visible:boolean,delay:number  = 0) {
+   if(visible){
+        window.dispatchEvent(new CustomEvent("showGlobalLoading",{
+            detail:{
+                visible:true
+            }
+        }))
+
+   }
    
-    if(!visible){
+    if(delay || !visible){
         setTimeout(() => {
             window.dispatchEvent(new CustomEvent("showGlobalLoading",{
                 detail:{
-                    visible
+                    visible:false
                 }
             }))
         }, delay * 1000);
-    }else{
-        window.dispatchEvent(new CustomEvent("showGlobalLoading",{
-            detail:{
-                visible
-            }
-        }))
     }
 }
 

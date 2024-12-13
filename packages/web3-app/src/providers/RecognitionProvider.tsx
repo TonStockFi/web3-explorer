@@ -8,8 +8,7 @@ import parser from 'cron-parser';
 import ProService from '../services/ProService';
 import RoiService from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { ProInfoProps, RoiInfo, SUB_WIN_ID } from '../types';
-import { useIAppContext } from './IAppProvider';
+import { PlaygroundMasterSideAction, ProInfoProps, RoiInfo, SUB_WIN_ID } from '../types';
 import { getRecoId, usePlayground } from './PlaygroundProvider';
 import { usePro } from './ProProvider';
 
@@ -29,6 +28,7 @@ interface AppContextType {
     showScreenMirror: boolean;
     selectedPage: string;
     selectedRoiId: string;
+    selectedTaskId: string;
     screenPushDelayMs: number;
     recognitionCatId: string;
     startRecognition: boolean;
@@ -48,6 +48,7 @@ interface AppContextType {
     onShowScreenMirror: (v: boolean) => void;
     updateScreenPushDelayMs: (n: number, skipNotify?: boolean) => void;
     onSelectRoi: (id: string) => void;
+    onSelectTask: (id: string) => void;
     addRoiArea: (r: RoiInfo, cutImageUrl: string, tabId: string) => void;
     removeRoiArea: (r: RoiInfo) => void;
     updateRoiArea: (r: RoiInfo) => void;
@@ -143,6 +144,9 @@ export const fixRow = (roi: RoiInfo) => {
     if (roi.pid === '#-2') {
         roi.pid = TASK_ID_ROI;
     }
+    if (roi.pid === '#0') {
+        roi.pid = ENTRY_ID_ROI;
+    }
 };
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -185,7 +189,8 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
 
-    const { accounts, tab, currentTabId, currentAccount } = usePlayground();
+    const { accounts, tab, onChangePlaygroundMasterSideAction, currentTabId, currentAccount } =
+        usePlayground();
     const index = currentAccount?.index || 0;
     const [selectOtherPage, setSelectOtherPage] = useState<boolean>(false);
     const [clickStopped, setClickStopped] = useState<boolean>(false);
@@ -193,6 +198,11 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const [selectedRoiId, setSelectedRoiId] = useLocalStorageState<string>(
         'selectedRoiId_' + recoId,
+        ''
+    );
+
+    const [selectedTaskId, setSelectedTaskId] = useLocalStorageState<string>(
+        'selectedTaskId_' + recoId,
         ''
     );
     const [recognitionCatId, setRecognitionCatId] = useSessionStorageState(
@@ -221,6 +231,12 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const onSelectRoi = (id: string) => {
         setSelectedRoiId(i => {
+            return id;
+        });
+    };
+
+    const onSelectTask = (id: string) => {
+        setSelectedTaskId(i => {
             return id;
         });
     };
@@ -357,7 +373,6 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             }
         }, 500);
     };
-    const { env } = useIAppContext();
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
         const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
         if (IdCache.get(id)) {
@@ -429,7 +444,12 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             });
 
             setTimeout(() => {
-                onSelectRoi(id);
+                if (row.pid === TASK_ID_ROI) {
+                    onSelectTask(id);
+                    onChangePlaygroundMasterSideAction(PlaygroundMasterSideAction.TASK);
+                } else {
+                    onSelectRoi(id);
+                }
             }, 400);
             notifyWindows('onUpdateRoi');
         }
@@ -526,6 +546,8 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
+                onSelectTask,
+                selectedTaskId,
                 onSelectOtherPage,
                 selectOtherPage,
                 onChangeCurrentDecisionn,
