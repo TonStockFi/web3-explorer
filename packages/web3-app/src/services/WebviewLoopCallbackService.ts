@@ -19,9 +19,10 @@ export interface OcrType {
 type ActionType = Map<
     number,
     {
-        type: 'click' | 'drag' | 'onMatch' | 'onOcrImg';
+        type: 'click' | 'drag' | 'onMatch' | 'onOcrImg' | 'insertText';
         feature: RoiInfo;
         ocr: OcrType;
+        text:string;
         ts: number;
         x: number;
         y: number;
@@ -265,9 +266,11 @@ export default class WebviewLoopCallbackService extends WebviewService {
         console.log('ocr>> message reply', message.reply, duration);
         return res
     }
+    
     async log(message:string){
         await this.execJs(`console.log("> ${message}")`);
     }
+
     async process() {
         const ws = this;
         if (ws.webviewIsReady()) {
@@ -282,7 +285,7 @@ export default class WebviewLoopCallbackService extends WebviewService {
                 await ws.execJs(`__Actions.delete(${ts})`);
                 const action = __Actions.get(ts)!;
                 console.debug('useTimeoutLoop', ts, __Actions.get(ts));
-                const { x, y, x1, y1, type, feature, ocr, steps } = action;
+                const { x, y, x1, y1, type, text,feature, ocr, steps } = action;
                 await this.log(`run action: ${type} ts:${ts}`)
                 if (type === 'click') {
                     await ws.sendClickEvent(action.x, action.y);
@@ -299,6 +302,10 @@ export default class WebviewLoopCallbackService extends WebviewService {
                 }
                 if (type === 'drag') {
                     await ws.sendDragEvent({ x, y }, { x: x1, y: y1 }, steps || 10);
+                    await this.responseActionResult(ts,true)
+                }
+                if (type === 'insertText') {
+                    await ws.insertText(text);
                     await this.responseActionResult(ts,true)
                 }
             }

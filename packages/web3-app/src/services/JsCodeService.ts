@@ -305,6 +305,13 @@ class G {
             return G.getActionResult(ts);
         }, timeout, interval);
     }
+    static async insertText(text,timeout = 30000,interval = 1000) {
+        const ts = +new Date();
+        window.__Actions.set(ts, { type: "insertText", ts, text });
+        return G.waitForResult(() => {
+            return G.getActionResult(ts);
+        }, timeout, interval);
+    }
     static async onMatch(featureId,timeout = 30000,interval = 1000) {
         const ts = +new Date();
         const {feature} = F(featureId) || {}
@@ -320,6 +327,7 @@ class G {
             return G.getActionResult(ts);
         }, timeout, interval);
     }
+
     static async clearRect(delaySeconds) {
         const t = delaySeconds ? delaySeconds * 1000: 0
         setTimeout(() => {

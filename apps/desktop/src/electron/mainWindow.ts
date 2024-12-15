@@ -193,9 +193,9 @@ export class MainWindow {
         if (this.mainWindow !== undefined && this.mainWindow !== null) return this.mainWindow;
         this.mainWindow = new BrowserWindow({
             ...this.getOptions(),
-            x: isDev ? 0 : undefined,
-            y: isDev ? 0 : undefined,
-            width: isDev ? 1140 : 1140,
+            x: 64,
+            y:64,
+            width: 860,
             minWidth: 380,
             height: 840,
             minHeight: 840,

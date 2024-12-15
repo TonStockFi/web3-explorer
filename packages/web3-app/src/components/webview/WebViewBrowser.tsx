@@ -355,6 +355,22 @@ const WebViewBrowser = ({
                 webviewProps?.onStopLoading && webviewProps?.onStopLoading();
                 onEvent('did-stop-loading');
                 TabIdWebviewReadyMap.set(tabId, true);
+                webview.executeJavaScript(`// 防止重复执行的标志位
+                    if (!window._observerInitialized) {
+                      window._observerInitialized = true; // 标志为已初始化
+                      
+                      const observer = new MutationObserver(() => {
+                        document.querySelectorAll('a[target="_blank"]').forEach(anchor => {
+                          anchor.removeAttribute('target');
+                        });
+                      });
+                    
+                      observer.observe(document.body, { childList: true, subtree: true });
+                      
+                      console.log('MutationObserver initialized');
+                    } else {
+                      console.log('MutationObserver is already running.');
+                    }`);
             },
             'did-fail-load': async ({
                 errorCode,
@@ -413,7 +429,22 @@ const WebViewBrowser = ({
                     }
 
                     await webview.insertCSS(GLOBAL_CSS);
+                    await webview.executeJavaScript(`// 防止重复执行的标志位
+if (!window._observerInitialized) {
+  window._observerInitialized = true; // 标志为已初始化
+  
+  const observer = new MutationObserver(() => {
+    document.querySelectorAll('a[target="_blank"]').forEach(anchor => {
+      anchor.removeAttribute('target');
+    });
+  });
 
+  observer.observe(document.body, { childList: true, subtree: true });
+  
+  console.log('MutationObserver initialized');
+} else {
+  console.log('MutationObserver is already running.');
+}`);
                     if (url.indexOf('mail.proton.me') > -1) {
                         await webview.insertCSS(
                             `body > div.app-root > div.flex.flex-row.flex-nowrap.h-full > div > div.flex.flex-nowrap.flex-row.p-4.items-center.border-bottom.border-weak{display:none}`

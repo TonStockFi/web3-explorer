@@ -189,22 +189,25 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     };
 
     const onChangeCurrentExtension = (v: ExtensionType) => {
-        onAction('getBounds', { winId: getWinId() })?.then(r => {
-            let { x } = r as { x: number };
-            const { workArea } = env;
-            const width = v === ExtensionType.NULL ? 368 : 368 * 3;
-            if (workArea.width < x + width) {
-                x = workArea.width - width;
-            }
-            onAction('setBounds', {
-                winId: getWinId(),
-                bounds: {
-                    width,
-                    x
-                },
-                animate: false
+        if (showMobile) {
+            onAction('getBounds', { winId: getWinId() })?.then(r => {
+                let { x } = r as { x: number };
+                const { screen } = window;
+                const width = v === ExtensionType.NULL ? 368 : 368 * 3;
+                if (screen.width < x + width) {
+                    x = screen.width - width;
+                }
+                onAction('setBounds', {
+                    winId: getWinId(),
+                    bounds: {
+                        width,
+                        x
+                    },
+                    animate: false
+                });
             });
-        });
+        }
+
         setCurrentExtension(v);
     };
 

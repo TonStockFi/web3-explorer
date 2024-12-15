@@ -3,11 +3,12 @@ import { OnAction } from '../libs/message';
 import { MainWindow } from './mainWindow';
 
 export const willNavigateHandler = async (e: Electron.Event & { url: string },webContentsId?:number) => {
-    // console.log("willNavigateHandler",e.url)
+    console.log("willNavigateHandler",e.url)
     if (
         e.url.startsWith('tonkeeper-tc://') ||
         e.url.startsWith('tonkeeper://') ||
-        e.url.startsWith('tonkeeper-tc://')
+        e.url.startsWith('tonkeeper-tc://')||
+        e.url.startsWith('tc://')
     ) {
         const window = await MainWindow.openMainWindow();
         window.show();
