@@ -1,5 +1,5 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
-import { PencilIcon } from '@tonkeeper/uikit/dist/components/Icon';
+import { KeyIcon, PencilIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '@tonkeeper/uikit/dist/components/List';
 import { SkeletonListDesktopAdaptive } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { Label2 } from '@tonkeeper/uikit/dist/components/Text';
@@ -12,6 +12,7 @@ import {
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { useTranslation } from 'react-i18next';
 
+import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals/RecoveryNotificationControlled';
 import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect } from 'react';
@@ -92,6 +93,7 @@ export const MAMIndexesPageContent: FC<{
         useEnableMAMAccountDerivation();
 
     const { onOpen: rename } = useRenameNotification();
+    const { onOpen: recovery } = useRecoveryNotification();
 
     const onEnableDerivation = async (index: number) => {
         enableDerivation({
@@ -149,15 +151,15 @@ export const MAMIndexesPageContent: FC<{
                                 <ButtonsContainer>
                                     <AccountMenu
                                         options={[
-                                            // {
-                                            //     name: t('settings_backup_seed'),
-                                            //     onClick: () =>
-                                            //         recovery({
-                                            //             accountId: account.id,
-                                            //             walletId: derivation.activeTonWalletId
-                                            //         }),
-                                            //     icon: <KeyIcon />
-                                            // },
+                                            {
+                                                name: t('settings_backup_seed'),
+                                                onClick: () =>
+                                                    recovery({
+                                                        accountId: account.id,
+                                                        walletId: derivation.activeTonWalletId
+                                                    }),
+                                                icon: <KeyIcon />
+                                            },
                                             {
                                                 name: t('Rename'),
                                                 onClick: () =>

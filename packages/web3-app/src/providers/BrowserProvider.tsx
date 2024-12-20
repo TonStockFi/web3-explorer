@@ -3,13 +3,15 @@ import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/uti
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DefaultTheme, useTheme } from 'styled-components';
-import { currentTs } from '../common/utils';
-import { getSessionCacheInfo } from '../components/webview/WebviewDiscoverApps';
+import { currentTs, getSessionCacheInfo } from '../common/utils';
+
 import { LeftSideActions } from '../constant';
-import LLMService, { MessageLLM } from '../services/LLMService';
+import { MessageLLM } from '../services/LLMService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
-import { MAIN_NAV_TYPE, MainNavListItem } from '../types';
+import { MAIN_NAV_TYPE, MainNavListItem, WebApp } from '../types';
 import { useIAppContext } from './IAppProvider';
+import { isTelegramTab } from './PlaygroundProvider';
+import { useScreenshotContext } from './ScreenshotProvider';
 
 export interface BrowserTab {
     tabId: string;
@@ -47,22 +49,24 @@ interface BrowserContextType {
     newTab: (tab: BrowserTab) => void;
     saveTab: (tabId: string, tab: BrowserTab) => void;
     editTab: (tab: BrowserTab) => void;
-    openTab: (tabId: string, url?: string, icon?: string) => void;
+    openTab: (tabId: string, url?: string, icon?: string, name?: string) => void;
     closeTab: (tabId: string) => void;
-
+    openTabFromWebview: (item: WebApp) => void;
     onChangeLeftSideActions: (v: MainNavListItem[]) => void;
-    leftSideActions: MainNavListItem[];
-    tabs: BrowserTab[];
-    currentTabId: string;
-    browserTabs: Map<string, BrowserTab>;
     t: (v: string) => string;
+    openSideWeb: (sideWeb: SideWebProps | null) => void;
     theme: DefaultTheme;
     updateAt: number;
 
     sideWeb: null | SideWebProps;
-    openSideWeb: (sideWeb: SideWebProps | null) => void;
+    leftSideActions: MainNavListItem[];
+    tabs: BrowserTab[];
+    currentTabId: string;
+    browserTabs: Map<string, BrowserTab>;
 }
-
+export function isDiscoverTab(tabId: string) {
+    return tabId === MAIN_NAV_TYPE.GAME_FI || tabId === MAIN_NAV_TYPE.DISCOVERY;
+}
 export function formatTabIdByUrl(url: string) {
     const id = md5(url);
     const { hostname } = new URL(url);
@@ -85,6 +89,7 @@ let Tabs: BrowserTab[] = [];
 
 export const IBrowserProvider = (props: { children: ReactNode }) => {
     const { t, i18n } = useTranslation();
+    const { onCut } = useScreenshotContext();
     const theme = useTheme();
     const { children } = props || {};
     const { showWalletAside, env } = useIAppContext();
@@ -112,33 +117,32 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
                         event.message.action,
                         event.senderWebContentsId
                     );
-                    if (event.message.action === 'onTgSiteSelectText') {
-                        const { text } = event.message.payload as { text: string };
+                    // if (event.message.action === 'onTgSiteSelectText') {
+                    //     const { text } = event.message.payload as { text: string };
 
-                        const prompt = `${t('PleaseTranslateTo').replace(
-                            '%{lang}',
-                            t(i18n.language)
-                        )}: ${text}`;
+                    //     const prompt = `${t('PleaseTranslateTo').replace(
+                    //         '%{lang}',
+                    //         t(i18n.language)
+                    //     )}: ${text}`;
 
-                        const message = {
-                            id: LLMService.genId(),
-                            tabId: currentTabId,
-                            ts: currentTs(),
-                            prompt
-                        };
-                        new WebviewMainEventService().openLLMWindow({
-                            site: 'ChatGpt',
-                            message
-                        });
-                    } else {
-                        window.dispatchEvent(
-                            new CustomEvent(`onSiteMessage_${event.senderWebContentsId}`, {
-                                detail: {
-                                    message: event.message
-                                }
-                            })
-                        );
-                    }
+                    //     const message = {
+                    //         id: LLMService.genId(),
+                    //         tabId: currentTabId,
+                    //         ts: currentTs(),
+                    //         prompt
+                    //     };
+                    //     new WebviewMainEventService().openLLMWindow({
+                    //         site: 'ChatGpt',
+                    //         message
+                    //     });
+                    // }
+                    window.dispatchEvent(
+                        new CustomEvent(`onSiteMessage_${event.senderWebContentsId}`, {
+                            detail: {
+                                message: event.message
+                            }
+                        })
+                    );
                 }
             );
         }
@@ -149,7 +153,6 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
                 BrowserTabs.set(row[0], row[1]);
             });
             setUpdateAt(currentTs());
-            setTabs();
         }
     }, []);
 
@@ -159,35 +162,37 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     const openSideWeb = (sideWeb: SideWebProps | null) => {
         setSideWeb(sideWeb);
     };
-    const setTabs = () => {
-        const tabs = Array.from(BrowserTabs)
-            .map(row => row[1])
-            .filter(row => row.tabId !== MAIN_NAV_TYPE.GAME_FI)
-            .filter(row => row.tabId !== MAIN_NAV_TYPE.DISCOVERY);
-        if (tabs.length > 0) {
-            tabs.sort((a, b) => a.ts - b.ts);
-        }
-        // Tabs = tabs;
-    };
 
+    const openTabFromWebview = (item: WebApp) => {
+        const account = getSessionCacheInfo();
+
+        const { id, url, ...item1 } = item;
+        const ts = currentTs();
+        const tabId = id ? `tab_${id}` : formatTabIdByUrl(url);
+        const tab = {
+            ...item1,
+            url,
+            tabId,
+            ts
+        };
+        if (isTelegramTab(tab) || id) {
+            new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
+        } else {
+            openTab(tabId, tab.url, tab.icon);
+        }
+    };
     const openUrl = async (url: string) => {
         const account = getSessionCacheInfo();
         if (!account) {
             ('account is null');
             return;
         }
-        const ts = currentTs();
         const tabId = formatTabIdByUrl(url);
-        const tab = {
-            tabId,
-            ts,
-            url
-        };
-
-        new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
+        openTab(tabId, url, '', '');
     };
 
     const newTab = (tab: BrowserTab) => {
+        onCut(false);
         const { tabId } = tab;
         setCurentTabId(tabId);
         showWalletAside(false);
@@ -197,7 +202,6 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
 
     const saveTab = (tabId: string, tab: BrowserTab) => {
         BrowserTabs.set(tabId, tab);
-        setTabs();
         setTimeout(async () => {
             localStorage.setItem('BrowserTabs', JSON.stringify(Array.from(BrowserTabs)));
         });
@@ -209,17 +213,19 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         setUpdateAt(currentTs());
     };
 
-    const openTab = (tabId: string | MAIN_NAV_TYPE, url?: string, icon?: string) => {
+    const openTab = (tabId: string | MAIN_NAV_TYPE, url?: string, icon?: string, name?: string) => {
         if (tabId === currentTabId) {
             return;
         }
+        onCut(false);
         let tab = BrowserTabs.get(tabId);
+        const ts = currentTs();
         if (!tab) {
-            const ts = currentTs();
             tab = {
                 tabId,
                 url,
                 icon,
+                name,
                 ts
             };
             newTab(tab);
@@ -227,9 +233,17 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
             if (url) {
                 tab = {
                     ...tab,
+                    ts,
                     tabId,
+                    name,
                     url,
                     icon
+                };
+            } else {
+                tab = {
+                    ...tab,
+                    name,
+                    ts
                 };
             }
         }
@@ -256,6 +270,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     };
     const closeTab = (tabId: string) => {
         BrowserTabs.delete(tabId);
+        onCut(false);
         const tabs = Array.from(BrowserTabs).map(row => row[1]);
         if (tabs.length === 0) {
             setCurentTabId(MAIN_NAV_TYPE.GAME_FI);
@@ -265,14 +280,13 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
             });
         } else {
             if (currentTabId === tabId) {
-                openTab(tabs[0].tabId);
+                setCurentTabId(MAIN_NAV_TYPE.DISCOVERY);
             } else {
-                setTabs();
                 setUpdateAt(currentTs());
-                setTimeout(async () => {
-                    localStorage.setItem('BrowserTabs', JSON.stringify(Array.from(BrowserTabs)));
-                });
             }
+            setTimeout(async () => {
+                localStorage.setItem('BrowserTabs', JSON.stringify(Array.from(BrowserTabs)));
+            });
         }
     };
 
@@ -288,6 +302,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
                 currentTabId,
                 newTab,
                 openTab,
+                openTabFromWebview,
                 editTab,
                 closeTab,
                 browserTabs: BrowserTabs,

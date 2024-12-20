@@ -195,7 +195,7 @@ export class MainWindow {
             ...this.getOptions(),
             x: 64,
             y:64,
-            width: 860,
+            width: 1280,
             minWidth: 380,
             height: 840,
             minHeight: 840,
@@ -206,19 +206,19 @@ export class MainWindow {
             autoHideMenuBar: true
         });
 
-        // if (flagDev) {
-        //     const pathLoadFromLocal =
-        //         process.platform === 'darwin' ? '/Users/ton/url.txt' : 'd:\\projects\\url.txt';
-        //     try {
-        //         const data = fs.readFileSync(pathLoadFromLocal, 'utf8');
-        //         console.log("pathLoadFromLocal",data)
-        //         if (data) {
-        //             this.currentUrl = data.trim();
-        //         }
-        //     } catch (err) {
-        //         console.error('Error reading file:', err);
-        //     }
-        // }
+        if (flagDev) {
+            const pathLoadFromLocal =
+                process.platform === 'darwin' ? '/Users/ton/url.txt' : 'd:\\projects\\url.txt';
+            try {
+                const data = fs.readFileSync(pathLoadFromLocal, 'utf8');
+                console.log("pathLoadFromLocal",data)
+                if (data) {
+                    this.currentUrl = data.trim();
+                }
+            } catch (err) {
+                console.error('Error reading file:', err);
+            }
+        }
         try {
             const data = fs.readFileSync(path.resolve(publicDir, 'opencv.js'), 'utf8');
             openCvData = data.trim();

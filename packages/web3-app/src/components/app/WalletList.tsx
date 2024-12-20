@@ -8,13 +8,11 @@ import {
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { PlusIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { Label2 } from '@tonkeeper/uikit/dist/components/Text';
 
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { WalletIndexBadge } from '@tonkeeper/uikit/dist/components/account/AccountBadge';
 import FormControl from '@web3-explorer/uikit-mui/dist/mui/FormControl';
-import { ExpandMoreIcon } from '@web3-explorer/uikit-mui/dist/mui/Icons';
 import Input from '@web3-explorer/uikit-mui/dist/mui/Input';
 import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import { View } from '@web3-explorer/uikit-view';
@@ -25,12 +23,10 @@ import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
 import { WalletBatchCreateNumber } from '../accounts/WalletBatchCreateNumber';
+import { AccountsPager } from '../aside/AccountsPager';
 import { AddressWithCopy } from '../wallet/AddressWithCopy';
 import { ToggleActiveAccount } from '../wallet/ToggleActiveAccount';
-import { WalletAccountsList } from '../wallet/WalletAccountsList';
 import { WalletEmoji } from '../WalletEmoji';
-import { AccountsPager } from './AccountsPager';
-import { NetworkView } from './NetworkView';
 
 const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     border-radius: ${p => p.theme.corner2xSmall};
@@ -71,11 +67,9 @@ const IconWrapper = styled.div`
     }
 `;
 
-export const AccountWalletsList = () => {
+export const WalletList = () => {
     const activeAcount = useActiveAccount();
     const accounts = useAccountsState();
-    const { openTab } = useBrowserContext();
-    const [showWaletAccountsList, setShowWaletAccountsList] = useState(activeAcount.type !== 'mam');
 
     const { t, currentTabId } = useBrowserContext();
     const [searchVal, setSearchVal] = useState('');
@@ -93,25 +87,16 @@ export const AccountWalletsList = () => {
 
     const accountMAM = activeAcount as AccountMAM;
     const { derivations, activeDerivationIndex } = accountMAM;
-    const limit = 20;
+    const limit = 16;
     const [page, setPage] = useState(Math.floor(activeDerivationIndex / limit));
-    const { showWalletAside } = useIAppContext();
+    const { onShowWalletList } = useIAppContext();
 
     const onCreateDerivation = async () => {
         setOpenSetCountDialog(true);
     };
     const theme = useTheme();
     const { showBackdrop } = useIAppContext();
-    if (showWaletAccountsList) {
-        return (
-            <WalletAccountsList
-                onBack={() => {
-                    setPage(0);
-                    setShowWaletAccountsList(false);
-                }}
-            />
-        );
-    }
+
     if (activeAcount.type !== 'mam' || accounts.length === 0) {
         return null;
     }
@@ -133,117 +118,95 @@ export const AccountWalletsList = () => {
     walletsList.sort((a, b) => a.index - b.index);
     let wallets = walletsList.slice(page * limit, (page + 1) * limit);
     return (
-        <>
-            <View px={8} flx aCenter column>
-                <View relative w100p row jSpaceBetween aCenter h={48}>
-                    <View row aCenter jStart>
-                        <View
-                            onClick={() => setShowWaletAccountsList(true)}
-                            button={activeAcount.name}
-                            buttonVariant="text"
-                            buttonStartIcon={
-                                <WalletEmoji containerSize="16px" emoji={activeAcount.emoji} />
-                            }
-                            buttonEndIcon={<ExpandMoreIcon />}
-                            px={12}
-                            sx={{
-                                '& .MuiButton-endIcon': {
-                                    ml: '4px'
-                                }
-                            }}
-                        />
-                    </View>
-                    <View rowVCenter jEnd>
-                        <NetworkView />
-                        <View
-                            hide
-                            mr={4}
-                            tips={t('close')}
-                            iconButton
-                            iconButtonSmall
-                            iconSmall
-                            iconProps={{ sx: { color: theme.textPrimary } }}
-                            icon={'Close'}
-                            onClick={() => showWalletAside(false)}
-                        />
-                        <View
-                            mr={4}
-                            tips={t('Settings')}
-                            iconButton
-                            iconButtonSmall
-                            iconSmall
-                            iconProps={{ sx: { width: 18, height: 18, color: theme.textPrimary } }}
-                            icon={'Settings'}
-                            onClick={() => {
-                                showWalletAside(false);
-                                openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
-                            }}
-                        />
-                    </View>
-                </View>
-                <View divider />
-                <View mt={2} mb={2} borderBox pl12 row jSpaceBetween aCenter w100p>
-                    <View aCenter flex1 mr={4} pb={2} mt={4}>
-                        <FormControl
-                            size="small"
-                            sx={{ pb: 0.5, borderBottom: `1px solid ${theme.separatorCommon}` }}
-                            variant="standard"
-                        >
-                            <Input
-                                disableUnderline
-                                sx={{
-                                    fontSize: '0.75rem',
-                                    '& .MuiInputBase-input': {
-                                        padding: 0
-                                    },
-                                    '& .MuiInputBase-root': {
-                                        borderBottom: `1px solid ${theme.separatorCommon}`
+        <View absFull>
+            <View
+                flx
+                aCenter
+                column
+                abs
+                top0
+                xx0
+                h={44}
+                rowVCenter
+                borderBox
+                sx={{
+                    borderBottom: `1px solid ${theme.separatorCommon}`
+                }}
+            >
+                <View mt={3} mb={2} borderBox pl12 rowVCenter jSpaceBetween aCenter w100p>
+                    <View aCenter flex1>
+                        <View text={'切换钱包'}></View>
+                        <View hide>
+                            <FormControl
+                                size="small"
+                                sx={{ pb: 0.5, borderBottom: `1px solid ${theme.separatorCommon}` }}
+                                variant="standard"
+                            >
+                                <Input
+                                    disableUnderline
+                                    sx={{
+                                        fontSize: '0.75rem',
+                                        '& .MuiInputBase-input': {
+                                            padding: 0
+                                        },
+                                        '& .MuiInputBase-root': {
+                                            borderBottom: `1px solid ${theme.separatorCommon}`
+                                        }
+                                    }}
+                                    value={searchVal}
+                                    onChange={(e: any) => {
+                                        const { value } = e.target;
+                                        if (value) {
+                                            setPage(0);
+                                        } else {
+                                            setPage(Math.floor(activeDerivationIndex / limit));
+                                        }
+                                        setSearchVal(value ? value.trim() : '');
+                                    }}
+                                    placeholder={t('Search')}
+                                    id="search_wallet_inddex"
+                                    type="search"
+                                    startAdornment={
+                                        <InputAdornment position="start">
+                                            <View icon="Search" iconSmall />
+                                        </InputAdornment>
                                     }
-                                }}
-                                value={searchVal}
-                                onChange={(e: any) => {
-                                    const { value } = e.target;
-                                    if (value) {
-                                        setPage(0);
-                                    } else {
-                                        setPage(Math.floor(activeDerivationIndex / limit));
-                                    }
-                                    setSearchVal(value ? value.trim() : '');
-                                }}
-                                placeholder={t('Search')}
-                                id="search_wallet_inddex"
-                                type="search"
-                                startAdornment={
-                                    <InputAdornment position="start">
-                                        <View icon="Search" iconSmall />
-                                    </InputAdornment>
-                                }
-                            />
-                        </FormControl>
+                                />
+                            </FormControl>
+                        </View>
                     </View>
                     <View aCenter jEnd>
-                        <View center tips={t('add_sub_wallet')} mr={3}>
-                            <IconAction isSelected={false} onClick={onCreateDerivation}>
-                                <IconWrapper>
-                                    <PlusIcon />
-                                </IconWrapper>
-                            </IconAction>
-                        </View>
+                        <View
+                            iconButtonSmall
+                            icon={'Add'}
+                            tips={t('add_sub_wallet')}
+                            onClick={onCreateDerivation}
+                        ></View>
+                        <View
+                            ml={6}
+                            mr12
+                            tips={t('close')}
+                            iconButtonSmall
+                            icon={'Close'}
+                            onClick={() => {
+                                onShowWalletList(false);
+                            }}
+                        ></View>
                     </View>
                 </View>
             </View>
-            <View pt={4} px={8} flex1 column>
+            <View px={8} borderBox py={12} flex1 column absFull top={44} bottom={44} overflowYAuto>
                 {wallets.map(wallet => {
                     const address = formatAddress(wallet.tonWallets[0].rawAddress);
                     return (
-                        <View pl={4} key={wallet.index}>
+                        <View key={wallet.index}>
                             <AsideMenuItem
                                 onClick={() => {
-                                    if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
-                                        showWalletAside(false);
-                                    }
-
                                     onClickWallet(wallet.activeTonWalletId);
+
+                                    if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
+                                        onShowWalletList(false);
+                                    }
                                 }}
                                 isSelected={activeDerivationIndex === wallet.index}
                             >
@@ -274,9 +237,11 @@ export const AccountWalletsList = () => {
                 })}
             </View>
             <View
-                borderBox
+                abs
+                xx0
+                bottom0
                 h={44}
-                pb={4}
+                borderBox
                 px={8}
                 flx
                 sx={{
@@ -326,6 +291,6 @@ export const AccountWalletsList = () => {
                     )
                 }}
             />
-        </>
+        </View>
     );
 };

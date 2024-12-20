@@ -2,6 +2,7 @@ import Typography from '@web3-explorer/uikit-mui/dist/mui/Typography';
 import { View } from '@web3-explorer/uikit-view';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { hexToRGBA } from '../common/utils';
 
 export default function ErrorWebview({
     errorDescription,
@@ -20,7 +21,7 @@ export default function ErrorWebview({
             zIdx={2}
             center
             column
-            bgColor={theme.backgroundContentAttention}
+            bgColor={hexToRGBA(theme.backgroundContent, 0.9)}
             borderRadius={8}
             overflowHidden
         >

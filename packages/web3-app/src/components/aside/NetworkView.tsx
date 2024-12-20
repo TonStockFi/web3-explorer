@@ -9,12 +9,26 @@ export const NetworkView = () => {
     const network = useActiveTonNetwork();
     const { mutate: mutateDevSettings } = useMutateDevSettings();
     const { showWalletAside } = useIAppContext();
+    const { showConfirm } = useIAppContext();
 
     return (
         <View
             onClick={() => {
-                mutateDevSettings({ tonNetwork: switchNetwork(network) });
-                showWalletAside(false);
+                showConfirm({
+                    id: 'confirm',
+                    title: '切换网络',
+                    content:
+                        network === Network.MAINNET
+                            ? '确认要切换到测试网么?'
+                            : '确认要切换到主网么?',
+                    onConfirm: () => {
+                        mutateDevSettings({ tonNetwork: switchNetwork(network) });
+                        showWalletAside(false);
+                    },
+                    onCancel: () => {
+                        showConfirm(false);
+                    }
+                });
             }}
             pointer
             tips={network === Network.TESTNET ? '切换到主网' : '切换到测试网'}

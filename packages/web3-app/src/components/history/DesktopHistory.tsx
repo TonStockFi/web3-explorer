@@ -5,8 +5,10 @@ import {
 import { SpinnerRing } from '@tonkeeper/uikit/dist/components/Icon';
 import { GenericActivity } from '@tonkeeper/uikit/dist/state/activity';
 import { MixedActivity } from '@tonkeeper/uikit/dist/state/mixedActivity';
+import { View } from '@web3-explorer/uikit-view/dist/View';
 import { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { LoadingView } from '../LoadingView';
 import { HistoryEvent } from './HistoryEvent';
 
 const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
@@ -110,26 +112,35 @@ export const DesktopHistory: FC<{
                 value={selectedActivity}
                 handleClose={() => setSelectedActivity(undefined)}
             />
-            {aggregatedActivity && (
-                <HistoryEventsGrid className={className}>
-                    <GridSizer />
-                    <GridSizer2 />
-                    <GridSizer3 />
-                    <GridSizer />
-                    {aggregatedActivity.map(group => (
-                        <HistoryEvent
-                            group={group}
-                            key={group.key}
-                            onActionClick={setSelectedActivity}
-                        />
-                    ))}
-                </HistoryEventsGrid>
+            {!aggregatedActivity && (
+                <View absFull empty>
+                    <LoadingView noBgColor loading={true} />
+                </View>
             )}
-            {(isFetchingNextPage || !activity) && (
-                <FetchingRows>
-                    <SpinnerRing />
-                </FetchingRows>
-            )}
+            <View abs xx0 top={240} bottom={6} overflowYAuto>
+                <View px12 borderBox>
+                    {aggregatedActivity && (
+                        <HistoryEventsGrid className={className}>
+                            <GridSizer />
+                            <GridSizer2 />
+                            <GridSizer3 />
+                            <GridSizer />
+                            {aggregatedActivity.map(group => (
+                                <HistoryEvent
+                                    group={group}
+                                    key={group.key}
+                                    onActionClick={setSelectedActivity}
+                                />
+                            ))}
+                        </HistoryEventsGrid>
+                    )}
+                    {(isFetchingNextPage || !activity) && (
+                        <FetchingRows>
+                            <SpinnerRing />
+                        </FetchingRows>
+                    )}
+                </View>
+            </View>
         </>
     );
 };

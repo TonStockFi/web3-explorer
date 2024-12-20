@@ -2,6 +2,15 @@ export function getPartitionKey(key: string) {
     return `persist:${key}`;
 }
 
+export const getSessionCacheInfo = (key?: string) => {
+    const res = sessionStorage.getItem(key || 'currentAccount');
+    if (res) {
+        return JSON.parse(res);
+    } else {
+        return null;
+    }
+};
+
 export function getUrlIsDev(){
     const uri = new URL(location.href);
     const isDev = !!uri.searchParams.get('isDev');

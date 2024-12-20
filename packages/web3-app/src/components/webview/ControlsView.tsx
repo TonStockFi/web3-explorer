@@ -60,14 +60,13 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
         });
     };
     useEffect(() => {
-        window.backgroundApi.onMainMessage(async (e: any) => {
-            const { action, payload, webContentsId } = e;
+        async function onMainMessage(e: any) {
+            const { action, payload, webContentsId } = e.detail;
             if (action === 'onContextMenu') {
                 const tabId = getTabIdByWebviewContentsId(webContentsId);
                 if (!tabId) {
                     return;
                 }
-
                 onContextMenu({ payload, webContentsId });
             }
             if (e.action === 'onShortcut') {
@@ -89,28 +88,25 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                     const text = await getFocusWebviewSelection(_currentTabId);
                     setFindInPage({ text });
                 }
-
-                // if (e.payload.key === 'CommandOrControl+W') {
-                //     if (_currentTabId) {
-                //         closeTab(_currentTabId);
-                //     }
-                // }
                 if (e.payload.key === 'Escape') {
                     setFindInPage(null);
                     setContextMenu(null);
                     onCut(false);
                 }
             }
-        });
+        }
+
         function handleOnWebviewContextMenu(e: any) {
             const { detail } = e;
             console.log('handleOnWebviewContextMenu', detail);
             const { params, webContentsId, tabId } = detail;
             onContextMenu({ payload: params, webContentsId, tabId });
         }
+        window.addEventListener('onMainMessage', onMainMessage);
         window.addEventListener('onWebviewContextMenu', handleOnWebviewContextMenu);
         return () => {
             window.removeEventListener('onWebviewContextMenu', handleOnWebviewContextMenu);
+            window.removeEventListener('onMainMessage', onMainMessage);
         };
     }, []);
 

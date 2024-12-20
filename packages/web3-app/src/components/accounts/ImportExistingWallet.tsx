@@ -137,7 +137,7 @@ export const ImportExistingWallet: FC<{ onClose?: () => void; afterCompleted?: (
                 abs
                 left={env.isMac ? undefined : 24}
                 right={env.isMac ? 24 : undefined}
-                top0
+                top={20}
                 mt12
             >
                 <View

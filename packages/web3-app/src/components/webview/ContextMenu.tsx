@@ -6,13 +6,14 @@ import React, { createRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { currentTs } from '../../common/utils';
+import { isDiscoverTab } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import LLMGeminiService from '../../services/LLMGeminiService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
-import { ContextMenuProps, MAIN_NAV_TYPE } from '../../types';
+import { ContextMenuProps } from '../../types';
 import { getFocusWebview, getTabIdByWebviewContentsId } from './WebViewBrowser';
 
 export default function ContextMenu({
@@ -60,12 +61,10 @@ export default function ContextMenu({
             }
         }
     };
+    const isDiscover = tabId && isDiscoverTab(tabId);
     // console.log('contextMenu >>', contextMenu, tabId, selectionText);
     if (!env.isDev) {
         if (!tabId) {
-            return null;
-        }
-        if (tabId === MAIN_NAV_TYPE.GAME_FI || tabId === MAIN_NAV_TYPE.DISCOVERY) {
             return null;
         }
     }
@@ -219,6 +218,7 @@ export default function ContextMenu({
                     />
                 </View>
                 <View
+                    hide={Boolean(isDiscover && !env.isDev)}
                     menuItem
                     onClick={() => {
                         if (webview) {

@@ -2,7 +2,7 @@ import { View } from '@web3-explorer/uikit-view';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
 import { useAccountInfo } from '../../hooks/wallets';
-import { BrowserTab, formatTabIdByUrl, useBrowserContext } from '../../providers/BrowserProvider';
+import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 
 import { getDiscoverHost } from '../../common/helpers';
@@ -13,18 +13,10 @@ import WebviewService from '../../services/WebviewService';
 import { InitConfig, MAIN_NAV_TYPE, WebApp } from '../../types';
 import { LoadingView } from '../LoadingView';
 
-import WebviewMainEventService from '../../services/WebviewMainEventService';
+import { useScreenshotContext } from '../../providers/ScreenshotProvider';
+import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
-
-export const getSessionCacheInfo = (key?: string) => {
-    const res = sessionStorage.getItem(key || 'currentAccount');
-    if (res) {
-        return JSON.parse(res);
-    } else {
-        return null;
-    }
-};
 
 export function WebviewDiscoverApps({
     winId,
@@ -34,14 +26,16 @@ export function WebviewDiscoverApps({
     tabId: string;
 }) {
     const isGames = winId === 'Games';
+    const { isCutEnable } = useScreenshotContext();
     const { env } = useIAppContext();
-    const { theme, currentTabId, onChangeLeftSideActions, browserTabs } = useBrowserContext();
+    const { theme, openTabFromWebview, currentTabId, onChangeLeftSideActions, browserTabs } =
+        useBrowserContext();
     let tab: BrowserTab | undefined = browserTabs.get(tabId);
 
     if (!tab) {
         tab = { tabId: tabId, ts: currentTs() };
     }
-
+    const isSelected = currentTabId === tabId;
     const [loading, setLoading] = useState<boolean>(true);
     const { updateProPlans } = usePro();
     const { name, emoji, index, id, address } = useAccountInfo();
@@ -73,19 +67,8 @@ export function WebviewDiscoverApps({
         }
 
         if (action === 'onOpenTab') {
-            const account = getSessionCacheInfo();
             const { item } = payload as { item: WebApp };
-            const { id, url, ...item1 } = item;
-            const ts = currentTs();
-            const tabId = id ? `tab_${id}` : formatTabIdByUrl(url);
-            const tab = {
-                ...item1,
-                url,
-                tabId,
-                ts
-            };
-
-            new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
+            openTabFromWebview(item);
         }
     };
 
@@ -104,7 +87,6 @@ export function WebviewDiscoverApps({
             <View abs xx0 top0 borderBox w100p h={44} px={12} aCenter row jSpaceBetween>
                 <View aCenter jStart flex1>
                     <WebviewTopBar
-                        urlReadOnly
                         hideOpenInNew
                         tab={{
                             ...tab!,
@@ -120,7 +102,7 @@ export function WebviewDiscoverApps({
                 overflowHidden
                 right={8}
                 left={8}
-                bottom={0}
+                bottom={8}
                 top={44}
                 borderBox
             >
@@ -147,6 +129,7 @@ export function WebviewDiscoverApps({
                     setLoading={(loading: boolean) => setLoading(loading)}
                 />
             </View>
+            {Boolean(isCutEnable && isSelected) && <ScreenshotView tabId={currentTabId} />}
         </View>
     );
 }

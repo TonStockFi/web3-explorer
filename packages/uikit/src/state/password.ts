@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
-import { QueryKey } from '../libs/queryKey';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { useTranslation } from '../hooks/translation';
+import { QueryKey } from '../libs/queryKey';
 
 export const useLookScreen = () => {
     const sdk = useAppSdk();

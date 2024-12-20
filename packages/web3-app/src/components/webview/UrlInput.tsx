@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { isValidDomain } from '../../common/utils';
 import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import WebviewService from '../../services/WebviewService';
-import { MAIN_NAV_TYPE } from '../../types';
 
 export function UrlInput({
     isDiscover,
@@ -18,7 +17,7 @@ export function UrlInput({
     currentUrl?: string;
     tab?: BrowserTab;
 }) {
-    const { t, openUrl, editTab, theme } = useBrowserContext();
+    const { t, openTabFromWebview, theme } = useBrowserContext();
     const inputRef = useRef<HTMLInputElement>(null);
     let isHttps = undefined;
     if (currentUrl) {
@@ -42,39 +41,49 @@ export function UrlInput({
                 }
                 if (e.key === 'Enter') {
                     let newUrl = urlEdit;
-                    if (!newUrl) {
+                    if (!newUrl || newUrl.trim() === currentUrl) {
+                        if (tab?.tabId) {
+                            new WebviewService(tab?.tabId).reloadWebview();
+                        }
                         return;
                     }
                     newUrl = newUrl.trim();
-                    if (!newUrl.startsWith('http') && !newUrl.startsWith('chrome://')) {
+                    if (newUrl.startsWith('chrome://')) {
+                        return;
+                    }
+                    if (!newUrl.startsWith('http')) {
                         if (isValidDomain(newUrl)) {
                             newUrl = `https://${newUrl}`;
                         } else {
                             const url = `https://bing.com/search?q=${encodeURIComponent(newUrl)}`;
                             // `https://www.google.com/search?q=${encodeURIComponent(newUrl)}`
-                            openUrl(url);
+                            openTabFromWebview({
+                                url,
+                                name: '',
+                                description: '',
+                                icon: ''
+                            });
+                            if (currentUrl) {
+                                setUrlEdit(currentUrl);
+                            }
+
                             return;
                         }
                     }
-                    if (!tab) {
-                        openUrl(newUrl);
-                    } else {
-                        if (!tab.url) {
-                            editTab({
-                                ...tab,
-                                url: newUrl
-                            });
-                        } else {
-                            new WebviewService(tab.tabId).goTo(newUrl);
-                        }
+                    openTabFromWebview({
+                        url: newUrl,
+                        name: '',
+                        description: '',
+                        icon: ''
+                    });
+
+                    if (currentUrl) {
+                        setUrlEdit(currentUrl);
                     }
                 }
             }}
             onFocus={e => {
                 setTimeout(() => {
-                    if (tab?.tabId === MAIN_NAV_TYPE.GAME_FI) {
-                        return;
-                    }
                     const input = e.target;
                     input.select();
                 }, 200);

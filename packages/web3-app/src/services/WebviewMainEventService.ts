@@ -24,7 +24,8 @@ import { currentTs, getPartitionKey } from '../common/utils';
 import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
-import { AccountPublic, RoiInfo, SUB_WIN_ID, WinControlType } from '../types';
+import { isTelegramTab } from '../providers/PlaygroundProvider';
+import { AccountPublic, MainMessageEvent, RoiInfo, SUB_WIN_ID, WinControlType } from '../types';
 import LLMService, { MessageLLM } from './LLMService';
 
 const colors = [
@@ -56,40 +57,32 @@ function getTopColor(index: number) {
     return topColor;
 }
 
+
 export default class WebviewMainEventService {
     static checkCacheMessage(
         action: string,
         payload?: Record<string, any>,
-        CacheMessage?: Map<number, boolean>
     ) {
-        if (CacheMessage) {
-            if (payload?.__msg_id) {
-                const flag = CacheMessage.has(payload.__msg_id);
-                if (flag) {
-                    return false;
-                }
-                CacheMessage.set(payload.__msg_id, true);
+        if (payload?.__msg_id) {
+            const flag = sessionStorage.getItem(payload.__msg_id)
+            console.log("__msg_id",payload.__msg_id,flag)
+            if (flag) {
+                return false;
             }
+            sessionStorage.setItem(payload.__msg_id,"true")
         }
-
         if (['accountsPublic', 'onBlur', 'onFocus'].indexOf(action) === -1) {
-            console.debug('> _ET onMainMessage', action, payload);
+            console.debug('> _ET onMainMessage', action);
         }
         return true;
     }
     static onMainMessage(
-        cb: ({
-            action,
-            payload
-        }: {
-            action: string;
-            payload?: Record<string, any>;
-        }) => Promise<void>
+        cb: (e: MainMessageEvent) => Promise<void>
     ) {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(
-                async ({ action, payload }: { action: string; payload?: Record<string, any> }) => {
-                    await cb({ action, payload });
+                async (e: MainMessageEvent) => {
+                    await cb(e);
                 }
             );
     }
@@ -226,7 +219,6 @@ export default class WebviewMainEventService {
     async openLLMWindow(sideWeb?: SideWebProps, message?: Partial<MessageLLM>) {
         const uri = new URL(location.href);
         const isDev = !!uri.searchParams.get('isDev');
-
         const url = `${getDiscoverHost(isDev)}#${SUB_WIN_ID.LLM}`;
         const width = 420;
         const height = 860;
@@ -305,7 +297,7 @@ export default class WebviewMainEventService {
 
         const {width:winWidth} = window.screen
 
-        const minWidth = twa ? 368 : 368 * 3;
+        const minWidth = isTelegramTab(tab) ? 368 : 368 * 3;
         let height = PLAYGROUND_WIN_HEIGHT;
         let x = winWidth - minWidth - 12;
         let y = 12;
@@ -427,8 +419,8 @@ export default class WebviewMainEventService {
     }
     async waitForIsWinReady(
         winId: SUB_WIN_ID | string,
-        timeout: number = 0,
-        interval: number = 100
+        timeout: number = 60000,
+        interval: number = 500
     ) {
         const startTime = Date.now();
 

@@ -1,8 +1,7 @@
 import { useBrowserContext } from '../providers/BrowserProvider';
-import { PayCommentOrder, SendTransferPayload } from '../types';
+import { MainMessageEvent, Network, PayCommentOrder, SendTransferPayload } from '../types';
 
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useMutateDevSettings } from '@tonkeeper/uikit/dist/state/dev';
@@ -15,15 +14,17 @@ import {
 import { useEffect, useState } from 'react';
 import { onAction } from '../common/electron';
 import { genId } from '../common/helpers';
-import { currentTs } from '../common/utils';
+import { currentTs, getSessionCacheInfo } from '../common/utils';
 import { useAccountInfo, usePublicAccountsInfo } from '../hooks/wallets';
+import { useIAppContext } from '../providers/IAppProvider';
 import { usePro } from '../providers/ProProvider';
 import PayCommentOrderService from '../services/PayCommentOrderService';
 import ProService from '../services/ProService';
+import WebviewMainEventService from '../services/WebviewMainEventService';
 import { PayCommentOrderBackgroundPage } from './webview-background/PayCommentOrderBackgroundPage';
-import { getSessionCacheInfo } from './webview/WebviewDiscoverApps';
 
 export function MainMessageDispatcher() {
+    const { onShowWallet } = useIAppContext();
     const { onShowProBuyDialog, checkPayCommentOrder, onCheckPayCommentOrder } = usePro();
     const { openUrl, openTab } = useBrowserContext();
     const accounts = usePublicAccountsInfo();
@@ -75,138 +76,163 @@ export function MainMessageDispatcher() {
         };
     }, []);
     useEffect(() => {
-        window.backgroundApi &&
-            window.backgroundApi.onMainMessage(async (e: any) => {
-                if (e.action === 'openMainTab') {
-                    let { tabId } = e.payload as {
-                        tabId: string;
-                    };
-                    openTab(tabId);
-                }
-                if (e.action === 'getNetwork') {
-                    let { fromWinId } = e.payload as {
-                        fromWinId: string;
-                    };
-                    const { network } = getSessionCacheInfo('cacheInfo');
-                    onAction('subWin', {
-                        toWinId: fromWinId,
-                        action: 'onGetNetwork',
-                        payload: {
-                            network
-                        }
-                    });
-                }
-                if (e.action === 'getConnectedApps') {
-                    const { connections } = getSessionCacheInfo('cacheInfo');
-                    let { fromWinId } = e.payload as {
-                        fromWinId: string;
-                    };
-                    console.log('getPayCommentOrder', fromWinId);
-                    onAction('subWin', {
-                        toWinId: fromWinId,
-                        action: 'onGetConnectedApps',
-                        payload: {
-                            connections: connections || []
-                        }
-                    });
-                }
-                if (e.action === 'getPayCommentOrder') {
-                    let { payCommentOrderId, fromWinId } = e.payload as {
-                        payCommentOrderId: string;
-                        fromWinId: string;
-                    };
-                    console.log('getPayCommentOrder', payCommentOrderId);
-                    const order = await new PayCommentOrderService().get(payCommentOrderId);
-                    if (!order?.isOk) {
-                        window.dispatchEvent(new CustomEvent('finishPay', {}));
-                    } else {
-                        onCheckPayCommentOrder(false);
+        WebviewMainEventService.onMainMessage(async (e: MainMessageEvent) => {
+            if (!WebviewMainEventService.checkCacheMessage(e.action, e.payload)) {
+                return;
+            }
+            const { action, payload, webContentsId } = e;
+            window.dispatchEvent(
+                new CustomEvent('onMainMessage', {
+                    detail: {
+                        action,
+                        payload,
+                        webContentsId
                     }
-                    onAction('subWin', {
-                        toWinId: fromWinId,
-                        action: 'onGetPayCommentOrder',
-                        payload: {
-                            order
-                        }
-                    });
-                }
-                if (e.action === 'delPayCommentOrder') {
-                    let { payCommentOrderId } = e.payload as {
-                        payCommentOrderId: string;
-                    };
-                    await new PayCommentOrderService().remove(payCommentOrderId);
-                }
-                if (e.action === 'onSendTransfer') {
-                    let { address, amount, comment, winId, mainNet, jetton, needPayOrder } =
-                        e.payload as SendTransferPayload;
-                    if (mainNet) {
-                        mutateDevSettings({ tonNetwork: Network.MAINNET });
-                    }
-                    if (!jetton) {
-                        jetton = 'TON';
-                    }
-                    if (needPayOrder && comment) {
-                        setPayCommentOrder({
-                            id: genId(),
-                            winId,
-                            symbol: jetton,
-                            amount: String(amount),
-                            address,
-                            ts: currentTs(),
-                            comment
-                        });
-                    } else {
-                        setPayCommentOrder(null);
-                    }
+                })
+            );
 
-                    const amount1 = String(format(String(amount * 1000000000)));
-
-                    sendTransfer({
-                        transfer: {
-                            address,
-                            amount: amount1,
-                            text: comment || '',
-                            jetton
-                        },
-                        asset: jetton
+            if (e.action === 'openWallet') {
+                let { visible } = e.payload as {
+                    visible: boolean;
+                };
+                onShowWallet(visible);
+            }
+            if (e.action === 'openMainTabUrl') {
+                let { url } = e.payload as {
+                    url: string;
+                };
+                openUrl(url);
+            }
+            if (e.action === 'openMainTab') {
+                let { tabId } = e.payload as {
+                    tabId: string;
+                };
+                openTab(tabId);
+            }
+            if (e.action === 'getNetwork') {
+                let { fromWinId } = e.payload as {
+                    fromWinId: string;
+                };
+                const { network } = getSessionCacheInfo('cacheInfo');
+                onAction('subWin', {
+                    toWinId: fromWinId,
+                    action: 'onGetNetwork',
+                    payload: {
+                        network
+                    }
+                });
+            }
+            if (e.action === 'getConnectedApps') {
+                const { connections } = getSessionCacheInfo('cacheInfo');
+                let { fromWinId } = e.payload as {
+                    fromWinId: string;
+                };
+                console.log('getPayCommentOrder', fromWinId);
+                onAction('subWin', {
+                    toWinId: fromWinId,
+                    action: 'onGetConnectedApps',
+                    payload: {
+                        connections: connections || []
+                    }
+                });
+            }
+            if (e.action === 'getPayCommentOrder') {
+                let { payCommentOrderId, fromWinId } = e.payload as {
+                    payCommentOrderId: string;
+                    fromWinId: string;
+                };
+                console.log('getPayCommentOrder', payCommentOrderId);
+                const order = await new PayCommentOrderService().get(payCommentOrderId);
+                if (!order?.isOk) {
+                    window.dispatchEvent(new CustomEvent('finishPay', {}));
+                } else {
+                    onCheckPayCommentOrder(false);
+                }
+                onAction('subWin', {
+                    toWinId: fromWinId,
+                    action: 'onGetPayCommentOrder',
+                    payload: {
+                        order
+                    }
+                });
+            }
+            if (e.action === 'delPayCommentOrder') {
+                let { payCommentOrderId } = e.payload as {
+                    payCommentOrderId: string;
+                };
+                await new PayCommentOrderService().remove(payCommentOrderId);
+            }
+            if (e.action === 'onSendTransfer') {
+                let { address, amount, comment, winId, mainNet, jetton, needPayOrder } =
+                    e.payload as SendTransferPayload;
+                if (mainNet) {
+                    mutateDevSettings({ tonNetwork: Network.MAINNET });
+                }
+                if (!jetton) {
+                    jetton = 'TON';
+                }
+                if (needPayOrder && comment) {
+                    setPayCommentOrder({
+                        id: genId(),
+                        winId,
+                        symbol: jetton,
+                        amount: String(amount),
+                        address,
+                        ts: currentTs(),
+                        comment
                     });
+                } else {
+                    setPayCommentOrder(null);
                 }
-                if (e.action === 'onPayPro') {
-                    onShowProBuyDialog(true);
-                }
-                if (e.action === 'changeAccount') {
-                    const { accountIndex } = e.payload;
-                    if (activeAcount.type === 'mam') {
-                        const { derivations } = activeAcount as AccountMAM;
-                        const account = derivations.find(row => row.index === accountIndex);
-                        if (account) {
-                            setActiveAccount(account.activeTonWalletId);
-                        }
+
+                const amount1 = String(format(String(amount * 1000000000)));
+
+                sendTransfer({
+                    transfer: {
+                        address,
+                        amount: amount1,
+                        text: comment || '',
+                        jetton
+                    },
+                    asset: jetton
+                });
+            }
+            if (e.action === 'onPayPro') {
+                onShowProBuyDialog(true);
+            }
+            if (e.action === 'changeAccount') {
+                const { accountIndex } = e.payload!;
+                if (activeAcount.type === 'mam') {
+                    const { derivations } = activeAcount as AccountMAM;
+                    const account = derivations.find(row => row.index === accountIndex);
+                    if (account) {
+                        setActiveAccount(account.activeTonWalletId);
                     }
                 }
+            }
 
-                if (e.action === 'openTab') {
-                    openUrl(e.payload.url);
-                }
-                if (e.action === 'getProInfo') {
-                    const proInfoList = await new ProService(accountId).getAll();
-                    onAction('subWin', {
-                        toWinId: e.fromWinId,
-                        action: 'updateProInfo',
-                        payload: {
-                            proInfoList
-                        }
-                    });
-                }
-                if (e.action === 'getAccountsPublic') {
-                    onAction('subWin', {
-                        fromWinId: 'main',
-                        toWinId: e.fromWinId,
-                        action: 'accountsPublic',
-                        payload: { accounts }
-                    });
-                }
-            });
+            if (e.action === 'openTab') {
+                openUrl(e.payload!.url);
+            }
+            if (e.action === 'getProInfo') {
+                const proInfoList = await new ProService(accountId).getAll();
+                onAction('subWin', {
+                    toWinId: e.fromWinId!,
+                    action: 'updateProInfo',
+                    payload: {
+                        proInfoList
+                    }
+                });
+            }
+            if (e.action === 'getAccountsPublic') {
+                onAction('subWin', {
+                    fromWinId: 'main',
+                    toWinId: e.fromWinId,
+                    action: 'accountsPublic',
+                    payload: { accounts }
+                });
+            }
+        });
     }, []);
 
     return <>{checkPayCommentOrder && <PayCommentOrderBackgroundPage />}</>;

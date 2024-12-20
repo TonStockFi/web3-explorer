@@ -10,7 +10,9 @@ import { HomHeaderHeight, SiderBarWidth } from '../constant';
 import { FavorProvider } from '../providers/FavorProvider';
 import { useIAppContext } from '../providers/IAppProvider';
 
+import { ChainListView } from '../components/app/ChainListView';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
+import { WalletView } from '../components/app/WalletView';
 import { MainMessageDispatcher } from '../components/MainMessageDispatcher';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
@@ -59,6 +61,8 @@ function Pages() {
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.FAVOR}>
                 <BrowserFavorPage />
             </View>
+            <WalletView />
+            <ChainListView />
         </>
     );
 }
@@ -126,19 +130,19 @@ export const Web3AppInner = () => {
 export const Web3App = () => {
     return (
         <ProProvider>
-            <IBrowserProvider>
-                <FavorProvider>
-                    <PlaygroundProvider>
-                        <RecognitionProvider>
-                            <ScreenshotProvider>
+            <ScreenshotProvider>
+                <IBrowserProvider>
+                    <FavorProvider>
+                        <PlaygroundProvider>
+                            <RecognitionProvider>
                                 <Web3AppThemeWrpper>
                                     <Web3AppInner />
                                 </Web3AppThemeWrpper>
-                            </ScreenshotProvider>
-                        </RecognitionProvider>
-                    </PlaygroundProvider>
-                </FavorProvider>
-            </IBrowserProvider>
+                            </RecognitionProvider>
+                        </PlaygroundProvider>
+                    </FavorProvider>
+                </IBrowserProvider>
+            </ScreenshotProvider>
         </ProProvider>
     );
 };

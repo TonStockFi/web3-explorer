@@ -1,6 +1,7 @@
 import { ConfirmationDialogProps } from '@web3-explorer/uikit-view/dist/View/types';
-import { useLocalStorageState } from '@web3-explorer/utils';
+import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { CHAIN } from '../types';
 
 interface SnackbarProps {
     message: string;
@@ -30,15 +31,23 @@ interface AppContextType {
     env: AppEnv;
     isFullScreen: boolean;
     selectedToken: string;
-    showWalletAside: (v: boolean) => void;
     isMacNotFullScreen: boolean;
-    onSelectToken: (v: string | 'ton') => void;
+    showWalletList: boolean;
     walletAside: boolean;
+    showWallet: boolean;
+    showChainList: boolean;
+    currentChainCode: CHAIN;
     windowSize: { width: number; height: number };
     alert: undefined | AlertProps;
     confirm: undefined | ConfirmationDialogProps;
     backdrop: boolean;
     snackbar: undefined | { message: string };
+    showWalletAside: (v: boolean) => void;
+    onShowWalletList: (v: boolean) => void;
+    onShowWallet: (v: boolean) => void;
+    onSelectToken: (v: string | 'ton') => void;
+    onShowChainList: (v: boolean) => void;
+    onChangeCurrentChainCode: (v: CHAIN) => void;
     showBackdrop: (visible: boolean) => void;
     showSnackbar: (snackbar: boolean | SnackbarProps) => void;
     showAlert: (alert: AlertProps | boolean) => void;
@@ -51,7 +60,14 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
 
     const [selectedToken, setSelectedToken] = useLocalStorageState('selected_token', '');
-    const [walletAside, setWalletAside] = useLocalStorageState('ui_walletAside', false);
+    const [currentChainCode, setCurrentChainCode] = useLocalStorageState(
+        'currentChainCode',
+        CHAIN.TON
+    );
+    const [walletAside, setWalletAside] = useSessionStorageState('ui_walletAside', false);
+    const [showWallet, setShowWallet] = useSessionStorageState('showWallet', false);
+    const [showChainList, setShowChainList] = useSessionStorageState('showChainList', false);
+    const [showWalletList, setShowWalletList] = useSessionStorageState('showWalletList', false);
     const [backdrop, setBackdrop] = useState(false);
     const [snackbar, setSnackbar] = useState<undefined | SnackbarProps>(undefined);
     const [alert, setAlert] = useState<undefined | AlertProps>(undefined);
@@ -75,8 +91,14 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     });
 
     const onSelectToken = (token: string | 'ton') => setSelectedToken(token);
-
+    const onChangeCurrentChainCode = (v: CHAIN) => setCurrentChainCode(v);
+    const onShowWallet = (visible: boolean) => {
+        onShowWalletList(false);
+        setShowWallet(visible);
+    };
     const showWalletAside = (visible: boolean) => setWalletAside(visible);
+    const onShowWalletList = (visible: boolean) => setShowWalletList(visible);
+    const onShowChainList = (visible: boolean) => setShowChainList(visible);
     const showBackdrop = (visible: boolean) => setBackdrop(visible);
     const showSnackbar = (v: boolean | SnackbarProps) =>
         setSnackbar(v ? (v as SnackbarProps) : undefined);
@@ -142,6 +164,14 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
+                onChangeCurrentChainCode,
+                currentChainCode,
+                onShowChainList,
+                showChainList,
+                onShowWalletList,
+                showWalletList,
+                onShowWallet,
+                showWallet,
                 env,
                 isMacNotFullScreen,
                 showConfirm,

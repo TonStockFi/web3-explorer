@@ -1,4 +1,4 @@
-import { MAIN_NAV_TYPE, MainNavListItem, ProPlan } from './types';
+import { CHAIN, ChainListItem, MAIN_NAV_TYPE, MainNavListItem, ProPlan } from './types';
 export const PRO_RECV_ADDRESS="UQAonoXuQ_1WzZhwbuoIHYFwBqkVCmZSf-yr0DQ1uhnIz53g"
 
 export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdYGAl8I2,0|TK1z-z7apmAbgW_o6toLWx1T,0"
@@ -65,6 +65,39 @@ export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;
 export const WEBVIEW_BORDERRADIUS = 8;
 export const BG_COLOR_ACE = "#272822";
 
+
+export const ChainsList : ChainListItem[] = [
+    {
+        icon: 'https://wallet.tonkeeper.com/img/toncoin.svg',
+        name: 'TON',
+        chain: CHAIN.TON,
+    },
+    {
+        icon: 'https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400',
+        name: 'BTC',
+        chain: CHAIN.BTC,
+    },
+    {
+        icon: 'https://assets.coingecko.com/coins/images/279/standard/ethereum.png?1696501628',
+        name: 'ETH',
+        chain: CHAIN.ETH,
+    },
+    {
+        icon: 'https://assets.coingecko.com/coins/images/825/standard/bnb-icon2_2x.png?1696501970',
+        name: 'BNB',
+        chain: CHAIN.BNB,
+    },
+    {
+        icon: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756',
+        name: 'SOL',
+        chain: CHAIN.SOL,
+    },
+    {
+        icon: 'https://assets.coingecko.com/coins/images/26375/standard/sui-ocean-square.png?1727791290',
+        name: 'SUI',
+        chain: CHAIN.SUI,
+    }
+]
 export const LeftSideActions : MainNavListItem[] = [
     {
         icon: 'BubbleChart',
@@ -74,24 +107,24 @@ export const LeftSideActions : MainNavListItem[] = [
         side: true
     }
 ]
+
 export const MainNavList : MainNavListItem[] = [
     {
         name: 'Games',
         tabId: MAIN_NAV_TYPE.GAME_FI,
         icon: 'SportsEsports',
-        side: true
+        side: false
     },
     {
         name: 'aside_discover',
         tabId: MAIN_NAV_TYPE.DISCOVERY,
         icon: 'Explore',
-        side: true
+        side: false
     },
     {
         name: 'wallet_title',
         tabId: MAIN_NAV_TYPE.WALLET,
         icon: 'AccountBalanceWallet',
-        side: true
     },
     {
         name: 'Favor',

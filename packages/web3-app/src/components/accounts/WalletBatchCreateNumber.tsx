@@ -62,7 +62,7 @@ export const WalletBatchCreateNumber: FC<{
                 abs
                 left={env.isMac ? undefined : 24}
                 right={env.isMac ? 24 : undefined}
-                top0
+                top={20}
                 mt12
             >
                 <View

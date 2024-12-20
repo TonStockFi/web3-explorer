@@ -1,7 +1,7 @@
 {
     "name": "@web3-explorer/desktop",
     "license": "Apache-2.0",
-    "version": "1.0.60",
+    "version": "1.0.61",
     "description": "web3-explorer desktop",
     "main": ".webpack/main",
     "repository": {
@@ -14,10 +14,10 @@
         "start1": "yarn fix1 && BUILD=false electron-forge start",
         "package": "electron-forge package",
         "make": "yarn fix2 && electron-forge make",
-        "make:mac": "DEBUG='electron-forge:*' electron-forge make --platform=darwin",
-        "make:arm": "electron-forge make --arch=arm64",
-        "make:intel": "electron-forge make --arch=x64",
-        "make:universal": "electron-forge make --arch=universal",
+        "make:mac": "yarn fix2 && DEBUG='electron-forge:*' electron-forge make --platform=darwin",
+        "make:arm64": "yarn fix2 && electron-forge make --arch=arm64",
+        "make:x64": "yarn fix2 && electron-forge make --arch=x64",
+        "make:universal": "yarn fix2 && electron-forge make --arch=universal",
         "lint": "eslint --ext .ts,.tsx .",
         "fix1": "echo \"location.href = 'http://localhost:3173';\nexport const App = () => { return <div/>;};\" > ./src/app/App.tsx",
         "fix2": "echo \"export { App } from '@web3-explorer/app/dist/src/desktop/App';\" > ./src/app/App.tsx",

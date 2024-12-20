@@ -308,9 +308,7 @@ export interface RoiInfo {
     name?: string;
     priority: number;
     jsCode?: string;
-    periodSecond?: boolean;
     type?: 'task' | 'reco' | string;
-    crontab?: string;
     action?: 'click' | 'invokeCode' | 'cron' | string;
     icon?: string;
     extensionId?: string;
@@ -444,4 +442,26 @@ export enum WinControlType {
     ALL = 'ALL',
     CURRENT_APP = 'CURRENT_APP',
     CURRENT_ACCOUNT = 'CURRENT_ACCOUNT',
+}
+
+export enum CHAIN {
+    TON = 'TON',
+    ETH = 'ETH',
+    BNB = 'BNB',
+    SOL = 'SOL',
+    SUI = 'SUI',
+    BTC = 'BTC',
+}
+
+export interface ChainListItem {
+    chain :CHAIN,
+    name:string,
+    icon:string
+}
+
+export interface MainMessageEvent{
+    action: string;
+    webContentsId?: Number;
+    fromWinId?: string;
+    payload?: Record<string, any>;
 }

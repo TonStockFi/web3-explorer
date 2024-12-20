@@ -2,7 +2,9 @@ import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useActiveAccount, useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
-import { AsideWidth } from '../../constant';
+import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
+import { useTranslation } from 'react-i18next';
+import { AsideWidth, ChainsList } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { AsideMenu } from '../aside/AsideMenu';
@@ -10,11 +12,11 @@ import { WalletEmoji } from '../WalletEmoji';
 
 export const WalletSide = () => {
     const account = useActiveAccount();
+    const { currentChainCode } = useIAppContext();
     let accountEmoji = account.emoji;
     let accountTitle = `${account.name}`;
-    const { walletAside, showWalletAside } = useIAppContext();
+    const { walletAside, showWalletAside, onShowChainList, onShowWallet } = useIAppContext();
     const { theme } = useBrowserContext();
-    const { env } = useIAppContext();
     const network = useActiveTonNetwork();
 
     if (account.type === 'mam') {
@@ -27,10 +29,31 @@ export const WalletSide = () => {
             accountTitle = `${name}`;
         }
     }
-
+    const { t } = useTranslation();
+    const currentChain = ChainsList.find(row => row.chain === currentChainCode);
     return (
-        <View center w100p h100p>
+        <View center w100p h100p relative>
             <View
+                iconButtonSmall
+                onClick={() => onShowChainList(true)}
+                tips={currentChain?.name}
+                icon={<ImageIcon size={20} icon={currentChain?.icon!} />}
+            ></View>
+            <View
+                iconButtonSmall
+                onClick={() => onShowWallet(true)}
+                tips={t('wallet_title')}
+                icon={'AccountBalanceWallet'}
+            ></View>
+            <View
+                tips={t('切换账户')}
+                onClick={() => showWalletAside(true)}
+                sx={{ '& svg': { zoom: 1.5 } }}
+                iconButtonSmall
+                icon={'AiOutlineUserSwitch'}
+            ></View>
+            <View
+                hide
                 hoverBgColor={theme.backgroundContentAttention}
                 bgColor={network === Network.TESTNET ? 'red' : theme.backgroundContentTint}
                 center

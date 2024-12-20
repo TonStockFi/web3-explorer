@@ -1,4 +1,4 @@
-import { KeyIcon, PencilIcon } from '@tonkeeper/uikit/dist/components/Icon';
+import { KeyIcon, PencilIcon, PlusIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { useDeleteAccountNotification } from '@tonkeeper/uikit/dist/components/modals/DeleteAccountNotificationControlled';
 import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals/RecoveryNotificationControlled';
 import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
@@ -17,7 +17,12 @@ const ButtonsContainer = styled.div`
     gap: 8px;
 `;
 
-export const AccountsMoreView: FC = () => {
+export const AccountsMoreView: FC<{
+    onCreateAccount?: () => void;
+    onImport?: () => void;
+    right?: string;
+    top?: string;
+}> = ({ right, top, onImport, onCreateAccount }) => {
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
     const wallet = activeAccount.activeTonWallet;
@@ -45,7 +50,24 @@ export const AccountsMoreView: FC = () => {
     return (
         <ButtonsContainer>
             <AccountMenu
+                right={right}
+                top={top}
                 options={[
+                    {
+                        name: t('create_wallet_account'),
+                        onClick: () => {
+                            onCreateAccount && onCreateAccount();
+                        },
+                        icon: <PlusIcon />
+                    },
+
+                    {
+                        name: t('import_mnemonic'),
+                        onClick: () => {
+                            onImport && onImport();
+                        },
+                        icon: <KeyIcon />
+                    },
                     {
                         name: t('settings_backup_seed'),
                         onClick: () => recovery({ accountId: activeAccount.id }),

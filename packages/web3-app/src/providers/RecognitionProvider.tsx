@@ -1,10 +1,9 @@
 import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { onAction } from '../common/electron';
-import { isPlaygroundMaster, showAlertMessage } from '../common/helpers';
+import { isPlaygroundMaster } from '../common/helpers';
 import { ENTRY_ID_ROI, MARK_ID_ROI, TASK_ID_ROI } from '../constant';
 
-import parser from 'cron-parser';
 import ProService from '../services/ProService';
 import RoiService from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
@@ -459,15 +458,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const updateRoiArea = (r: RoiInfo) => {
-        if (r.crontab && r.action === 'cron') {
-            try {
-                parser.parseExpression(r.crontab!);
-            } catch (e) {
-                showAlertMessage('定时任务不合法:r.crontab');
-
-                return;
-            }
-        }
+       
         let pid = r.pid;
         if (r.type === 'task') {
             pid = TASK_ID_ROI;

@@ -120,7 +120,7 @@ export function observePortals() {
 // let loading_getTgGlobalState = false;
 
 export function observeTgWebSite() {
-    handleSelectText()
+    // handleSelectText()
     // const user_auth = JSON.parse(localStorage.getItem('user_auth') || '{}');
     // console.debug("tgLogged:",{tgLogged,PortalsObserved},user_auth);
     // if (user_auth.dcID && user_auth.id) {
@@ -159,5 +159,4 @@ export function observeTMEWebSite() {
     if (location.hostname.indexOf('t.me') === -1) {
         return;
     }
-
 }

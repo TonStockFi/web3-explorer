@@ -5,11 +5,10 @@ import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
 import { TabBar } from './TabBar';
-import { WalletSide } from './WalletSide';
 
 export const TopBar = () => {
     const ref = createRef<HTMLDivElement>();
-    const { currentTabId, openTab } = useBrowserContext();
+    const { currentTabId, updateAt, t, browserTabs, closeTab, openTab } = useBrowserContext();
     const { walletAside } = useIAppContext();
 
     useEffect(() => {
@@ -24,7 +23,31 @@ export const TopBar = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
-
+    const firstTabs = [MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY] as string[];
+    const tabs = Array.from(browserTabs).map(row => row[1]);
+    const mainTabs = tabs.filter(row => !row.tabId.startsWith('tab_')).map(row => row.tabId);
+    const currentTabs = tabs
+        .filter(row => {
+            return (
+                row.tabId.startsWith('tab_') &&
+                currentTabId === row.tabId &&
+                mainTabs.indexOf(row.tabId) === -1 &&
+                firstTabs.indexOf(row.tabId) === -1
+            );
+        })
+        .map(row => row.tabId);
+    const urlTabs = tabs
+        .filter(row => {
+            return (
+                row.tabId.startsWith('tab_') &&
+                // currentTabId !== row.tabId &&
+                mainTabs.indexOf(row.tabId) === -1 &&
+                firstTabs.indexOf(row.tabId) === -1
+            );
+        })
+        .map(row => row.tabId);
+    urlTabs.reverse();
+    const showPlus = currentTabId !== MAIN_NAV_TYPE.DISCOVERY;
     return (
         <View borderBox relative flx rowVCenter m={8} borderRadius={8} mr={0}>
             <View
@@ -32,27 +55,82 @@ export const TopBar = () => {
                 rowVCenter
                 overflowXAuto
                 ref={ref}
-                mr={walletAside ? AsideWidth : 180}
+                mr={walletAside ? AsideWidth : 0}
                 miniScrollBar
             >
-                {[currentTabId].map(row => {
+                {[MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY].map(row => {
                     return (
                         <TabBar
                             key={row}
                             tabId={row}
                             minTabBar={false}
-                            onClick={() => {}}
-                            onClose={() => {}}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
                         />
                     );
                 })}
-                <View appRegionDrag flex1 h={36} />
-            </View>
+                {[...mainTabs].map(row => {
+                    return (
+                        <TabBar
+                            key={row}
+                            tabId={row}
+                            minTabBar={false}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
+                        />
+                    );
+                })}
 
-            <View abs h100p right={6} bottom0 jEnd rowVCenter>
-                <WalletSide />
+                {[...urlTabs].map(row => {
+                    return (
+                        <TabBar
+                            key={row}
+                            tabId={row}
+                            minTabBar={false}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
+                        />
+                    );
+                })}
+                {/* {[...currentTabs].map(row => {
+                    return (
+                        <TabBar
+                            key={row}
+                            tabId={row}
+                            minTabBar={false}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
+                        />
+                    );
+                })} */}
+                <View appRegionDrag={!walletAside} flex1 h={36} mr={showPlus ? 44 : 0} />
+                <View abs right={12} top={0} rowVCenter hide={!showPlus}>
+                    <View
+                        tips={t('AddTab')}
+                        iconButtonSmall
+                        icon={'Add'}
+                        onClick={() => {
+                            openTab(MAIN_NAV_TYPE.DISCOVERY);
+                        }}
+                    ></View>
+                </View>
             </View>
         </View>
     );
 };
-``;

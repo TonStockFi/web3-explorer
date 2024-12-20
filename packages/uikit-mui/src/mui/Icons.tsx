@@ -57,6 +57,7 @@ import NorthEast from '@mui/icons-material/NorthEast';
 import NotificationImportant from '@mui/icons-material/NotificationImportant';
 import OpenInFull from '@mui/icons-material/OpenInFull';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import PhotoLibrary from '@mui/icons-material/PhotoLibrary';
 import PrecisionManufacturing from '@mui/icons-material/PrecisionManufacturing';
 import Psychology from '@mui/icons-material/Psychology';
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -87,11 +88,13 @@ import WifiOff from '@mui/icons-material/WifiOff';
 import WifiTetheringError from '@mui/icons-material/WifiTetheringError';
 import { IconProps } from '@mui/material/Icon';
 import { ReactNode } from 'react';
+import { AiOutlineUserSwitch } from 'react-icons/ai';
 import { BsLayoutSidebar, BsLayoutSidebarReverse } from 'react-icons/bs';
 import { GiClick } from 'react-icons/gi';
 
 export type IconList =
     | 'Folder'
+    | 'AiOutlineUserSwitch'
     | 'BubbleChart'
     | 'GiClick'
     | 'Psychology'
@@ -139,6 +142,7 @@ export type IconList =
     | 'ChatGpt'
     | 'VolumeOff'
     | 'ToggleOn'
+    | 'PhotoLibrary'
     | 'ToggleOff'
     | 'Send'
     | 'Comment'
@@ -189,6 +193,8 @@ export const IconsMap: Record<string, React.ElementType> = {
     Diamond,
     Remove,
     Comment,
+    PhotoLibrary,
+    AiOutlineUserSwitch,
     AutoFixHigh,
     OpenInFull,
     EmojiEvents,
@@ -304,6 +310,7 @@ export {
     MoreHorizIcon,
     MoreVertIcon,
     OpenInNewIcon,
+    PhotoLibrary,
     QrCodeIcon,
     RefreshIcon,
     SearchIcon,

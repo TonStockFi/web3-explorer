@@ -8507,6 +8507,7 @@ __metadata:
     globals: "npm:^15.9.0"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
+    react-i18next: "npm:^13.5.0"
     storybook: "npm:^8.2.9"
     typescript: "npm:^4.9.4"
     typescript-eslint: "npm:^8.0.1"

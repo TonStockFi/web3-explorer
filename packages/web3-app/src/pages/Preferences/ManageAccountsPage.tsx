@@ -1,4 +1,3 @@
-import { View } from '@web3-explorer/uikit-view';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ManageAccounts } from '../../components/accounts/ManageAccounts';
@@ -21,20 +20,7 @@ export const ManageAccountsPage = () => {
     ];
     return (
         <Page full>
-            <View wh100p borderBox px={12} pt={12} overflowYAuto>
-                <View h100p sx={{ margin: '0 auto', maxWidth: '768px' }}>
-                    <ManageSubWalletPage />
-                    {/* <TabViewContainer
-                        panelStyle={{
-                            height: '100%',
-                            overflowY: 'auto'
-                        }}
-                        onChangeTabIndex={setCurrentTabIndex}
-                        tabs={tabs}
-                        currentTabIndex={currentTabIndex}
-                    /> */}
-                </View>
-            </View>
+            <ManageSubWalletPage />
         </Page>
     );
 };

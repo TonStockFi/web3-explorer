@@ -7,6 +7,7 @@ import { MessageLLM } from './LLMService';
 import RoiService from './RoiService';
 import WebviewMainEventService from './WebviewMainEventService';
 import WebviewService from './WebviewService';
+import WebviewServiceTelegram from './WebviewServiceTelegram';
 
 export interface OcrType {
     rect: XYWHProps;
@@ -19,9 +20,10 @@ export interface OcrType {
 type ActionType = Map<
     number,
     {
-        type: 'click' | 'drag' | 'onMatch' | 'onOcrImg' | 'insertText';
+        type: 'click' | 'drag' | 'onMatch' | 'onOcrImg' | 'insertText' | 'tgChatLastMessage';
         feature: RoiInfo;
         ocr: OcrType;
+        chatId:string;
         text:string;
         ts: number;
         x: number;
@@ -285,7 +287,7 @@ export default class WebviewLoopCallbackService extends WebviewService {
                 await ws.execJs(`__Actions.delete(${ts})`);
                 const action = __Actions.get(ts)!;
                 console.debug('useTimeoutLoop', ts, __Actions.get(ts));
-                const { x, y, x1, y1, type, text,feature, ocr, steps } = action;
+                const { x, y, x1, y1, type,chatId, text,feature, ocr, steps } = action;
                 await this.log(`run action: ${type} ts:${ts}`)
                 if (type === 'click') {
                     await ws.sendClickEvent(action.x, action.y);
@@ -303,6 +305,19 @@ export default class WebviewLoopCallbackService extends WebviewService {
                 if (type === 'drag') {
                     await ws.sendDragEvent({ x, y }, { x: x1, y: y1 }, steps || 10);
                     await this.responseActionResult(ts,true)
+                }
+                
+                if (type === 'tgChatLastMessage') {
+                    const service = new WebviewServiceTelegram(this.getTabId())
+                    const state = await service.getTgGlobalState()
+                    try{
+                        const {byChatId} =  state.messages
+                        const messages = Object.values(byChatId[chatId].byId)
+                        const message = messages[messages.length - 1];
+                        await this.responseActionResult(ts,{message,messages})
+                    }catch(e){
+                        await this.responseActionResult(ts,null)
+                    }
                 }
                 if (type === 'insertText') {
                     await ws.insertText(text);

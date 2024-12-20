@@ -1,7 +1,7 @@
 import { bool } from '@web3-explorer/opencv/dist/types/opencv';
 import { IndexedDbCache } from '@web3-explorer/utils';
 import { urlToDataUri } from '../common/opencv';
-import { ENTRY_ID_ROI } from '../constant';
+import { ENTRY_ID_ROI, TASK_ID_ROI } from '../constant';
 import { ExtenssionPublishData, RoiInfo } from '../types';
 
 
@@ -111,6 +111,12 @@ export default class RoiService {
         return ENTRY_ID_ROI
     }
     
+    static isTask(row: RoiInfo): bool {
+        return row.pid === TASK_ID_ROI
+    }
+    static isRunTask(row: RoiInfo): bool {
+        return  row.jsCode !== '' && row.pid === TASK_ID_ROI && row.action === 'invokeCode'
+    }
     static isEntryElement(row: RoiInfo): bool {
         return row.pid === RoiService.getEntryId()
     }

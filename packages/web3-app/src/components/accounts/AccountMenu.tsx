@@ -28,12 +28,14 @@ const IconWrapper = styled.div`
 `;
 
 export const AccountMenu: FC<{
+    right?: string;
+    top?: string;
     options: { hide?: boolean; name: string; onClick: () => void; icon: ReactNode }[];
-}> = ({ options }) => {
+}> = ({ options, right, top }) => {
     return (
         <DropDownStyled
-            right="0"
-            top="0"
+            right={right || '0'}
+            top={top || '0'}
             payload={onClose => (
                 <DropDownContent>
                     {options

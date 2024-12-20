@@ -4,6 +4,7 @@ import { ListBlockDesktopAdaptive } from '@tonkeeper/uikit/dist/components/List'
 
 import { DesktopViewPageLayout } from '@tonkeeper/uikit/dist/components/desktop/DesktopViewLayout';
 import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
+import { useCheckTouchId } from '@tonkeeper/uikit/dist/state/password';
 import {
     useAccountsState,
     useActiveAccount,
@@ -34,6 +35,8 @@ export const ManageSubWalletPage = () => {
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
     const accountsMAM = accounts.filter(account => account.type === 'mam');
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
     const [selectAccount, setSelectAccount] = useState<Account | null>(
         activeAccount.type !== 'mam'
             ? accountsMAM.length > 0
@@ -63,129 +66,129 @@ export const ManageSubWalletPage = () => {
     const accountMAM = selectAccount as AccountMAM;
     const { allAvailableDerivations: derivations } = accountMAM;
     const total = derivations.length;
-    const limit = 18;
+    const limit = 15;
 
     return (
-        <DesktopViewPageLayoutStyled>
-            <View borderBox w100p h={58} row aCenter jSpaceBetween mb12>
-                <View row aCenter jStart pl12>
-                    <View
-                        center
-                        onClick={() => setImportDialog(true)}
-                        button={t('import_mnemonic')}
-                        buttonStartIcon={<View icon="Input" iconSmall />}
-                    />
-                    <View
-                        ml12
-                        center
-                        onClick={() => setOpenCreateAccountDialog(true)}
-                        button={t('create_wallet_account')}
-                        buttonStartIcon={<View icon="Input" iconSmall />}
-                    />
-                    <View
-                        ml12
-                        center
-                        onClick={() => onCreateDerivation()}
-                        button={t('add_sub_wallet')}
-                        buttonStartIcon={<View icon="Add" iconSmall />}
-                    />
-                </View>
-                <View rowVCenter jStart>
-                    <AccountsSelect
-                        accounts={accountsMAM}
-                        onChange={(val: Account) => setSelectAccount(val)}
-                        account={selectAccount}
-                    />
-                    <View ml12 center mr={16}>
-                        <AccountsMoreView />
+        <View absFull>
+            <View sx={{ margin: '0 auto', maxWidth: '768px' }} relative h100p>
+                <View borderBox w100p h={58} row aCenter jSpaceBetween mb12>
+                    <View rowVCenter jStart>
+                        <AccountsSelect
+                            accounts={accountsMAM}
+                            onChange={(val: Account) => setSelectAccount(val)}
+                            account={selectAccount}
+                        />
+                        <View ml12 center mr={16}>
+                            <AccountsMoreView
+                                onImport={() => setImportDialog(true)}
+                                onCreateAccount={() => setOpenCreateAccountDialog(true)}
+                                right="-180px"
+                                top="24px"
+                            />
+                        </View>
+                    </View>
+                    <View row aCenter jEnd pl12>
+                        <View
+                            ml12
+                            center
+                            onClick={async () => {
+                                onCreateDerivation();
+                            }}
+                            button={t('add_sub_wallet')}
+                            buttonStartIcon={<View icon="Add" iconSmall />}
+                        />
                     </View>
                 </View>
-            </View>
-            <ListBlockDesktopAdaptive margin={false}>
-                <MAMIndexesPageContent
-                    limit={limit}
-                    page={page}
-                    setSelectAccount={(val: AccountMAM) => setSelectAccount(val)}
-                    account={accountMAM}
-                />
-            </ListBlockDesktopAdaptive>
-            <View h={58} hide={total <= limit} row aCenter jStart abs bottom0 left0 right0>
-                <View ml12 w={150}>
-                    <AccountsPager
-                        total={total}
-                        limit={limit}
-                        page={page}
-                        setPage={(p: number) => setPage(p)}
-                    />
+                <View absFull top={58} bottom={58} overflowYAuto>
+                    <DesktopViewPageLayoutStyled>
+                        <ListBlockDesktopAdaptive margin={false}>
+                            <MAMIndexesPageContent
+                                limit={limit}
+                                page={page}
+                                setSelectAccount={(val: AccountMAM) => setSelectAccount(val)}
+                                account={accountMAM}
+                            />
+                        </ListBlockDesktopAdaptive>
+                    </DesktopViewPageLayoutStyled>
                 </View>
+                <View h={58} hide={total <= limit} row aCenter jStart abs bottom0 left0 right0>
+                    <View ml12 w100p>
+                        <AccountsPager
+                            total={total}
+                            limit={limit}
+                            page={page}
+                            setPage={(p: number) => setPage(p)}
+                        />
+                    </View>
+                </View>
+                <View
+                    dialog={{
+                        dialogProps: {
+                            fullScreen: true,
+                            open: openSetCountDialog
+                        },
+                        content: (
+                            <View wh100p row center bgColor={theme.backgroundPage}>
+                                <View sx={{ maxWidth: 800 }}>
+                                    <WalletBatchCreateNumber
+                                        onClose={() => {
+                                            setOpenSetCountDialog(false);
+                                        }}
+                                        submitHandler={async ({ count }: { count: number }) => {
+                                            setOpenSetCountDialog(false);
+                                            const d = await createDerivation({
+                                                accountId: accountMAM.id,
+                                                count: count
+                                            });
+                                            if (d) {
+                                                await onClickWallet(d.activeTonWalletId);
+                                                const v = await storage.getAccount(accountMAM.id);
+                                                setSelectAccount(v as AccountMAM);
+                                            }
+                                            if (total + count > limit) {
+                                                setPage(Math.ceil((total + count) / limit) - 1);
+                                            }
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        )
+                    }}
+                />
+                <View
+                    dialog={{
+                        dialogProps: {
+                            fullScreen: true,
+                            open: importDialog
+                        },
+                        content: (
+                            <View wh100p row center bgColor={theme.backgroundPage}>
+                                <View sx={{ maxWidth: 800 }}>
+                                    <ImportExistingWallet
+                                        onClose={() => {
+                                            setImportDialog(false);
+                                        }}
+                                        afterCompleted={() => {
+                                            setImportDialog(false);
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        )
+                    }}
+                />
+                <DialogCreateAccount
+                    {...{
+                        open: openCreateAccountDialog,
+                        onClose: () => {
+                            setOpenCreateAccountDialog(false);
+                        },
+                        onConfirm: () => {
+                            setPage(Math.ceil((total + 1) / limit) - 1);
+                        }
+                    }}
+                />
             </View>
-            <View
-                dialog={{
-                    dialogProps: {
-                        fullScreen: true,
-                        open: openSetCountDialog
-                    },
-                    content: (
-                        <View wh100p row center bgColor={theme.backgroundPage}>
-                            <View sx={{ maxWidth: 800 }}>
-                                <WalletBatchCreateNumber
-                                    onClose={() => {
-                                        setOpenSetCountDialog(false);
-                                    }}
-                                    submitHandler={async ({ count }: { count: number }) => {
-                                        setOpenSetCountDialog(false);
-                                        const d = await createDerivation({
-                                            accountId: accountMAM.id,
-                                            count: count
-                                        });
-                                        if (d) {
-                                            await onClickWallet(d.activeTonWalletId);
-                                            const v = await storage.getAccount(accountMAM.id);
-                                            setSelectAccount(v as AccountMAM);
-                                        }
-                                        if (total + count > limit) {
-                                            setPage(Math.ceil((total + count) / limit) - 1);
-                                        }
-                                    }}
-                                />
-                            </View>
-                        </View>
-                    )
-                }}
-            />
-            <View
-                dialog={{
-                    dialogProps: {
-                        fullScreen: true,
-                        open: importDialog
-                    },
-                    content: (
-                        <View wh100p row center bgColor={theme.backgroundPage}>
-                            <View sx={{ maxWidth: 800 }}>
-                                <ImportExistingWallet
-                                    onClose={() => {
-                                        setImportDialog(false);
-                                    }}
-                                    afterCompleted={() => {
-                                        setImportDialog(false);
-                                    }}
-                                />
-                            </View>
-                        </View>
-                    )
-                }}
-            />
-            <DialogCreateAccount
-                {...{
-                    open: openCreateAccountDialog,
-                    onClose: () => {
-                        setOpenCreateAccountDialog(false);
-                    },
-                    onConfirm: () => {
-                        setPage(Math.ceil((total + 1) / limit) - 1);
-                    }
-                }}
-            />
-        </DesktopViewPageLayoutStyled>
+        </View>
     );
 };

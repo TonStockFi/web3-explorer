@@ -1,12 +1,10 @@
 
-import { RoiInfo } from '../types';
+import { AccountPublic, RoiInfo } from '../types';
 export const MainEntry = `// main 方法是当前模块执行入口
 async function main(){
-  console.log("Hello Web3!")
-  G.log(F().id,F().name,"is running...");
+  alert("Hello Web3!")
 }`
 
- 
 export const DefaultOcrPrompt = `输入： 一张图片。
 输出示例：
 
@@ -149,7 +147,7 @@ await G.clickFeature(F("#1"));`,
 await G.clickRect({x, y, w , h}, 1);`,
 
     showRect: `\n// show a specific rect
-G.showRect({x, y, w , h});`,
+await G.showRect({x, y, w , h});`,
 
     clearRect: `\n// clear all rect
 await G.clearRect(1);`,
@@ -174,12 +172,19 @@ class G {
 
     static __CurrentFeatureId = null;
     static __matchedIds = [];
+    static __account = null;
     static __Features = new Map();
     
     static getCurrentFeatureId() {
         return G.__CurrentFeatureId;
     }
+    static setAccount(v){
+        G.__account = v;
+    }
 
+    static getAccount(v){
+        return G.__account;
+    }
     static setMatchedIds(v){
         G.__matchedIds = v;
     }
@@ -219,6 +224,9 @@ class G {
         return  G.__matchedIds.indexOf(featureId) > -1
     }
         
+    static currentTs() {
+        return +(new Date) / 1000;
+    }
     static random(start, end) {
         return Math.floor(Math.random() * (end - start + 1)) + start;
     }
@@ -279,7 +287,7 @@ class G {
 
     static async clickRect({ x, y, w, h },sleepSeconds,justRect) {
         if(justRect){
-            G.showRect({ x, y, w, h },sleepSeconds)
+            await G.showRect({ x, y, w, h },sleepSeconds)
         }else{
             await G.click({x:x + w / 2, y:y + h / 2});
         }
@@ -305,14 +313,44 @@ class G {
             return G.getActionResult(ts);
         }, timeout, interval);
     }
-    static async insertText(text,timeout = 30000,interval = 1000) {
+        //tgChatLastMessage
+
+
+    static async getTgChatLastMessage(chatId,timeout = 1000,interval = 100) {
+        const ts = +new Date();
+        window.__Actions.set(ts, { type: "tgChatLastMessage", ts, chatId });
+        return G.waitForResult(() => {
+            return G.getActionResult(ts);
+        }, timeout, interval);
+    }
+    static async insertText(text,timeout = 1000,interval = 100) {
         const ts = +new Date();
         window.__Actions.set(ts, { type: "insertText", ts, text });
         return G.waitForResult(() => {
             return G.getActionResult(ts);
         }, timeout, interval);
     }
-    static async onMatch(featureId,timeout = 30000,interval = 1000) {
+    static async waitForElement(selector,timeout = 30000,interval = 100) {
+        const ts = +new Date();
+        return G.waitForResult(() => {
+            const ele = document.querySelector(selector)
+            return ele
+        }, timeout, interval);
+    }
+
+    static async waitForElementRect(selector,timeout = 30000,interval = 100) {
+        const ts = +new Date();
+        return G.waitForResult(() => {
+            const ele = document.querySelector(selector)
+            if(!ele){
+                return null;
+            }
+            const rect = ele.getBoundingClientRect();
+            return {y:rect.top,x:rect.left,w:rect.width,h:rect.height}
+        }, timeout, interval);
+    }
+
+    static async onMatch(featureId,timeout = 30000,interval = 100) {
         const ts = +new Date();
         const {feature} = F(featureId) || {}
         if(!feature){
@@ -386,7 +424,7 @@ class G {
         }
     }
 
-    static showRect({x, y, w, h}, showSeconds = 0,color = "red",text = "" ) {
+    static async showRect({x, y, w, h}, showSeconds = 0,color = "red",text = "" ) {
         const rect = document.createElement('div');
         rect.className = '__react';
         rect.style.position = 'fixed';
@@ -409,7 +447,8 @@ class G {
         if (showSeconds && showSeconds > 0) {
             setTimeout(() => {
                 try{document.body.removeChild(rect)}catch(e){}
-            }, showSeconds * 1000); // Convert seconds to milliseconds
+            }, showSeconds * 1000);
+            await G.sleep(showSeconds)
         }
     }
 }
@@ -433,7 +472,11 @@ class Feature {
     get name() {
         return this.feature.name || "";
     }
-        
+
+    get threshold(){
+        return this.feature.threshold || 0;
+    }
+
     get feature() {
         return this.feature || {};
     }
@@ -461,11 +504,8 @@ class Feature {
     get rect() {
         return this.feature.cutAreaRect;
     }
-
-    click(sleepSeconds) {
-        return G.clickFeature(this,sleepSeconds)
-    }
 }
+
 const F = (id)=>{
     return new Feature(id)
 }
@@ -516,7 +556,8 @@ async function main(){
         roi: RoiInfo | null,
         roiAreaList: RoiInfo[],
         isTest: boolean = false,
-        matchedIds: string[] = []
+        matchedIds: string[] = [],
+        currentAccount?:AccountPublic
     ) {
         let features: string[] =  [];
         features = [...matchedIds]
@@ -534,15 +575,20 @@ async function main(){
         const featuresPrefix = JsCodeService.getFeaturesPrefix(roi, roiAreaList, features);
 
         const matchedIdsInPagePrefix = JsCodeService.getMatchedIdsInPagePrefix(matchedIds);
+        const currentAccountPrefix = currentAccount ? JsCodeService.getCurrentAccountPrefix(currentAccount):"";
 
         return JsCodeService.formatCode(
-            `${featuresPrefix}\n${matchedIdsInPagePrefix}\n${code}\n`,
+            `${featuresPrefix}\n${matchedIdsInPagePrefix}\n${currentAccountPrefix}\n${code}\n`,
             isTest
         );
     }
 
     static getMatchedIdsInPagePrefix(ids: string[]) {
         return `\tG.setMatchedIds(${JSON.stringify(ids)});\n`;
+    }
+
+    static getCurrentAccountPrefix(acount: AccountPublic) {
+        return `\tG.setAccount(${JSON.stringify(acount)});\n`;
     }
     static getFeaturesPrefix(roi: RoiInfo | null, roiAreaList: RoiInfo[], features: string[]) {
         const currentFeatureId = roi ? `"${roi.id}"` : 'null';

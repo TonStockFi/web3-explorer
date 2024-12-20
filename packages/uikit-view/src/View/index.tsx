@@ -23,6 +23,7 @@ import Alert from '@web3-explorer/uikit-mui/dist/mui/Alert';
 import Tooltip from '@web3-explorer/uikit-mui/dist/mui/Tooltip';
 import Typography from '@web3-explorer/uikit-mui/dist/mui/Typography';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import DialogView from '../components/DialogView';
 import Prompt from '../components/Prompt';
@@ -107,6 +108,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         iconButtonProps,
         ...props_
     } = props;
+    const { t } = useTranslation();
     const [showDrawer, setShowDrawer] = useState(false);
     if (hide) return null;
 
@@ -158,7 +160,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
             };
         }
         //@ts-ignore
-        const node = <Button {...p2}>{buttonText}</Button>;
+        const node = <Button {...p2}>{t(buttonText)}</Button>;
         if (drawer) {
             return (
                 <>
@@ -204,7 +206,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         const node = <IconButton {...p2}>{node1}</IconButton>;
         if (tips) {
             return (
-                <Tooltip arrow placement={tipsPlacement || 'bottom'} title={tips}>
+                <Tooltip arrow placement={tipsPlacement || 'bottom'} title={t(tips)}>
                     <Box {...p1}>{node}</Box>
                 </Tooltip>
             );
@@ -214,7 +216,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     if (icon) {
         if (tips) {
             return (
-                <Tooltip placement={tipsPlacement || 'bottom'} title={tips}>
+                <Tooltip placement={tipsPlacement || 'bottom'} title={t(tips)}>
                     <>{getIcon(icon, iconProps, iconSmall, iconColor, iconFontSize)}</>
                 </Tooltip>
             );
@@ -267,7 +269,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
                     component="span"
                     {...p2}
                 >
-                    {children || text}
+                    {children || t(text)}
                 </Typography>
             </Box>
         );
@@ -289,7 +291,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
 
     if (tips) {
         return (
-            <Tooltip placement={tipsPlacement || 'bottom'} title={tips}>
+            <Tooltip placement={tipsPlacement || 'bottom'} title={t(tips)}>
                 <Box {...handleProps(props_)} />
             </Tooltip>
         );

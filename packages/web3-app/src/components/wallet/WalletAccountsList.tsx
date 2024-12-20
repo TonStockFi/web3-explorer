@@ -14,7 +14,7 @@ import { WalletEmoji } from '../WalletEmoji';
 import { AddressWithCopy } from './AddressWithCopy';
 import { ToggleActiveAccount } from './ToggleActiveAccount';
 
-export function WalletAccountsList({ onBack }: { onBack: () => void }) {
+export function WalletAccountsList() {
     const theme = useTheme();
     const account = useActiveAccount();
     const { openTab } = useBrowserContext();
@@ -36,11 +36,13 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                         iconSmall
                         iconButtonSmall
                         iconButton
+                        onClick={() => {
+                            showWalletAside(false);
+                        }}
                         iconProps={{ sx: { width: 16, height: 16, color: theme.textPrimary } }}
-                        onClick={onBack}
                         icon="Back"
                     />
-                    <View ml12 h100p row aCenter>
+                    <View ml12 mr12 h100p row aCenter>
                         <View text={t('WalletAccounts')} />
                     </View>
                     <NetworkView />
@@ -75,13 +77,7 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                             pointer
                             onClick={() => {
                                 onClickAccount(wallet.id);
-                                if (wallet.type !== 'mam') {
-                                    if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
-                                        showWalletAside(false);
-                                    }
-                                } else {
-                                    onBack();
-                                }
+                                showWalletAside(false);
                             }}
                             bgColor={
                                 account.id === wallet.id
@@ -100,7 +96,7 @@ export function WalletAccountsList({ onBack }: { onBack: () => void }) {
                                 <View h={32} center mr12>
                                     <WalletEmoji containerSize="20px" emoji={wallet.emoji} />
                                 </View>
-                                <View text={wallet.name} textFontSize="0.8rem" />
+                                <View text={wallet.name} textFontSize="0.9rem" />
                                 <View center ml12>
                                     <AccountBadge accountType={wallet.type} size="s">
                                         {wallet.type === 'mam' ? t('Multi') : ''}

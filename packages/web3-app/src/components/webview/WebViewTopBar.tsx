@@ -7,6 +7,7 @@ import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewService from '../../services/WebviewService';
+import { WalletSide } from '../app/WalletSide';
 import { UrlInput } from './UrlInput';
 
 export function WebviewTopBar({
@@ -110,12 +111,14 @@ export function WebviewTopBar({
                             height: 18
                         }
                     }}
-                    icon={<ImageIcon icon={'OpenInNew'} size={18} />}
+                    tips={'机器决策'}
+                    icon={<ImageIcon icon={'PrecisionManufacturing'} size={18} />}
                     iconButtonSmall
                     onClick={() => {
                         new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
                     }}
                 />
+                <WalletSide />
             </View>
         </View>
     );

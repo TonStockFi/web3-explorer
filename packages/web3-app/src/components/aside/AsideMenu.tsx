@@ -3,7 +3,7 @@ import { View } from '@web3-explorer/uikit-view';
 import { FC } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTheme } from 'styled-components';
-import { AccountWalletsList } from './AccountWalletsList';
+import { WalletAccountsList } from '../wallet/WalletAccountsList';
 
 interface AsideMenuProps {
     hideClose?: boolean;
@@ -25,7 +25,7 @@ export const AsideMenu: FC<AsideMenuProps> = ({ asideWidth, hideClose }) => {
                     borderRight: `1px solid ${theme.separatorCommon}`
                 }}
             >
-                <AccountWalletsList />
+                <WalletAccountsList />
             </View>
         </ErrorBoundary>
     );

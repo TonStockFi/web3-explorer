@@ -11,12 +11,14 @@ export function LoadingView({
     setLoading,
     borderRadius,
     onRefresh,
-    tips
+    tips,
+    noBgColor
 }: {
     borderRadius?: number;
     tips?: string;
     allowClose?: boolean;
     loading: boolean;
+    noBgColor?: boolean;
     onRefresh?: () => void;
     setLoading?: (loading: boolean) => void;
 }) {
@@ -51,7 +53,7 @@ export function LoadingView({
             column
             zIdx={1}
             borderRadius={borderRadius || 0}
-            bgColor={hexToRGBA(theme.backgroundContent, 0.9)}
+            bgColor={noBgColor ? undefined : hexToRGBA(theme.backgroundContent, 0.9)}
             absFull
             center
         >

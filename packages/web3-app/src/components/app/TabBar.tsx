@@ -68,7 +68,6 @@ export function TabBar({
         icon = navTab.icon;
     }
     let mainNav = !!navTab;
-
     const [loading, setLoading] = useState(false);
     const [hover, setHover] = useState(false);
     const [icon1, setIcon] = useState(icon);
@@ -78,7 +77,7 @@ export function TabBar({
     const [title1, setTitle] = useState(d_title);
 
     useEffect(() => {
-        if (!mainNav && tab && tab.url) {
+        if (tab && tab.url) {
             if (!icon1) {
                 const { host } = new URL(tab.url);
                 new BrowserFavoricoService(host).get().then((res: any) => {
@@ -116,26 +115,29 @@ export function TabBar({
             isDesktop() && setIcon(detail.icon);
         };
 
-        if (!mainNav) {
+        if (tab && tab.url) {
             window.addEventListener(`siteLoading_${tabId}`, handleSiteLoading);
             window.addEventListener(`siteTitleUpated_${tabId}`, handleSiteTitleUpated);
             window.addEventListener(`siteFavorUpated_${tabId}`, handleSiteFavorUpdated);
         }
         return () => {
-            if (!mainNav) {
+            if (tab && tab.url) {
                 window.addEventListener(`siteLoading_${tabId}`, handleSiteLoading);
                 window.addEventListener(`siteTitleUpated_${tabId}`, handleSiteTitleUpated);
                 window.addEventListener(`siteFavorUpated_${tabId}`, handleSiteFavorUpdated);
             }
         };
-    }, [mainNav]);
+    }, [tab]);
 
     const IconNode = () => (
         <>
             <View w={20} center hide={mainNav}>
                 <View empty hide={!tab?.url}>
                     <View hide={!icon}>
-                        <View wh={20} center>
+                        <View wh={20} center hide={!loading}>
+                            <SpinnerIcon />
+                        </View>
+                        <View wh={20} center hide={loading}>
                             <ImageIcon icon={icon!} size={16} />
                         </View>
                     </View>
@@ -204,11 +206,11 @@ export function TabBar({
     if (minTabBar) {
         if (isSelected || hover) {
             hideTilte = false;
-            widthBar = 120;
+            widthBar = 180;
         }
     } else {
         hideTilte = false;
-        widthBar = 120;
+        widthBar = 180;
     }
     if (
         tabId === MAIN_NAV_TYPE.GAME_FI ||
@@ -216,7 +218,7 @@ export function TabBar({
         tabId === MAIN_NAV_TYPE.DISCOVERY
     ) {
         hideTilte = false;
-        widthBar = 120;
+        widthBar = 180;
     }
 
     return (
@@ -230,7 +232,7 @@ export function TabBar({
                         h100p
                         flex1
                         borderRadiusTop={8}
-                        sx={{ minWidth: widthBar }}
+                        sx={{ minWidth: widthBar, maxWidth: widthBar }}
                         overflowHidden
                         pointer
                         onMouseEnter={() => setHover(true)}
@@ -241,12 +243,48 @@ export function TabBar({
                         }
                         bgColor={isSelected ? theme.backgroundBrowserActive : undefined}
                     >
-                        <View abs top0 w={20} center h100p pl={12}>
+                        <View abs top0 w={20} center h100p pl={8}>
                             <IconNode />
                         </View>
-                        <View ml={40} hide={hideTilte} w={'calc(100% - 50px)'}>
+                        <View ml={36} hide={hideTilte} w={'calc(100% - 60px)'}>
                             <TitleNode w={'100%'} />
                         </View>
+                        <View
+                            abs
+                            zIdx={10}
+                            onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onClose && onClose();
+                            }}
+                            top={0}
+                            w={12}
+                            right={18}
+                            bottom0
+                            center
+                            hide={
+                                !hover ||
+                                tabId === MAIN_NAV_TYPE.GAME_FI ||
+                                tabId === MAIN_NAV_TYPE.DISCOVERY
+                            }
+                        >
+                            <View
+                                pointer
+                                iconProps={{ sx: { width: 12, height: 12 } }}
+                                icon={'Close'}
+                            ></View>
+                        </View>
+                        <View
+                            abs
+                            zIdx={10}
+                            bgColor={theme.backgroundBrowserActive}
+                            w={1}
+                            right={8}
+                            hide={hover}
+                            top={6}
+                            bottom={6}
+                            center
+                        ></View>
                     </View>
                     <Corner width={8} type={'right'} hover={false} isSelected={isSelected} />
                 </View>

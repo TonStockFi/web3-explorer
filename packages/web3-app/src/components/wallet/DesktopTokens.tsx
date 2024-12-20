@@ -11,6 +11,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import styled, { css } from 'styled-components';
 
 import { useAssetsDistribution } from '@tonkeeper/uikit/dist/state/asset';
+import { View } from '@web3-explorer/uikit-view/dist/View';
+import { LoadingView } from '../LoadingView';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -88,6 +90,11 @@ const DesktopTokensPayload = ({ onClick }: { onClick: (adr: string) => void }) =
     // console.log({ sortedAssets, assets, distribution });
     return (
         <DesktopViewPageLayout ref={containerRef}>
+            {!assets && (
+                <View absFull empty>
+                    <LoadingView noBgColor loading={true} />
+                </View>
+            )}
             <TokensPageBody
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`,

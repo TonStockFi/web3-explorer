@@ -7,14 +7,15 @@ import { useAccountInfo, useAccountWallePartitionId } from '../../hooks/wallets'
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import WebviewService from '../../services/WebviewService';
-import { WebveiwEventType } from '../../types';
+import { WebApp, WebveiwEventType } from '../../types';
 import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
 
 export function WebviewAppView({ tabId }: { tabId: string }) {
     const { isCutEnable } = useScreenshotContext();
-    const { currentTabId, updateAt, browserTabs, saveTab } = useBrowserContext();
+    const { currentTabId, openTabFromWebview, updateAt, browserTabs, saveTab } =
+        useBrowserContext();
 
     const theme = useTheme();
     const tab = browserTabs.get(tabId)!;
@@ -26,7 +27,7 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
     const isSelected = currentTabId === tabId;
     const displayNone = !isSelected;
     const [firstLoad, setFirstLoad] = useState(true);
-    console.log({ currentTabId, tabId, url });
+    // console.log({ currentTabId, tabId, url });
     const onEvent = async (webview1: WebviewTag, eventType: WebveiwEventType, payload: any) => {
         switch (eventType) {
             case 'did-start-navigation': {
@@ -65,6 +66,11 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
         payload?: Record<string, any> | undefined;
     }) => {
         console.log('_ET', action, payload);
+
+        if (action === 'onOpenTab') {
+            const { item } = payload as { item: WebApp };
+            openTabFromWebview(item);
+        }
     };
 
     useEffect(() => {
