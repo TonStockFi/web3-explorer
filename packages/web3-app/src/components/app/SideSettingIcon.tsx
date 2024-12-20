@@ -187,9 +187,10 @@ export default function SideSettingIcon() {
                     <View text={t('Localization')} textFontSize="0.9rem" />
                 </View>
 
-                <View divider />
+                <View divider hide />
 
                 <View
+                    hide
                     menuItem
                     onClick={async () => {
                         openTab(MAIN_NAV_TYPE.MULTI_SEND);
@@ -216,6 +217,7 @@ export default function SideSettingIcon() {
                 </View> */}
                 <View
                     menuItem
+                    hide
                     onClick={async () => {
                         openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
                         setAnchorEl(null);

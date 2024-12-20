@@ -1,8 +1,6 @@
 name: Verify_p12_p8
 on:
     push:
-        tags:
-            - v*
         branches:
             - verify_p12_p8
 env:

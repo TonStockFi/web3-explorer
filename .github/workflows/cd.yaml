@@ -32,7 +32,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:
-            VERSION: 1.0.63
+            VERSION: 1.0.64
             PROJECT_NAME: Web3Explorer
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -65,25 +65,12 @@ jobs:
                   CREDENTIALS: ${{ secrets.APPLE_API_KEY_B64 }}
               run: |
                   echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
-
-            - name: Verify p8
-              if: runner.os == 'macOS'
-              run: |
-                  openssl pkey -in ${{ github.workspace }}/AuthKey.p8 -noout -text
-                  xcrun notarytool store-credentials "TestCredentials" --key "${{ github.workspace }}/AuthKey.p8" --key-id "${{ env.APPLE_API_KEY_ID }}" --issuer "${{ env.APPLE_API_ISSUER }}"
-
             - name: Configure keychain
               if: runner.os == 'macOS'
               uses: houlonglong/import-codesign-certs@master
               with:
                   p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
                   p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
-
-            - name: Verify p12
-              if: runner.os == 'macOS'
-              run: |
-                  echo "--------------------- find-identity "
-                  /usr/bin/security find-identity -p codesigning -v
 
             - name: Run install
               uses: borales/actions-yarn@v5
@@ -108,17 +95,17 @@ jobs:
               env:
                   tag: ${{ github.ref_name }}
               run: |
-                  dir ${{ github.workspace }}/apps/desktop/out/make/zip/win32/x64
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/win32/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}}.zip"
-                  dir ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/x64
-                  gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-${{env.VERSION}} Setup.exe"
+                  mv "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-${{env.VERSION}} Setup.exe" "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}} Setup.exe"
+                  gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}} Setup.exe"
 
             - name: Release Upload assets on mac
               if: runner.os != 'Windows'
               run: |
                   ls apps/desktop/out/make
                   ls apps/desktop/out/make/zip/darwin/${{ matrix.tag }}
-                  gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-${{env.VERSION}}-${{ matrix.tag }}.dmg"
+                  mv "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-${{env.VERSION}}-${{ matrix.tag }}.dmg" "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.dmg"
+                  gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.dmg"
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/darwin/${{ matrix.tag }}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.zip"
 
             - name: Clean-up credentials
