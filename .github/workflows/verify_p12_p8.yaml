@@ -1,4 +1,4 @@
-name: Web3ExplorerBeta CD
+name: Verify_p12_p8
 on:
     push:
         tags:

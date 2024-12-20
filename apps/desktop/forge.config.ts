@@ -100,7 +100,7 @@ const config: ForgeConfig = {
                         x: 200,
                         y: 170,
                         type: 'file',
-                        path: `${process.cwd()}/out/Web3Explorer-darwin-${arch}/Web3ExplorerBeta.app`
+                        path: `${process.cwd()}/out/Web3Explorer-darwin-${arch}/Web3Explorer.app`
                     },
                     { x: 400, y: 170, type: 'link', path: '/Applications' }
                 ]
