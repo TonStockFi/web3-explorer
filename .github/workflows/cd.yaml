@@ -16,6 +16,12 @@ jobs:
         strategy:
             matrix:
                 include:
+                    - os: ubuntu-latest
+                      tag: x64
+                      command: make:x64
+                    - os: ubuntu-latest
+                      tag: arm64
+                      command: make:arm64
                     - os: windows-latest
                       command: make:x64
                       tag: x64
@@ -32,7 +38,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:
-            VERSION: 1.0.65
+            VERSION: 1.0.66
             PROJECT_NAME: Web3Explorer
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -68,20 +74,17 @@ jobs:
               uses: borales/actions-yarn@v5
               with:
                   cmd: install
-
             - name: Build Pkg
               run: |
                   cd ${{ github.workspace }}
                   yarn workspace @tonkeeper/locales build:rm
                   yarn build:pkg
                   echo "export { App } from '@web3-explorer/app/dist/src/desktop/App';" > apps/desktop/src/app/App.tsx
-
             - name: Run build distributive
               uses: borales/actions-yarn@v5
               with:
                   cmd: ${{ matrix.command }}
                   dir: 'apps/desktop'
-
             - name: Release Upload assets on Win32
               if: runner.os == 'Windows'
               env:
@@ -90,15 +93,18 @@ jobs:
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/win32/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}}.zip"
                   mv "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-${{env.VERSION}} Setup.exe" "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}} Setup.exe"
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}} Setup.exe"
-
             - name: Release Upload assets on mac
-              if: runner.os != 'Windows'
+              if: runner.os == 'macOS'
               run: |
-                  ls apps/desktop/out/make
-                  ls apps/desktop/out/make/zip/darwin/${{ matrix.tag }}
+                  #ls apps/desktop/out/make
+                  #ls apps/desktop/out/make/zip/darwin/${{ matrix.tag }}
                   mv "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-${{env.VERSION}}-${{ matrix.tag }}.dmg" "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.dmg"
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.dmg"
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/darwin/${{ matrix.tag }}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.zip"
+            - name: Release Upload assets on linux
+              if: runner.os == 'Linux'
+              run: |
+                  ls apps/desktop/out/make
 
             - name: Clean-up credentials
               if: always() && runner.os == 'macOS'
