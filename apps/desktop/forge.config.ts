@@ -18,7 +18,7 @@ dotenv.config();
 
 const IsDev = process.env.BUILD === 'false';
 
-console.log('>> IsDev', IsDev,process.env.APPLE_API_KEY);
+// console.log('>> IsDev', IsDev,process.env.APPLE_API_KEY);
 
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc', 'web3'];
 
