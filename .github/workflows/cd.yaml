@@ -38,7 +38,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:
-            VERSION: 1.0.68
+            VERSION: 1.0.69
             PROJECT_NAME: Web3Explorer
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -104,8 +104,8 @@ jobs:
             - name: Release Upload assets on linux
               if: runner.os == 'Linux'
               run: |
-                  ls apps/desktop/out/make/deb/x64
-                  ls apps/desktop/out/make/rpm/x64
+                  ls apps/desktop/out/make/deb/${{ matrix.tag }}
+                  ls apps/desktop/out/make/rpm/${{ matrix.tag }}
                   ls apps/desktop/out/make/zip/linux
                   tree apps/desktop/out/make/
 
