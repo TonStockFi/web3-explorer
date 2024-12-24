@@ -51,6 +51,8 @@
     "react-error-boundary": "^4.0.13",
     "react-hook-form": "^7.53.0",
     "react-i18next": "^13.5.0",
+    "react-markdown": "^9.0.1",
+    "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.4.5",
     "react-transition-group": "^4.4.5",
     "styled-components": "^6.1.13",

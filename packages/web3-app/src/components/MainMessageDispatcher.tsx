@@ -91,6 +91,33 @@ export function MainMessageDispatcher() {
                 })
             );
 
+            if (e.action === 'onProtocol') {
+                let { url } = e.payload as {
+                    url: string;
+                };
+                try {
+                    const { pathname, searchParams } = new URL(url);
+                    switch (pathname) {
+                        case '//onBuyProduct': {
+                            const productHex = searchParams.get('product');
+                            alert(productHex);
+                            break;
+                        }
+                        case '//openMainTabUrl': {
+                            const urlHex = searchParams.get('url');
+                            alert(urlHex);
+                            break;
+                        }
+                        case '//onOpenTab': {
+                            const itemHex = searchParams.get('item');
+                            alert(itemHex);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                } catch (e) {}
+            }
             if (e.action === 'openWallet') {
                 let { visible } = e.payload as {
                     visible: boolean;

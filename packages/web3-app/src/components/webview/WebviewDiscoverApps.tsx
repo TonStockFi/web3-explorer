@@ -28,8 +28,14 @@ export function WebviewDiscoverApps({
     const isGames = winId === 'Games';
     const { isCutEnable } = useScreenshotContext();
     const { env } = useIAppContext();
-    const { theme, openTabFromWebview, currentTabId, onChangeLeftSideActions, browserTabs } =
-        useBrowserContext();
+    const {
+        theme,
+        openUrl,
+        openTabFromWebview,
+        currentTabId,
+        onChangeLeftSideActions,
+        browserTabs
+    } = useBrowserContext();
     let tab: BrowserTab | undefined = browserTabs.get(tabId);
 
     if (!tab) {
@@ -50,7 +56,7 @@ export function WebviewDiscoverApps({
             setFirstLoad(false);
         }
     }, [currentTabId]);
-    const url = `${getDiscoverHost(env.isDev)}#${winId}`;
+    const url = `${getDiscoverHost(env.isDev, env.version)}#${winId}`;
     // console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({
@@ -69,6 +75,11 @@ export function WebviewDiscoverApps({
         if (action === 'onOpenTab') {
             const { item } = payload as { item: WebApp };
             openTabFromWebview(item);
+        }
+
+        if (action === 'openMainTabUrl') {
+            const { url } = payload as { url: string };
+            openUrl(url);
         }
     };
 

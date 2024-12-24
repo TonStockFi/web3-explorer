@@ -104,7 +104,7 @@ export function LLmWebview({
                     ws.goTo(url);
                     setLoading(true);
                 }}
-                loading={loading}
+                loading={false}
                 setLoading={(loading: boolean) => setLoading(loading)}
             />
         </View>

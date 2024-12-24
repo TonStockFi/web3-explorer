@@ -8,6 +8,7 @@ import {
     Menu,
     nativeImage,
     screen,
+    shell,
     Tray,
     webContents
 } from 'electron';
@@ -51,6 +52,8 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 const isMac = process.platform === 'darwin';
 const isWin = process.platform === 'win32';
+
+let focusedWin:BrowserWindow|undefined = undefined;
 
 const store = new CookieStore();
 const cookieJar = new CookieJar(store);
@@ -176,7 +179,7 @@ export class MainWindow {
                 this.createTray();
             }
             this.onWinEvent(win);
-            this.handleShotcuts(win);
+            this.handleFocusAndBlure(win);
         } else {
             if (win.isMinimized()) {
                 win.restore();
@@ -262,7 +265,10 @@ export class MainWindow {
 
             this.mainWindow = undefined;
         });
-        this.handleShotcuts(this.mainWindow);
+        this.handleFocusAndBlure(this.mainWindow);
+        setInterval(()=>{
+            this.checkShortcutKeys()
+        },2000)
         this.onWinEvent(this.mainWindow);
         this.mainWindow.webContents.on('dom-ready', () => {
             this.mainWindow.show();
@@ -287,7 +293,7 @@ export class MainWindow {
                 return null;
             }
         });
-
+        
         this.mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
             { urls: [] },
             (details, callback) => {
@@ -406,50 +412,59 @@ export class MainWindow {
             });
         });
     }
-    static onBlur(win: BrowserWindow){
+    static isWinFocused(window?:BrowserWindow){
+        return window && !window.isDestroyed() && window.isVisible() && window.isFocused()
+    }
+    static checkShortcutKeys(){
+        let focusedWin1:BrowserWindow|undefined = undefined;
         const {shortcutKeys} = this;
-        let isAnyWindowFocused = false;
-
         [
             ...Array.from(this.windows)
                 .map(row => row[1]),
             this.mainWindow
         ].forEach(window => {
-            if (window && window.isFocused()) {
-                isAnyWindowFocused = true;
+            if (this.isWinFocused(window)) {
+                focusedWin1 = window;
             }
         });
-
-        if (!isAnyWindowFocused) {
+        if (!focusedWin1) {
+            focusedWin = undefined
+            console.log("===>> shortcutKeys unregister")
             shortcutKeys.forEach(key => {
-                globalShortcut.unregister(key);
+                if(globalShortcut.isRegistered(key)){
+                    globalShortcut.unregister(key);
+                }
             });
-        }
-
-    }
-    static onFocus(win: BrowserWindow){
-        const {shortcutKeys} = this;
-        shortcutKeys.forEach(key => {
-            globalShortcut.register(key, () => {
-                [
-                    ...Array.from(this.windows)
-                        .map(row => row[1]),
-                    this.mainWindow
-                ].forEach(window => {
-                    if (window && window.isFocused()) {
-                        window.webContents.send('onMainMessage', {
+        }else{
+            if(focusedWin1 === focusedWin){
+                return;
+            }
+            shortcutKeys.forEach(key => {
+                if(globalShortcut.isRegistered(key)){
+                    globalShortcut.unregister(key);
+                }
+            });
+            focusedWin = focusedWin1
+            console.log("===>> shortcutKeys onMainMessage",shortcutKeys,this.isWinFocused(focusedWin))
+            shortcutKeys.forEach(key => {
+                if(globalShortcut.isRegistered(key)){
+                    return;
+                }
+                globalShortcut.register(key, () => {
+                    if (this.isWinFocused(focusedWin)) {
+                        console.log("onShortcut")
+                        focusedWin.webContents.send('onMainMessage', {
                             action: 'onShortcut',
                             payload: { key }
                         });
                     }
                 });
             });
-        });
-
+        }
     }
-    static handleShotcuts(win: BrowserWindow) {
+    
+    static handleFocusAndBlure(win: BrowserWindow) {
         win.on('blur', () => {
-            this.onBlur(win)
 
             win.webContents.send('onMainMessage', {
                 action: 'onBlur',
@@ -462,17 +477,29 @@ export class MainWindow {
                 action: 'onFocus',
                 payload: {}
             });
-            this.onFocus(win)
             
         });
     }
-    static onSiteMessage(message: { action: string; payload: any }, senderId: number) {
+    static async onSiteMessage(message: { action: string; payload: any }, senderId: number) {
         console.log('>> site message', message);
         if (message.action === 'isWinReady') {
             const { winId } = message.payload || {};
             const isReady = winId ? !!this.windowsReady.get(winId) : false;
             //console.log(winId,isReady,this.windowsReady.get(winId))
             return isReady;
+        }  else if (message.action === 'openSystemBrowser') {
+            const { url } = message.payload || {};;
+            if (!url) {
+                console.error('No URL provided for openSystemBrowser');
+                return false;
+            }
+            try {
+                await shell.openExternal(url); // Opens the URL in the default system browser
+                return true; // Indicate success
+            } catch (error) {
+                console.error('Failed to open URL in system browser:', error);
+                return false; // Indicate failure
+            }
         } else if (message.action === 'subWin') {
             const { toWinId, ...p } = message.payload || {};
             if (
@@ -517,7 +544,7 @@ export class MainWindow {
                 payload
             });
             return true;
-        } else if (messageAction === 'serverIsReady') {
+        }else if (messageAction === 'serverIsReady') {
             return WebSocketServerWrapper.serverIsReady();
         } else if (messageAction === 'fetch') {
             const { url } = messageValue;

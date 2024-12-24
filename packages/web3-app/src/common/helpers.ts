@@ -20,11 +20,11 @@ export function getPlaygroundScreenSize(tab: BrowserTab) {
     return { width, height };
 }
  
-export function getDiscoverHost(isDev: boolean) {
+export function getDiscoverHost(isDev: boolean,version?:string) {
     if(false){
-        return `${DISCOVER_HOST_DEV}?isDev=true`
+        return `${DISCOVER_HOST_DEV}?isDev=true&version=${version}`
     }else{
-        return `${DISCOVER_HOST}?`
+        return `${DISCOVER_HOST}?version=${version}`
     }
 }
  

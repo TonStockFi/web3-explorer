@@ -308,7 +308,7 @@ export default class WebviewMainEventService {
                 width: minWidth,
                 minWidth: 368,
                 minHeight: height,
-                resizable: resizable_,
+                resizable: !isTelegramTab(tab),
                 height: height,
                 x,
                 y,

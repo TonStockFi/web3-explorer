@@ -28,7 +28,16 @@ export const setProtocolHandlerWindowsLinux = () => {
 
         log.info({ secondInsUrl: url });
         app.whenReady().then(() => {
-            window.webContents.send('tc', url);
+            if(url.startsWith("web3")){
+                window.webContents.send('onMainMessage', {
+                    action: 'onProtocol',
+                    payload: {
+                        url
+                    }
+                });
+            }else{
+                window.webContents.send('tc', url);
+            }
         });
     });
 
@@ -57,7 +66,16 @@ export const setProtocolHandlerOSX = () => {
         app.whenReady().then(async () => {
             const window = await MainWindow.openMainWindow();
             window.show();
-            window.webContents.send('tc', url);
+            if(url.startsWith("web3")){
+                window.webContents.send('onMainMessage', {
+                    action: 'onProtocol',
+                    payload: {
+                        url
+                    }
+                });
+            }else{
+                window.webContents.send('tc', url);
+            }
         });
     });
 };
@@ -76,7 +94,16 @@ const initMainWindow = async () => {
         log.info({ initUrl: url });
 
         if (url != null) {
-            window.webContents.send('tc', url);
+            if(url.startsWith("web3")){
+                window.webContents.send('onMainMessage', {
+                    action: 'onProtocol',
+                    payload: {
+                        url
+                    }
+                });
+            }else{
+                window.webContents.send('tc', url);
+            }
         }
     } catch (e) {
         log.error(e);

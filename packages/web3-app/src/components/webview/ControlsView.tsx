@@ -69,8 +69,8 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                 }
                 onContextMenu({ payload, webContentsId });
             }
-            if (e.action === 'onShortcut') {
-                if (e.payload.key === 'Cmd+Shift+W') {
+            if (action === 'onShortcut') {
+                if (payload.key === 'Cmd+Shift+W') {
                     if (tabId.startsWith('side_')) {
                         return;
                     }
@@ -79,7 +79,7 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                     setFindInPage(null);
                     setContextMenu(null);
                 }
-                if (e.payload.key === 'CommandOrControl+F') {
+                if (payload.key === 'CommandOrControl+F') {
                     const ws = new WebviewService(_currentTabId);
                     if (!ws.getWebview()) {
                         return;
@@ -88,7 +88,7 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                     const text = await getFocusWebviewSelection(_currentTabId);
                     setFindInPage({ text });
                 }
-                if (e.payload.key === 'Escape') {
+                if (payload.key === 'Escape') {
                     setFindInPage(null);
                     setContextMenu(null);
                     onCut(false);

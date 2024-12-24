@@ -14,7 +14,7 @@ import { WebviewTopBar } from './WebViewTopBar';
 
 export function WebviewAppView({ tabId }: { tabId: string }) {
     const { isCutEnable } = useScreenshotContext();
-    const { currentTabId, openTabFromWebview, updateAt, browserTabs, saveTab } =
+    const { currentTabId, openUrl, openTabFromWebview, updateAt, browserTabs, saveTab } =
         useBrowserContext();
 
     const theme = useTheme();
@@ -66,7 +66,6 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
         payload?: Record<string, any> | undefined;
     }) => {
         console.log('_ET', action, payload);
-
         if (action === 'onOpenTab') {
             const { item } = payload as { item: WebApp };
             openTabFromWebview(item);

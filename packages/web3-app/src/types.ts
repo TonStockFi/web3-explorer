@@ -465,3 +465,37 @@ export interface MainMessageEvent{
     fromWinId?: string;
     payload?: Record<string, any>;
 }
+
+export enum WebpageNav{
+    HOME="HOME",
+    JOIN_US="JOIN_US",
+    TOKEN="TOKEN",
+    MALL="MALL",
+    DAO="DAO",
+    WEB3_EXPLORER="WEB3_EXPLORER",
+    WEB3_REMOTE="WEB3_REMOTE",
+    DISCOVER="DISCOVER",
+    GAMES="GAMES_FI",
+    TASK= "TASK"
+}
+
+export interface HodlerRow {
+    address:string,
+    balance:number,
+    tag?:string,
+    pie:string
+}
+
+export interface JobItem {
+    title:string,
+    salary:string,
+    desc:string
+}
+
+export interface MallProduct {
+    title:string,
+    pirce:string,
+    pirceReal:string,
+    desc:string,
+    detail:string
+}

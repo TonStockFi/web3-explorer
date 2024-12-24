@@ -58,8 +58,14 @@ export function ConfirmationDialog(props: ConfirmationDialogProps) {
                     <Button
                         disabled={confirming}
                         onClick={() => {
-                            onConfirm && onConfirm();
-                            onCancel && onCancel();
+                            if (onConfirm) {
+                                const res = onConfirm();
+                                if (!res) {
+                                    onCancel && onCancel();
+                                }
+                            } else {
+                                onCancel && onCancel();
+                            }
                         }}
                     >
                         {confirmTxt ? confirmTxt : 'OK'}

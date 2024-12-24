@@ -173,7 +173,7 @@ export interface ConfirmationDialogProps {
     content: string | any;
     keepMounted?: boolean;
     open?: boolean;
-    onConfirm?: () => void;
+    onConfirm?: () => void | Promise<void> | boolean;
     onCancel?: () => void;
 }
 

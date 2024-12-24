@@ -1,3 +1,4 @@
+
 export function getPartitionKey(key: string) {
     return `persist:${key}`;
 }
@@ -94,7 +95,7 @@ export function sleep(ms: number): Promise<void> {
 
 export function isDesktop() {
     //@ts-ignore
-    return !!window.backgroundApi;
+    return !!window.backgroundApi || !!window.__appApi;
 }
 
 export function formatDappUrl(dappUrl?: string) {
@@ -187,3 +188,43 @@ export const formatTs = (timestamp: number,options?:Intl.DateTimeFormatOptions) 
     const formattedDate: string = date.toLocaleString('en-US', options1);
     return formattedDate;
 };
+
+
+export function openWindow(url: string) {
+    if(isDesktop()){
+        if(url.endsWith(".zip")||url.endsWith(".dmg")||url.endsWith(".exe")){
+            window.__appApi.message({
+                action: 'openSystemBrowser',
+                payload: { url }
+            });
+            return;
+        }
+        window.__appApi.message({
+            action: 'openMainTabUrl',
+            payload: { url }
+        });
+    }else{
+        window.open(url);
+    }
+}
+
+export function isIntel() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    // Check for Mac but not ARM-based (e.g., Apple Silicon)
+    return userAgent.includes("mac") && !userAgent.includes("arm") && !userAgent.includes("apple silicon");
+}
+
+export function isMac() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return userAgent.includes("mac");
+}
+
+export  function isWin32() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return userAgent.includes("win");
+}
+
+export function isLinux() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return userAgent.includes("linux");
+}

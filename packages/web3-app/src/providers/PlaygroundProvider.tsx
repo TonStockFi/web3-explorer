@@ -115,7 +115,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
             (account?.id || '1') +
             (account?.index || '1') +
             (tabInit?.tabId || ''),
-        showMobileInit ? ExtensionType.GEMINI : ExtensionType.NULL
+        ExtensionType.NULL
     );
 
     useEffect(() => {
