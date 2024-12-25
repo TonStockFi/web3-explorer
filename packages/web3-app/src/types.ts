@@ -464,6 +464,7 @@ export interface MainMessageEvent{
     webContentsId?: Number;
     fromWinId?: string;
     payload?: Record<string, any>;
+    __msg_id?:number;
 }
 
 export enum WebpageNav{
@@ -476,6 +477,7 @@ export enum WebpageNav{
     WEB3_REMOTE="WEB3_REMOTE",
     DISCOVER="DISCOVER",
     GAMES="GAMES_FI",
+    SWAP="SWAP",
     TASK= "TASK"
 }
 
@@ -492,6 +494,11 @@ export interface JobItem {
     desc:string
 }
 
+export interface ProposalItem {
+    title:string,
+    detail:string,
+    creator:string
+}
 export interface MallProduct {
     title:string,
     pirce:string,

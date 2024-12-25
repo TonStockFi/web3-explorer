@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld('backgroundApi', {
             senderWebContentsId: number;
             message: { action: string; payload?: Record<string, any> };
         }) => void
-    ) => ipcRenderer.on('siteMessage', (_event, value) => callback(value)),
+    ) => ipcRenderer.on('siteMessage', (_event, value) => callback({...value,__msg_id:+new Date()})),
     onTonConnect: (callback: (url: string) => void) =>
         ipcRenderer.on('tc', (_event, value) => callback(value)),
     onTonConnectTransaction: (callback: (value: SendTransactionAppRequest) => void) =>
@@ -31,5 +31,5 @@ contextBridge.exposeInMainWorld('backgroundApi', {
         ipcRenderer.on('disconnect', (_event, value) => callback(value)),
     onRefresh: (callback: () => void) => ipcRenderer.on('refresh', _event => callback()),
     onMainMessage: (callback: (e:{toWinId?:string;fromWinId?:string;action:string,payload?: Record<string, any>}) => void) =>
-        ipcRenderer.on('onMainMessage', (_event, value) => callback(value))
+        ipcRenderer.on('onMainMessage', (_event, value) => callback({...value,__msg_id:+new Date()}))
 });

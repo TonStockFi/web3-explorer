@@ -1,5 +1,11 @@
 import { useBrowserContext } from '../providers/BrowserProvider';
-import { MainMessageEvent, Network, PayCommentOrder, SendTransferPayload } from '../types';
+import {
+    MainMessageEvent,
+    MallProduct,
+    Network,
+    PayCommentOrder,
+    SendTransferPayload
+} from '../types';
 
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
@@ -26,7 +32,7 @@ import { PayCommentOrderBackgroundPage } from './webview-background/PayCommentOr
 export function MainMessageDispatcher() {
     const { onShowWallet } = useIAppContext();
     const { onShowProBuyDialog, checkPayCommentOrder, onCheckPayCommentOrder } = usePro();
-    const { openUrl, openTab } = useBrowserContext();
+    const { openUrl, openTabFromWebview, openTab } = useBrowserContext();
     const accounts = usePublicAccountsInfo();
     const { id: accountId } = useAccountInfo();
     const activeAcount = useActiveAccount();
@@ -100,17 +106,28 @@ export function MainMessageDispatcher() {
                     switch (pathname) {
                         case '//onBuyProduct': {
                             const productHex = searchParams.get('product');
-                            alert(productHex);
+                            if (productHex) {
+                                const product = JSON.parse(
+                                    Buffer.from(productHex, 'hex').toString()
+                                ) as MallProduct;
+                                alert(JSON.stringify(product));
+                            }
                             break;
                         }
                         case '//openMainTabUrl': {
                             const urlHex = searchParams.get('url');
-                            alert(urlHex);
+                            if (urlHex) {
+                                const { url } = JSON.parse(Buffer.from(urlHex, 'hex').toString());
+                                openUrl(url);
+                            }
                             break;
                         }
                         case '//onOpenTab': {
                             const itemHex = searchParams.get('item');
-                            alert(itemHex);
+                            if (itemHex) {
+                                const item = JSON.parse(Buffer.from(itemHex, 'hex').toString());
+                                openTabFromWebview(item);
+                            }
                             break;
                         }
                         default:

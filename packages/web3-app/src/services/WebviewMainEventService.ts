@@ -82,6 +82,15 @@ export default class WebviewMainEventService {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(
                 async (e: MainMessageEvent) => {
+                    if(e.__msg_id){
+                        const flag = sessionStorage.getItem(String(e.__msg_id))
+                        console.log("__msg_id",e.__msg_id,flag)
+                        if (flag) {
+                            return false;
+                        }
+                        sessionStorage.setItem(String(e.__msg_id),"true")
+                    }
+                    console.log("MainMessageEvent",e)
                     await cb(e);
                 }
             );
