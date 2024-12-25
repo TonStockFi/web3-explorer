@@ -38,7 +38,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:
-            VERSION: 1.0.79
+            VERSION: 1.0.80
             PROJECT_NAME: Web3Explorer
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -90,7 +90,7 @@ jobs:
               env:
                   tag: ${{ github.ref_name }}
               run: |
-                  gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/win32/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}}.zip"
+                  #gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/win32/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}}.zip"
                   mv "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-${{env.VERSION}} Setup.exe" "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}} Setup.exe"
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/squirrel.windows/x64/${{env.PROJECT_NAME}}-win32-x64-${{env.VERSION}} Setup.exe"
             - name: Release Upload assets on mac
@@ -100,7 +100,7 @@ jobs:
                   #ls apps/desktop/out/make/zip/darwin/${{ matrix.tag }}
                   mv "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-${{env.VERSION}}-${{ matrix.tag }}.dmg" "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.dmg"
                   gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.dmg"
-                  gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/darwin/${{ matrix.tag }}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.zip"
+                  #gh release upload ${{ github.ref_name }} "${{env.MAKE_OUT_DIR}}/zip/darwin/${{ matrix.tag }}/${{env.PROJECT_NAME}}-darwin-${{ matrix.tag }}-${{env.VERSION}}.zip"
             - name: Release Upload assets on linux x64
               if: runner.os == 'Linux' && matrix.tag != 'x64'
               run: |
