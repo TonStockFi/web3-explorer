@@ -106,6 +106,18 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     const showConfirm = (v: boolean | ConfirmationDialogProps) =>
         setConfirm(v ? (v as ConfirmationDialogProps) : undefined);
     useEffect(() => {
+        function onMainMessage(event: any) {
+            const e = event.detail;
+            if (e.action === 'onFullScreen') {
+                setIsFullScreen(e.payload.isFullScreen);
+                setEnv(env => {
+                    return {
+                        ...env,
+                        isFullScreen: e.payload.isFullScreen
+                    };
+                });
+            }
+        }
         if (window.backgroundApi) {
             window.backgroundApi
                 .message({
@@ -130,26 +142,7 @@ export const IAppProvider = (props: { children: ReactNode }) => {
                     }
                     setIsReady(true);
                 });
-
-            window.backgroundApi.onMainMessage(async (e: any) => {
-                if (e.__msg_id) {
-                    const flag = sessionStorage.getItem(String(e.__msg_id) + '1');
-                    console.log('__msg_id', e.__msg_id, flag);
-                    if (flag) {
-                        return false;
-                    }
-                    sessionStorage.setItem(String(e.__msg_id) + '1', 'true');
-                }
-                if (e.action === 'onFullScreen') {
-                    setIsFullScreen(e.payload.isFullScreen);
-                    setEnv(env => {
-                        return {
-                            ...env,
-                            isFullScreen: e.payload.isFullScreen
-                        };
-                    });
-                }
-            });
+            window.addEventListener('onMainMessage', onMainMessage);
         }
 
         const handleResize = () => {
@@ -166,6 +159,9 @@ export const IAppProvider = (props: { children: ReactNode }) => {
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
+            if (window.backgroundApi) {
+                window.removeEventListener('onMainMessage', onMainMessage);
+            }
         };
     }, []);
     const isMacNotFullScreen = env.isMac && !env.isFullScreen;

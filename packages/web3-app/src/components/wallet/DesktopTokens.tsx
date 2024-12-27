@@ -4,11 +4,11 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '@tonkeeper/uikit/dist/components/desktop/DesktopViewLayout';
-import { JettonAsset, TonAsset } from '@tonkeeper/uikit/dist/components/home/Jettons';
 import { useAssets } from '@tonkeeper/uikit/dist/state/home';
 import { useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import styled, { css } from 'styled-components';
+import { JettonAsset, TonAsset } from './Jettons';
 
 import { useAssetsDistribution } from '@tonkeeper/uikit/dist/state/asset';
 import { View } from '@web3-explorer/uikit-view/dist/View';

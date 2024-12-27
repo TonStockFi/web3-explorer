@@ -64,12 +64,12 @@ export default class WebviewMainEventService {
         payload?: Record<string, any>,
     ) {
         if (payload?.__msg_id) {
-            const flag = sessionStorage.getItem(payload.__msg_id)
-            console.log("__msg_id",payload.__msg_id,flag)
+            const flag = sessionStorage.getItem(action+payload.__msg_id)
+            console.log("__msg_id",action,payload.__msg_id,flag)
             if (flag) {
                 return false;
             }
-            sessionStorage.setItem(payload.__msg_id,"true")
+            sessionStorage.setItem(action+payload.__msg_id,"true")
         }
         if (['accountsPublic', 'onBlur', 'onFocus'].indexOf(action) === -1) {
             console.debug('> _ET onMainMessage', action);
@@ -82,15 +82,6 @@ export default class WebviewMainEventService {
         window.backgroundApi &&
             window.backgroundApi.onMainMessage(
                 async (e: MainMessageEvent) => {
-                    if(e.__msg_id){
-                        const flag = sessionStorage.getItem(String(e.__msg_id))
-                        console.log("__msg_id",e.__msg_id,flag)
-                        if (flag) {
-                            return false;
-                        }
-                        sessionStorage.setItem(String(e.__msg_id),"true")
-                    }
-                    console.log("MainMessageEvent",e)
                     await cb(e);
                 }
             );
@@ -340,7 +331,7 @@ export default class WebviewMainEventService {
     async closePlaygroundWindow({ index, tabId }: { index: number; tabId: string }) {
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
         const r = await this.isWinReady(winId);
-        console.log({ winId }, r);
+        // console.log({ winId }, r);
         await this.closeWindow(winId);
     }
 

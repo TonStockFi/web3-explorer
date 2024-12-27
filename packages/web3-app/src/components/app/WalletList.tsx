@@ -53,19 +53,6 @@ const AsideMenuItem = styled.div<{ isSelected: boolean }>`
         background: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.56)};
     }
 `;
-const IconAction = styled(AsideMenuItem)<{ isSelected: boolean }>`
-    zoom: 0.8;
-    padding: 6px 10px;
-    gap: 0;
-`;
-
-const IconWrapper = styled.div`
-    color: ${p => p.theme.iconSecondary};
-    height: fix-content;
-    > svg {
-        display: block;
-    }
-`;
 
 export const WalletList = () => {
     const activeAcount = useActiveAccount();
@@ -205,7 +192,7 @@ export const WalletList = () => {
                                     onClickWallet(wallet.activeTonWalletId);
 
                                     if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
-                                        onShowWalletList(false);
+                                        //onShowWalletList(false);
                                     }
                                 }}
                                 isSelected={activeDerivationIndex === wallet.index}
@@ -229,7 +216,7 @@ export const WalletList = () => {
                                             {'#' + (wallet.index + 1)}
                                         </WalletIndexBadge>
                                     </View>
-                                    <AddressWithCopy address={address} />
+                                    <AddressWithCopy hideChainView showAddress address={address} />
                                 </View>
                             </AsideMenuItem>
                         </View>

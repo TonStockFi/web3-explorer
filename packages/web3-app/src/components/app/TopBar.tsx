@@ -9,7 +9,7 @@ import { TabBar } from './TabBar';
 export const TopBar = () => {
     const ref = createRef<HTMLDivElement>();
     const { currentTabId, updateAt, t, browserTabs, closeTab, openTab } = useBrowserContext();
-    const { walletAside } = useIAppContext();
+    const { walletAside, showWalletList } = useIAppContext();
 
     useEffect(() => {
         const handleKeyDown = (event: any) => {
@@ -48,6 +48,10 @@ export const TopBar = () => {
         .map(row => row.tabId);
     urlTabs.reverse();
     const showPlus = currentTabId !== MAIN_NAV_TYPE.DISCOVERY;
+    let mr = showPlus ? 44 : 0;
+    if (showWalletList) {
+        mr = 380;
+    }
     return (
         <View borderBox relative flx rowVCenter m={8} borderRadius={8} mr={0}>
             <View
@@ -119,7 +123,7 @@ export const TopBar = () => {
                         />
                     );
                 })} */}
-                <View appRegionDrag={!walletAside} flex1 h={36} mr={showPlus ? 44 : 0} />
+                <View appRegionDrag={!walletAside} flex1 h={36} mr={mr} />
                 <View abs right={12} top={0} rowVCenter hide={!showPlus}>
                     <View
                         tips={t('AddTab')}

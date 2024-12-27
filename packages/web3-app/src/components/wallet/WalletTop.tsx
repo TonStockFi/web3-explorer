@@ -5,7 +5,7 @@ import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useWalletTotalBalance } from '@tonkeeper/uikit/dist/state/asset';
-import { useActiveAccount, useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import {
     HistoryIcon,
     PhotoLibrary,
@@ -20,6 +20,7 @@ import { useBlockChainExplorer } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
+import { WalletList } from '../app/WalletList';
 import { NetworkView } from '../aside/NetworkView';
 import { DesktopHeaderBalance } from '../dashboard/DesktopHeaderElements';
 import { WalletEmoji } from '../WalletEmoji';
@@ -87,8 +88,7 @@ export function WalletTop() {
 
     let accountEmoji = account.emoji;
     let accountTitle = `${account.name}`;
-    const network = useActiveTonNetwork();
-    const { onShowWalletList, onShowWallet } = useIAppContext();
+    const { onShowWalletList, showWalletList, onShowWallet } = useIAppContext();
     if (account.type === 'mam') {
         const name = account.activeDerivation.name;
         accountEmoji = account.activeDerivation.emoji;
@@ -111,6 +111,19 @@ export function WalletTop() {
             bgColor={theme.backgroundBrowser}
             column
         >
+            <View
+                drawer={{
+                    onClose: () => {
+                        onShowWalletList(false);
+                    },
+                    open: showWalletList,
+                    anchor: 'right'
+                }}
+            >
+                <View width={380}>
+                    <WalletList></WalletList>
+                </View>
+            </View>
             <View w100p center column>
                 <View w100p center mb12 relative>
                     <View abs top={-6} left={0} h={44} rowVCenter>
@@ -152,9 +165,9 @@ export function WalletTop() {
                             rowVCenter
                             textFontSize="0.9rem"
                             text={`${accountTitle}`}
-                            mr12
+                            mr={6}
                         />
-                        <View iconSmall icon="ExpandMore" />
+                        <View iconSmall icon="ArrowRight" />
                     </View>
                 </View>
                 <View>

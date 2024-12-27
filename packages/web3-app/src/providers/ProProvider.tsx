@@ -39,7 +39,11 @@ export const ProProvider = (props: { children: ReactNode }) => {
     };
     const onChangeProInfo = (proInfo: ProInfoProps) => {
         setProInfo(proInfo);
-        new ProService(proInfo.id).save(proInfo.index, proInfo);
+        new ProService(proInfo.index + proInfo.id).save(proInfo.index, proInfo).then(() => {
+            new ProService(proInfo.index + proInfo.id).getAll().then(rows => {
+                updateProInfo(rows);
+            });
+        });
     };
 
     const onShowProBuyDialog = (v: boolean) => {

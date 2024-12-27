@@ -1,4 +1,4 @@
-import { showGlobalLoading } from '../common/helpers';
+import { getAccountIdFromAccount, showAlertMessage, showGlobalLoading } from '../common/helpers';
 import { sleep } from '../common/utils';
 import { isTelegramWeb } from '../providers/PlaygroundProvider';
 import { AccountPublic } from '../types';
@@ -224,6 +224,18 @@ async function getCachedImageAsDataUri(userId,accessKey){
         } catch (e) {
             console.error(e);
             return null;
+        }
+    }
+    async sendAccountIdAddAddress(account:AccountPublic){
+        const id = getAccountIdFromAccount(account)
+        const res = await this.waitForElemenBoundingClientRect(`#editable-message-text`);
+        if (res) {
+            this.execJs(`document.querySelector("#editable-message-text").innerHTML = ""`)
+            await this.sendClickEvent(res.left + res.width / 2, res.top + res.height / 2);
+            await sleep(100);
+            this.insertText("AccountId: "+id + "\n"+"Address: "+account.address);
+        }else{
+            showAlertMessage("发送失败")
         }
     }
 }

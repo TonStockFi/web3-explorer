@@ -84,7 +84,6 @@ const HistoryEventSingle: FC<{
 
     const hasButton = Boolean(onCollapse || onExpand);
     isGroupItem ||= hasButton;
-
     return (
         <>
             {event.actions.map((action, index) => (

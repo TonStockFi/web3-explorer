@@ -105,7 +105,7 @@ export const DesktopHistory: FC<{
             return i;
         });
     }, [activity]);
-
+    // console.log({ activity, aggregatedActivity });
     return (
         <>
             <ActivityNotification

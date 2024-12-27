@@ -22,8 +22,10 @@ const CopyIconStyled = styled(CopyIcon)`
 `;
 export function AddressWithCopy({
     showAddress,
+    hideChainView,
     address
 }: {
+    hideChainView?: boolean;
     showAddress?: boolean;
     address: string;
 }) {
@@ -57,22 +59,25 @@ export function AddressWithCopy({
 
     return (
         <View row aCenter jEnd>
-            <View
-                ml={6}
-                hide={hovered && !showAddress}
-                icon={'Language'}
-                iconFontSize="0.8rem"
-                tips={t('transaction_view_in_explorer')}
-                iconButton={{ sx: { color: theme.textPrimary } }}
-                iconButtonSmall
-                onClick={(e: any) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const url = accountExplorer.replace('%s', address);
-                    openUrl(url);
-                    return false;
-                }}
-            />
+            {!hideChainView && (
+                <View
+                    ml={6}
+                    hide={hovered && !showAddress}
+                    icon={'Language'}
+                    iconFontSize="0.8rem"
+                    tips={t('transaction_view_in_explorer')}
+                    iconButton={{ sx: { color: theme.textPrimary } }}
+                    iconButtonSmall
+                    onClick={(e: any) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const url = accountExplorer.replace('%s', address);
+                        openUrl(url);
+                        return false;
+                    }}
+                />
+            )}
+
             <View
                 ml={6}
                 h100p

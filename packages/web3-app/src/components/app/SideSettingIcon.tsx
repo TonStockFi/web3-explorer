@@ -1,6 +1,5 @@
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { DevSettings } from '@tonkeeper/uikit/dist/pages/settings/Dev';
-import { FiatCurrency } from '@tonkeeper/uikit/dist/pages/settings/FiatCurrency';
 import { Localization } from '@tonkeeper/uikit/dist/pages/settings/Localization';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
@@ -316,9 +315,9 @@ export default function SideSettingIcon() {
                                     <View empty hide={dialogType !== 'Localization'}>
                                         <Localization />
                                     </View>
-                                    <View empty hide={dialogType !== 'FiatCurrency'}>
+                                    {/* <View empty hide={dialogType !== 'FiatCurrency'}>
                                         <FiatCurrency />
-                                    </View>
+                                    </View> */}
                                     <View empty hide={dialogType !== 'DevSettings'}>
                                         <DevSettings />
                                     </View>

@@ -1,7 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect } from 'react';
-import { WalletList } from '../../components/app/WalletList';
 import { DesktopTokens } from '../../components/wallet/DesktopTokens';
 import { WalletTop } from '../../components/wallet/WalletTop';
 import { useIAppContext } from '../../providers/IAppProvider';
@@ -12,13 +11,7 @@ export function WalletPage() {
     useEffect(() => {
         onSelectToken('');
     }, []);
-    if (showWalletList) {
-        return (
-            <View absFull>
-                <WalletList></WalletList>
-            </View>
-        );
-    }
+
     return (
         <View absFull>
             <View

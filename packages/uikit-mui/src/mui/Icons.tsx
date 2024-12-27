@@ -57,6 +57,7 @@ import NorthEast from '@mui/icons-material/NorthEast';
 import NotificationImportant from '@mui/icons-material/NotificationImportant';
 import OpenInFull from '@mui/icons-material/OpenInFull';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Person from '@mui/icons-material/Person';
 import PhotoLibrary from '@mui/icons-material/PhotoLibrary';
 import PrecisionManufacturing from '@mui/icons-material/PrecisionManufacturing';
 import Psychology from '@mui/icons-material/Psychology';
@@ -134,6 +135,7 @@ export type IconList =
     | 'Gemini'
     | 'StarOutline'
     | 'Star'
+    | 'Person'
     | 'AutoFixHigh'
     | 'Logout'
     | 'MoreVert'
@@ -198,6 +200,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     AutoFixHigh,
     OpenInFull,
     EmojiEvents,
+    Person,
     GiClick,
     Stop: StopIcon,
     WifiTetheringError,

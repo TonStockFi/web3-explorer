@@ -1,5 +1,6 @@
 import { useBrowserContext } from '../providers/BrowserProvider';
 import {
+    AccountPublic,
     MainMessageEvent,
     MallProduct,
     Network,
@@ -17,9 +18,10 @@ import {
     useActiveTonNetwork,
     useMutateActiveTonWallet
 } from '@tonkeeper/uikit/dist/state/wallet';
+import { deepDiff } from '@web3-explorer/utils';
 import { useEffect, useState } from 'react';
 import { onAction } from '../common/electron';
-import { genId } from '../common/helpers';
+import { genId, getAccountIdFromAccount } from '../common/helpers';
 import { currentTs, getSessionCacheInfo } from '../common/utils';
 import { useAccountInfo, usePublicAccountsInfo } from '../hooks/wallets';
 import { useIAppContext } from '../providers/IAppProvider';
@@ -34,7 +36,7 @@ export function MainMessageDispatcher() {
     const { onShowProBuyDialog, checkPayCommentOrder, onCheckPayCommentOrder } = usePro();
     const { openUrl, openTabFromWebview, openTab } = useBrowserContext();
     const accounts = usePublicAccountsInfo();
-    const { id: accountId } = useAccountInfo();
+    const { id: accountId, index } = useAccountInfo();
     const activeAcount = useActiveAccount();
     const network = useActiveTonNetwork();
     const { data: connections } = useActiveWalletTonConnectConnections();
@@ -43,6 +45,12 @@ export function MainMessageDispatcher() {
     const format = useFormatCoinValue();
     const [_, setPayCommentOrder] = useState<null | PayCommentOrder>(null);
     const { mutate: mutateDevSettings } = useMutateDevSettings();
+    const [accountsList, setAccountsList] = useState<AccountPublic[]>([]);
+    useEffect(() => {
+        if (deepDiff(accounts, accountsList)) {
+            setAccountsList(accounts);
+        }
+    }, [accounts, accountsList]);
     useEffect(() => {
         sessionStorage.setItem(
             'cacheInfo',
@@ -110,7 +118,6 @@ export function MainMessageDispatcher() {
                                 const product = JSON.parse(
                                     Buffer.from(productHex, 'hex').toString()
                                 ) as MallProduct;
-                                alert(JSON.stringify(product));
                             }
                             break;
                         }
@@ -259,7 +266,9 @@ export function MainMessageDispatcher() {
                 openUrl(e.payload!.url);
             }
             if (e.action === 'getProInfo') {
-                const proInfoList = await new ProService(accountId).getAll();
+                const proInfoList = await new ProService(
+                    getAccountIdFromAccount({ id: accountId, index: index })
+                ).getAll();
                 onAction('subWin', {
                     toWinId: e.fromWinId!,
                     action: 'updateProInfo',
@@ -269,11 +278,14 @@ export function MainMessageDispatcher() {
                 });
             }
             if (e.action === 'getAccountsPublic') {
-                onAction('subWin', {
-                    fromWinId: 'main',
-                    toWinId: e.fromWinId,
-                    action: 'accountsPublic',
-                    payload: { accounts }
+                setAccountsList((accounts: AccountPublic[]) => {
+                    onAction('subWin', {
+                        fromWinId: 'main',
+                        toWinId: e.fromWinId,
+                        action: 'accountsPublic',
+                        payload: { accounts }
+                    });
+                    return accounts;
                 });
             }
         });

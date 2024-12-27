@@ -1,6 +1,7 @@
 import { MenuProps } from "@mui/material/Menu/Menu";
-import { DISCOVER_HOST, DISCOVER_HOST_DEV, PLAYGROUND_WEBVIEW_HEIGHT, PLAYGROUND_WEBVIEW_WIDTH } from "../constant";
+import { DISCOVER_HOST, DISCOVER_HOST_DEV, PLAYGROUND_WEBVIEW_HEIGHT, PLAYGROUND_WEBVIEW_WIDTH, TELEGRAME_WEB } from "../constant";
 
+import { md5 } from "@web3-explorer/lib-crypto/dist/utils";
 import { v4 as uuidv4 } from 'uuid';
 import { BrowserTab } from "../providers/BrowserProvider";
 import { RoiInfo, SUB_WIN_ID } from "../types";
@@ -88,3 +89,11 @@ export function getDropdownMenuOptions(id:string){
     } as Partial<MenuProps>
 }
 export const sortPriority = (a: RoiInfo, b: RoiInfo) => b.priority - a.priority;
+
+export function getTelegramChatUrl(chatId:string){
+    return `${TELEGRAME_WEB}#${chatId}`
+}
+
+export function getAccountIdFromAccount(account:{id:string,index:number}){
+    return `${account.index}${md5(account.id+"TON_WEB3"+account.id.substring(0,4))}`
+}

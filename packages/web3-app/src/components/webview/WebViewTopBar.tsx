@@ -53,7 +53,22 @@ export function WebviewTopBar({
     return (
         <View aCenter jStart wh100p pr={4} borderBox pl={0}>
             <View empty>
+                <View>
+                    <WalletSide />
+                </View>
+            </View>
+            <View h={44} row aCenter ml12 flex1>
+                <UrlInput
+                    urlReadOnly={urlReadOnly}
+                    isDiscover={false}
+                    currentUrl={currentUrl}
+                    tab={tab}
+                />
+            </View>
+
+            <View ml12 rowVCenter>
                 <View
+                    hide
                     center
                     mr12
                     onClick={() => {
@@ -73,6 +88,7 @@ export function WebviewTopBar({
                 />
 
                 <View
+                    tips={'reload'}
                     onClick={() => {
                         const ws = new WebviewService(tab.tabId);
                         const webview = ws.getWebview();
@@ -90,17 +106,6 @@ export function WebviewTopBar({
                     iconProps={{ sx: { width: 18, height: 18 } }}
                     icon={loading ? 'Close' : 'Refresh'}
                 />
-            </View>
-            <View h={44} row aCenter ml12 flex1>
-                <UrlInput
-                    urlReadOnly={urlReadOnly}
-                    isDiscover={false}
-                    currentUrl={currentUrl}
-                    tab={tab}
-                />
-            </View>
-
-            <View ml12 rowVCenter>
                 <View
                     hide={hideOpenInNew1}
                     borderRadius={8}
@@ -118,7 +123,6 @@ export function WebviewTopBar({
                         new WebviewMainEventService().openPlaygroundWindow(tab, account, env);
                     }}
                 />
-                <WalletSide />
             </View>
         </View>
     );

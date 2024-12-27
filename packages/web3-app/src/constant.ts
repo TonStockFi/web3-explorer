@@ -1,12 +1,18 @@
 import { CHAIN, ChainListItem, MAIN_NAV_TYPE, MainNavListItem, ProPlan } from './types';
-export const PRO_RECV_ADDRESS="UQAonoXuQ_1WzZhwbuoIHYFwBqkVCmZSf-yr0DQ1uhnIz53g"
+export const PRO_RECV_ADDRESS="UQDUawBs8JDdr3QR4dYDkJq2ic9_0yNRSp-6eq29MKZKUkT-"
 
+export const W3C_JETTON_CONTRACT  = '0:3f145e2bd301b31329418ca3b8aea0d6c44f0ecfa85b5b412787d87c55284e76'
 export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdYGAl8I2,0|TK1z-z7apmAbgW_o6toLWx1T,0"
 export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
 export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
 
 export const P2E_ChatId = '7363481027';
+
+export const W3C_ChatId = '7469429463';
+export const SWAP_ChatId = '7469429463';
+
 export const SERVICE_ChatId = '7187821521';
+export const TASK_CENTER_ChatId = '7187821521';
 export const BOT_ID_EXTESSION_CENTER = '7168826112';
 export const BOT_ID_SERVICE_CENTER = '7853783224';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
@@ -177,20 +183,14 @@ export const ProPlans: ProPlan[] = [
     {
         level: "LONG",
         name: '永久至尊',
-        description: `提供 {accountTitle} 下的N个钱包帐号的无限制无期限使用功能。包括不限于: 一对多转帐、超级智能机器识别辅助、多帐户资产汇总分析`,
-        amount: '199990000000'
+        description: `提供 {accountTitle} 下的不限钱包帐号的无限制无期限使用功能;一对一,7*24小时技术支持;优先获取空投;奖励积分翻倍`,
+        amount: '19999'
     },
     {
         level: "YEAR",
-        name: '年付',
-        description: `提供 {walletTitle} 无限制功能,使用期限一年。包括不限于: 一对多转帐、超级智能机器识别辅助、多帐户资产汇总分析`,
-        amount: '19999000000'
-    },
-    {
-        level: "MONTH",
-        name: '月付',
-        description: `提供 {walletTitle} 无限制功能,使用期限一个月。包括不限于: 一对多转帐、超级智能机器识别辅助`,
-        amount: '1999900000'
+        name: '年付会员',
+        description: `提供 {walletTitle} 下无限制功能,使用期限一年。优先获取空投，工单技术支持`,
+        amount: '999'
     },
 ];
 
@@ -215,7 +215,6 @@ export const TASK_ID_ROI = "#2"
 export const ALL_ID_ROI = ""
 export const NOT_SHOW_IDS_ROI = [ALL_ID_ROI,MARK_ID_ROI,TASK_ID_ROI,ENTRY_ID_ROI]
 export const DEFAULT_CUT_AREA = {
-   
     x: 0,
     y: 0,
     w: 0,

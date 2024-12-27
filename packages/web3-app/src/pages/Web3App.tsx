@@ -31,7 +31,7 @@ import { DesktopMultiSendFormPage } from './Wallet/multi-send/MultiSendFormPage'
 import { WalletPage } from './Wallet/WalletPage';
 
 function Pages() {
-    let { currentTabId, openTab } = useBrowserContext();
+    let { currentTabId } = useBrowserContext();
     const mainNavType = currentTabId as MAIN_NAV_TYPE;
     return (
         <>

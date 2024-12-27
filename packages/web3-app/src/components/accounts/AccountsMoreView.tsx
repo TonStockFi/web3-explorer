@@ -26,7 +26,6 @@ export const AccountsMoreView: FC<{
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
     const wallet = activeAccount.activeTonWallet;
-    console.log(activeAccount.id, wallet.id);
     const { t } = useTranslation();
     const { onOpen: recovery } = useRecoveryNotification();
 

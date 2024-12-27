@@ -8,6 +8,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { isPlaygroundWebApp } from '../../common/helpers';
+import { W3C_ChatId } from '../../constant';
 import { BrowserTab } from '../../providers/BrowserProvider';
 import { usePlayground } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
@@ -15,6 +16,7 @@ import TgTwaIframeService from '../../services/TgTwaIframeService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
+import WebviewServiceTelegram from '../../services/WebviewServiceTelegram';
 import { AccountPublic } from '../../types';
 
 export default function MoreTopbarDropdown({
@@ -53,6 +55,7 @@ export default function MoreTopbarDropdown({
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const isW3CTgChat = tab.url && tab.url.indexOf(W3C_ChatId) > -1;
 
     const slotProps = {
         paper: {
@@ -60,7 +63,7 @@ export default function MoreTopbarDropdown({
             sx: {
                 bgcolor: theme.backgroundContentAttention,
                 overflow: 'visible',
-                width: '180px',
+                width: '280px',
                 filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                 mt: 2.5,
                 ml: 1,
@@ -119,6 +122,38 @@ export default function MoreTopbarDropdown({
                 onClose={handleClose}
                 TransitionComponent={Fade}
             >
+                <View
+                    hide={!isPlaygroundWebApp()}
+                    menuItem
+                    onClick={async () => {
+                        setAnchorEl(null);
+                        if (tab.url) {
+                            new WebviewService(tab.tabId).goTo(tab.url);
+                        }
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={'Home'} iconSmall />
+                    </ListItemIcon>
+                    <View text={t(`主页`)} textFontSize="0.9rem" />
+                </View>
+                <View
+                    hide={!isW3CTgChat}
+                    menuItem
+                    onClick={async () => {
+                        if (currentAccount) {
+                            const service = new WebviewServiceTelegram(tab.tabId);
+                            service.sendAccountIdAddAddress(currentAccount);
+                        }
+                        setAnchorEl(null);
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={'Person'} iconSmall />
+                    </ListItemIcon>
+                    <View text={t(`发送帐户ID和地址`)} textFontSize="0.9rem" />
+                </View>
+
                 <View
                     hide={!isPlaygroundWebApp()}
                     menuItem

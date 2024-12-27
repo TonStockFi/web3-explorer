@@ -40,17 +40,21 @@ export const WalletSide = () => {
                 icon={<ImageIcon size={20} icon={currentChain?.icon!} />}
             ></View>
             <View
-                iconButtonSmall
-                onClick={() => onShowWallet(true)}
-                tips={t('wallet_title')}
-                icon={'AccountBalanceWallet'}
-            ></View>
-            <View
+                mr={4}
                 tips={t('切换账户')}
                 onClick={() => showWalletAside(true)}
                 sx={{ '& svg': { zoom: 1.5 } }}
                 iconButtonSmall
                 icon={'AiOutlineUserSwitch'}
+            ></View>
+            <View
+                buttonOutlined={`${accountEmoji} ${accountTitle}`}
+                onClick={() => onShowWallet(true)}
+                tips={t('wallet_title')}
+                icon={'AccountBalanceWallet'}
+                buttonEndIcon={
+                    <View iconProps={{ sx: { width: 14, height: 12 } }} icon={'ExpandMore'}></View>
+                }
             ></View>
             <View
                 hide

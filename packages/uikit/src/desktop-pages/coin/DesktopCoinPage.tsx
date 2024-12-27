@@ -13,6 +13,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
+import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Button } from '../../components/fields/Button';
 import { BuyNotification } from '../../components/home/BuyAction';
 import { useAppContext } from '../../hooks/appContext';
@@ -30,7 +31,6 @@ import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useIsActiveWalletWatchOnly } from '../../state/wallet';
-import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();

@@ -26,7 +26,7 @@ export const ChainListView = () => {
                     display: 'block',
                     position: 'absolute',
                     top: 44,
-                    right: 86,
+                    left: 24,
                     width: 10,
                     height: 10,
                     opacity: 1,
@@ -46,7 +46,7 @@ export const ChainListView = () => {
                     border: `1px solid ${theme.separatorCommon}`,
                     boxShadow: ' 0px 4px 16px rgba(0, 0, 0, 0.16)'
                 }}
-                right={12}
+                left={0}
                 bgColor={theme.backgroundBrowser}
                 borderBox
                 borderRadius={8}

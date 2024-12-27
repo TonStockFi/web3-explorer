@@ -4,10 +4,10 @@ import { ListBlockDesktopAdaptive } from '@tonkeeper/uikit/dist/components/List'
 
 import { DesktopViewPageLayout } from '@tonkeeper/uikit/dist/components/desktop/DesktopViewLayout';
 import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
-import { useCheckTouchId } from '@tonkeeper/uikit/dist/state/password';
 import {
     useAccountsState,
     useActiveAccount,
+    useMutateActiveAccount,
     useMutateActiveTonWallet
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
@@ -35,7 +35,6 @@ export const ManageSubWalletPage = () => {
     const accounts = useAccountsState();
     const activeAccount = useActiveAccount();
     const accountsMAM = accounts.filter(account => account.type === 'mam');
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     const [selectAccount, setSelectAccount] = useState<Account | null>(
         activeAccount.type !== 'mam'
@@ -56,10 +55,7 @@ export const ManageSubWalletPage = () => {
     const onCreateDerivation = async () => {
         setOpenSetCountDialog(true);
     };
-
-    if (selectAccount === null) {
-        return null;
-    }
+    const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
 
     const [importDialog, setImportDialog] = useState(false);
     const [openCreateAccountDialog, setOpenCreateAccountDialog] = useState(false);
@@ -67,7 +63,9 @@ export const ManageSubWalletPage = () => {
     const { allAvailableDerivations: derivations } = accountMAM;
     const total = derivations.length;
     const limit = 15;
-
+    if (selectAccount === null) {
+        return null;
+    }
     return (
         <View absFull>
             <View sx={{ margin: '0 auto', maxWidth: '768px' }} relative h100p>
@@ -75,7 +73,7 @@ export const ManageSubWalletPage = () => {
                     <View rowVCenter jStart>
                         <AccountsSelect
                             accounts={accountsMAM}
-                            onChange={(val: Account) => setSelectAccount(val)}
+                            onChange={(val: Account) => setActiveAccount(val.id)}
                             account={selectAccount}
                         />
                         <View ml12 center mr={16}>

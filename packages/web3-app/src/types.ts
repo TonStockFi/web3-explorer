@@ -401,6 +401,24 @@ export interface WebApp {
     isDev?: boolean;
     iframeBaseUrl?: string;
     twa?: boolean;
+    mobile?: boolean;
+}
+export interface TonHistoryItem {
+    kind: 'ton'|string;
+    jetton: {
+        address: string;
+        name: string;
+        symbol: string;
+        decimals: number;
+        image: string;
+    };
+    timestamp: number;
+    amount: number;
+    isTon: boolean;
+    status: 'ok';
+    comment?: string;
+    fromAddress: string;
+    toAddress: string;
 }
 
 export interface WebAppListItem {
@@ -441,7 +459,7 @@ export enum PlaygroundMasterSideAction {
 export enum WinControlType {
     ALL = 'ALL',
     CURRENT_APP = 'CURRENT_APP',
-    CURRENT_ACCOUNT = 'CURRENT_ACCOUNT',
+    CURRENT_ACCOUNT = 'CURRENT_ACCOUNT'
 }
 
 export enum CHAIN {
@@ -450,59 +468,63 @@ export enum CHAIN {
     BNB = 'BNB',
     SOL = 'SOL',
     SUI = 'SUI',
-    BTC = 'BTC',
+    BTC = 'BTC'
 }
 
 export interface ChainListItem {
-    chain :CHAIN,
-    name:string,
-    icon:string
+    chain: CHAIN;
+    name: string;
+    icon: string;
 }
 
-export interface MainMessageEvent{
+export interface MainMessageEvent {
     action: string;
     webContentsId?: Number;
     fromWinId?: string;
     payload?: Record<string, any>;
-    __msg_id?:number;
+    __msg_id?: number;
 }
 
-export enum WebpageNav{
-    HOME="HOME",
-    JOIN_US="JOIN_US",
-    TOKEN="TOKEN",
-    MALL="MALL",
-    DAO="DAO",
-    WEB3_EXPLORER="WEB3_EXPLORER",
-    WEB3_REMOTE="WEB3_REMOTE",
-    DISCOVER="DISCOVER",
-    GAMES="GAMES_FI",
-    SWAP="SWAP",
-    TASK= "TASK"
+export enum WebpageNav {
+    HOME = 'HOME',
+    JOIN_US = 'JOIN_US',
+    TOKEN = 'TOKEN',
+    MALL = 'MALL',
+    DAO = 'DAO',
+    WEB3_EXPLORER = 'WEB3_EXPLORER',
+    WEB3_REMOTE = 'WEB3_REMOTE',
+    DISCOVER = 'DISCOVER',
+    GAMES = 'GAMES_FI',
+    SWAP = 'SWAP',
+    TASK = 'TASK'
 }
 
 export interface HodlerRow {
-    address:string,
-    balance:number,
-    tag?:string,
-    pie:string
+    address: string;
+    balance: number;
+    tag?: string;
+    pie: string;
 }
 
 export interface JobItem {
-    title:string,
-    salary:string,
-    desc:string
+    title: string;
+    salary: string;
+    desc: string;
 }
 
 export interface ProposalItem {
-    title:string,
-    detail:string,
-    creator:string
+    title: string;
+    detail: string;
+    creator: string;
+}
+
+export interface TaskItem {
+    title: string;
 }
 export interface MallProduct {
-    title:string,
-    pirce:string,
-    pirceReal:string,
-    desc:string,
-    detail:string
+    title: string;
+    pirce: string;
+    pirceReal: string;
+    desc: string;
+    detail: string;
 }

@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { DesktopHistory } from '../../../components/history/DesktopHistory';
+import { W3C_JETTON_CONTRACT } from '../../../constant';
 
 const CoinHeaderStyled = styled.div`
     padding: 0 1rem;
@@ -184,20 +185,24 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             }
 
             const amount = jettonBalance.balance;
-
+            // console.log(jettonBalance);
+            let fiatAmount =
+                jettonBalance.jetton.symbol === 'W3C'
+                    ? '$' + format(String(Number(amount) / 10), jettonBalance.jetton.decimals)
+                    : formatFiatCurrency(
+                          fiat,
+                          jettonBalance.price
+                              ? shiftedDecimals(
+                                    jettonBalance.balance,
+                                    jettonBalance.jetton.decimals
+                                ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                              : 0
+                      );
             return {
                 image: jettonBalance.jetton.image,
                 symbol: jettonBalance.jetton.symbol,
                 amount: format(amount, jettonBalance.jetton.decimals),
-                fiatAmount: formatFiatCurrency(
-                    fiat,
-                    jettonBalance.price
-                        ? shiftedDecimals(
-                              jettonBalance.balance,
-                              jettonBalance.jetton.decimals
-                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
-                        : 0
-                )
+                fiatAmount
             };
         }, [assets, format, rate, fiat]);
 
@@ -231,19 +236,36 @@ const HistoryContainer = styled.div`
 
 export const CoinPage: FC<{ justHistory?: boolean; token: string; onClose?: () => void }> = ({
     justHistory,
-    token,
-    onClose
+    token
 }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
-
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data } =
         useFetchFilteredActivity(token);
+
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
     const activity = useMemo(() => {
-        return getMixedActivity(data, undefined);
-    }, [data]);
+        const isW3CToken = token === W3C_JETTON_CONTRACT;
+        const rows = getMixedActivity(data, undefined);
+
+        return rows.map(row => {
+            if (isW3CToken) {
+                //@ts-ignore
+                return {
+                    ...row,
+                    event: {
+                        ...row.event,
+                        event: {
+                            ...row.event.event,
+                            isScam: false
+                        }
+                    }
+                } as any;
+            }
+            return row;
+        });
+    }, [data, token]);
 
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {
@@ -257,6 +279,7 @@ export const CoinPage: FC<{ justHistory?: boolean; token: string; onClose?: () =
         return assets.ton.jettons.balances.find(b => eqAddresses(b.jetton.address, token))?.jetton
             .symbol;
     }, [assets, t, token]);
+
     if (justHistory) {
         return (
             <DesktopViewPageLayout ref={ref}>

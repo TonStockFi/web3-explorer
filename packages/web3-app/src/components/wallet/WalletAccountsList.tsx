@@ -19,7 +19,7 @@ export function WalletAccountsList() {
     const account = useActiveAccount();
     const { openTab } = useBrowserContext();
     const accounts = useAccountsState();
-    const { currentTabId, t } = useBrowserContext();
+    const { t } = useBrowserContext();
     const { showWalletAside } = useIAppContext();
 
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();

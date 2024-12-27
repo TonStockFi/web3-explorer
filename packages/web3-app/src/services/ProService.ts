@@ -60,9 +60,7 @@ export default class ProService {
             const res = proInfoList.find(row => row.index === index);
             if (res) {
                 const { level, ts } = res;
-                if (level === 'MONTH' && currentTs() > ts + 30 * 3600 * 24 * 1000) {
-                    currentPlan = null;
-                } else if (level === 'YEAR' && currentTs() > ts + 12 * 30 * 3600 * 24 * 1000) {
+                if (level === 'YEAR' && currentTs() > ts + 12 * 30 * 3600 * 24 * 1000) {
                     currentPlan = null;
                 } else {
                     currentPlan = res;
@@ -70,32 +68,32 @@ export default class ProService {
                 }
             }
         }
-        if(pro_white_list_long.indexOf(id) > -1){
-            isLongProLevel = true;
-            isPayMmeber = true;
-        }
+        // if(pro_white_list_long.indexOf(id) > -1){
+        //     isLongProLevel = true;
+        //     isPayMmeber = true;
+        // }
 
-        if(pro_white_list_month.indexOf(`${id},${index}`) > -1){
-            currentPlan = {
-                id,
-                index,
-                level:"MONTH",
-                amount:1.99,
-                ts:currentTs()
-            };
-            isPayMmeber = true;
-        }
+        // if(pro_white_list_month.indexOf(`${id},${index}`) > -1){
+        //     currentPlan = {
+        //         id,
+        //         index,
+        //         level:"MONTH",
+        //         amount:1.99,
+        //         ts:currentTs()
+        //     };
+        //     isPayMmeber = true;
+        // }
 
-        if(pro_white_list_year.indexOf(`${id},${index}`) > -1){
-            currentPlan = {
-                id,
-                index,
-                level:"YEAR",
-                amount:19.99,
-                ts:currentTs()
-            };
-            isPayMmeber = true;
-        }
+        // // if(pro_white_list_year.indexOf(`${id},${index}`) > -1){
+        //     currentPlan = {
+        //         id,
+        //         index,
+        //         level:"YEAR",
+        //         amount:19.99,
+        //         ts:currentTs()
+        //     };
+        //     isPayMmeber = true;
+        // }
         return { isLongProLevel,isPayMmeber, plan:currentPlan,plans:proInfoList } as CurrentPayPlan;
     }
 }

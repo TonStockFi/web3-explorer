@@ -1,26 +1,26 @@
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { FC, Suspense, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { ActivitySkeletonPage } from '../../components/Skeleton';
-import { useAppContext } from '../../hooks/appContext';
-import { useFetchNext } from '../../hooks/useFetchNext';
-import { getMixedActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
-import { useAppSdk } from '../../hooks/appSdk';
-import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet } from '../../state/wallet';
-import { Label2 } from '../../components/Text';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
-import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
-import { useFetchFilteredActivity } from '../../state/activity';
 import {
     AssetHistoryFilter,
     OtherHistoryFilters
 } from '../../components/desktop/history/DesktopHistoryFilters';
+import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
+import { ActivitySkeletonPage } from '../../components/Skeleton';
+import { Label2 } from '../../components/Text';
+import { useAppContext } from '../../hooks/appContext';
+import { useAppSdk } from '../../hooks/appSdk';
+import { useTranslation } from '../../hooks/translation';
+import { useFetchNext } from '../../hooks/useFetchNext';
+import { useFetchFilteredActivity } from '../../state/activity';
+import { getMixedActivity } from '../../state/mixedActivity';
+import { useActiveWallet } from '../../state/wallet';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;

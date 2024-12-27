@@ -189,6 +189,9 @@ export const formatTs = (timestamp: number,options?:Intl.DateTimeFormatOptions) 
     return formattedDate;
 };
 
+export function formatNumberWithComma(number: number): string {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 export function openWindow(url: string) {
     if(isDesktop()){

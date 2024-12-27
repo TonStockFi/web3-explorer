@@ -4,7 +4,6 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AccountsApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import React, { FC, useMemo, useRef } from 'react';
 import { InnerBody } from '@tonkeeper/uikit/dist/components/Body';
 import { CoinSkeletonPage } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SubHeader } from '@tonkeeper/uikit/dist/components/SubHeader';
@@ -22,6 +21,7 @@ import { useJettonBalance, useJettonInfo } from '@tonkeeper/uikit/dist/state/jet
 import { useFormatFiat, useRate } from '@tonkeeper/uikit/dist/state/rates';
 import { useAllSwapAssets } from '@tonkeeper/uikit/dist/state/swap/useSwapAssets';
 import { useActiveWallet, useIsActiveWalletWatchOnly } from '@tonkeeper/uikit/dist/state/wallet';
+import React, { FC, useMemo, useRef } from 'react';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
@@ -39,7 +39,7 @@ const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTML
                 limit: 20,
                 beforeLt: pageParam
             }),
-        getNextPageParam: (lastPage:any) => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
+        getNextPageParam: (lastPage: any) => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, innerRef);

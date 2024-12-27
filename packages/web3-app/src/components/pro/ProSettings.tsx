@@ -1,19 +1,24 @@
 import { Network, switchNetwork } from '@tonkeeper/core/dist/entries/network';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { ColumnText } from '@tonkeeper/uikit/dist/components/Layout';
 import { ListBlock, ListItem, ListItemPayload } from '@tonkeeper/uikit/dist/components/List';
 import { Body1, Title } from '@tonkeeper/uikit/dist/components/Text';
 import { Button } from '@tonkeeper/uikit/dist/components/fields/Button';
 import { Radio } from '@tonkeeper/uikit/dist/components/fields/Checkbox';
+import { Input } from '@tonkeeper/uikit/dist/components/fields/Input';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useMutateDevSettings } from '@tonkeeper/uikit/dist/state/dev';
+import { useAssets } from '@tonkeeper/uikit/dist/state/home';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { genId } from '../../common/helpers';
-import { currentTs } from '../../common/utils';
+import { genId, getAccountIdFromAccount, getTelegramChatUrl } from '../../common/helpers';
+import { currentTs, formatNumberWithComma } from '../../common/utils';
+import { SWAP_ChatId, W3C_JETTON_CONTRACT } from '../../constant';
+import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { usePro } from '../../providers/ProProvider';
 import PayCommentOrderService from '../../services/PayCommentOrderService';
@@ -38,6 +43,7 @@ const Icon = styled.img`
 `;
 
 const Description = styled(Body1)`
+    width: 480px;
     color: ${props => props.theme.textSecondary};
     margin-bottom: 16px;
 `;
@@ -56,7 +62,6 @@ const SelectProPlans: FC<{
     setPlan: (plan: ProPlan) => void;
     disabled?: boolean;
 }> = ({ plans, isLongProLevel, currentProInfo, selected, setPlan, disabled }) => {
-    const format = useFormatCoinValue();
     if (isLongProLevel) {
         disabled = true;
     }
@@ -76,7 +81,7 @@ const SelectProPlans: FC<{
                             <ColumnText
                                 noWrap
                                 text={plan.name}
-                                secondary={<>{format(plan.amount)} TON</>}
+                                secondary={<>{formatNumberWithComma(Number(plan.amount))} W3C</>}
                             />
                             {currentProInfo?.level === plan.level && (
                                 <View
@@ -107,15 +112,14 @@ export const ProSettings: FC<{
     accountId: string;
     accountIndex: number;
     accountTitle: string;
-    currentProInfo: ProInfoProps | null;
-    isLongProLevel: boolean;
     walletTitle: string;
 }> = ({ accountId, accountIndex, accountTitle, walletTitle }) => {
     const { t } = useTranslation();
+    const { openTabFromWebview } = useBrowserContext();
     const { env } = useIAppContext();
     const network = useActiveTonNetwork();
     const { mutate: mutateDevSettings } = useMutateDevSettings();
-
+    const theme = useTheme();
     useEffect(() => {
         if (network === Network.TESTNET && !env.isDev) {
             mutateDevSettings({ tonNetwork: switchNetwork(network) });
@@ -130,18 +134,33 @@ export const ProSettings: FC<{
         return { ...proPlan, description };
     });
     const currentPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
-
     const isLongProLevel = currentPlan.isLongProLevel;
     const currentProInfo = currentPlan.plan;
+    // console.log({ proInfoList, proPlans, currentPlan });
+
     if (currentPlan && currentPlan.isLongProLevel) {
         plans = plans.filter(row => row.level === 'LONG');
     }
-
-    if (currentPlan && currentPlan.plan && currentPlan.plan.level === 'YEAR') {
-        plans = plans.filter(row => row.level !== 'MONTH');
-    }
-
+    const [assets] = useAssets();
+    // console.log({ assets });
+    let gasIsEnough = false;
+    let w3cIsEnough = false;
     const [selectedPlan, setPlan] = useState<ProPlan>(plans[0]);
+
+    if (assets) {
+        if (assets.ton && assets.ton.info.balance > 100000000) {
+            gasIsEnough = true;
+        }
+        if (assets.ton && assets.ton.jettons.balances.find(row => row.jetton.symbol === 'W3C')) {
+            const w3c = assets.ton.jettons.balances.find(row => row.jetton.symbol === 'W3C')!;
+            const { amount } = selectedPlan;
+
+            if (formatDecimals(w3c.balance, w3c.jetton.decimals) >= Number(amount)) {
+                w3cIsEnough = true;
+            }
+        }
+    }
+    // console.log({ w3cIsEnough, gasIsEnough });
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [_, setOrderComment] = useState<string>('');
 
@@ -151,16 +170,16 @@ export const ProSettings: FC<{
         function finishPay(e: any) {
             onCheckPayCommentOrder(true);
             setOrderComment(text => {
-                const [comment, amount] = text.split('|');
+                const amount = text.split('/')[0];
                 const id = genId();
-                const amount1 = String(Number(amount) / 1000000000);
                 new PayCommentOrderService().save(genId(), {
                     id,
-                    symbol: 'TON',
-                    amount: amount1,
+                    symbol: 'W3C',
+                    checkProLevel: true,
+                    amount: amount,
                     address: proRecvAddress,
                     ts: currentTs(),
-                    comment: comment
+                    comment: text
                 });
                 return '';
             });
@@ -170,52 +189,51 @@ export const ProSettings: FC<{
             window.removeEventListener('finishPay', finishPay);
         };
     }, []);
+    const [promo, setPromo] = useState('');
     const onSubmit = async () => {
         if (!selectedPlan) {
             return;
         }
         const { level, amount } = selectedPlan;
-        const amount1 = String(format(amount));
-        const text = `${level}/${amount1}/${accountIndex}/${currentTs()}/${accountId}`;
-
-        setOrderComment(text + '|' + amount1);
+        const amount1 = String(format(String(Number(amount) * 1000000000)));
+        const id = getAccountIdFromAccount({ id: accountId, index: accountIndex });
+        const text = `${amount1}/${level}/${Math.floor(currentTs() / 1000)}/${promo || '-'}/${id}`;
+        setOrderComment(text);
         setIsLoading(true);
         sendTransfer({
             transfer: {
                 address: proRecvAddress,
                 amount: amount1,
                 text,
-                jetton: 'TON'
+                jetton: W3C_JETTON_CONTRACT
             },
-            asset: 'TON'
+            asset: 'W3C'
         });
     };
     useEffect(() => {
         function onCloseNotify() {
             setIsLoading(false);
         }
+
+        function updatePayPlan() {
+            setIsLoading(false);
+            setPlan(plans[0]);
+        }
+
+        window.addEventListener('updatePayPlan', updatePayPlan);
         window.addEventListener('onCloseNotify', onCloseNotify);
         return () => {
+            window.removeEventListener('updatePayPlan', updatePayPlan);
             window.removeEventListener('onCloseNotify', onCloseNotify);
         };
     }, []);
 
-    const theme = useTheme();
-
     return (
         <View px={24} py12 relative userSelectNone>
-            <View abs xx0 center bottom={8}>
-                <View
-                    useSelectText
-                    textFontSize="0.8rem"
-                    textColor={theme.textSecondary}
-                    text={`${accountId},${accountIndex}`}
-                />
-            </View>
             <View>
                 <Block>
                     <Icon
-                        style={{ marginBottom: 1, paddingBottom: 0 }}
+                        style={{ marginBottom: 1, paddingBottom: 0, width: 100, height: 100 }}
                         src="https://explorer.web3r.site/logo-128x128.png"
                     />
                     <Title style={{ marginTop: 0, paddingTop: 0 }}>{t('Web3 Explorer')}</Title>
@@ -229,19 +247,56 @@ export const ProSettings: FC<{
                     selected={selectedPlan}
                     disabled={isLongProLevel ? true : isLoading}
                 />
+                <Line>
+                    <Input
+                        disabled={isLoading}
+                        value={promo}
+                        onChange={setPromo}
+                        label={t('推荐码')}
+                        clearButton
+                    />
+                </Line>
+                <View
+                    mb={20}
+                    pl12
+                    mt={-16}
+                    textColor={theme.textSecondary}
+                    textFontSize="0.8rem"
+                    text={'如果推荐码有效，您和推荐人会分别获得 0.5% W3C 空投'}
+                ></View>
                 {!isLongProLevel && (
                     <Line>
                         <Button
                             primary={!isLoading}
                             size="large"
                             fullWidth
+                            disabled={!(gasIsEnough && w3cIsEnough)}
                             loading={isLoading}
                             onClick={onSubmit}
                         >
-                            {currentProInfo ? t('升级') : t('wallet_buy')}
+                            {gasIsEnough && w3cIsEnough ? (
+                                <View>{currentProInfo ? t('升级') : t('wallet_buy')}</View>
+                            ) : (
+                                <View>{t('Ton Gas费 或者 W3C 余额不足')}</View>
+                            )}
                         </Button>
                     </Line>
                 )}
+
+                <View center mb={6} hide={gasIsEnough && w3cIsEnough}>
+                    <View
+                        onClick={() => {
+                            openTabFromWebview({
+                                icon: '',
+                                name: 'W3C 兑换中心',
+                                description: '',
+                                url: getTelegramChatUrl(SWAP_ChatId),
+                                mobile: true
+                            });
+                        }}
+                        buttonOutlined={'兑换 Ton Gas费 或者 W3C'}
+                    ></View>
+                </View>
             </View>
         </View>
     );
