@@ -56,7 +56,11 @@ export function WebviewDiscoverApps({
             setFirstLoad(false);
         }
     }, [currentTabId]);
-    const url = `${getDiscoverHost(env.isDev, env.version)}#${winId}`;
+    let id1 = Buffer.from(id).toString('hex');
+    const url = `${getDiscoverHost(
+        env.isDev,
+        env.version
+    )}&address=${address}&id=${id1}&index=${index}#${winId}`;
     // console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({
