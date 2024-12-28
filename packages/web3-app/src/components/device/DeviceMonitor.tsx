@@ -8,7 +8,7 @@ import { useIAppContext } from '../../providers/IAppProvider';
 import { ErrCodes, WsCloseCode } from '../../types';
 import DeviceAuth from './components/DeviceAuth';
 import { Devices } from './global';
-import DeviceScreenView from './Screen/DeviceScreenView';
+import DeviceScreenView, { getMonitorImageId } from './Screen/DeviceScreenView';
 
 export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
     const { handleClientDeviceInfo } = useDevice();
@@ -32,6 +32,29 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
         if (screenImageData.startsWith('data:jpeg;base64_')) {
             const { password } = device!;
             const crypto = new DESCrypto(password!);
+
+            const imgId = getMonitorImageId(deviceId);
+            if (imgId) {
+                const img = document.getElementById(imgId);
+                if (img) {
+                    const { width, height } = img.getBoundingClientRect();
+                    const device = Devices.get(deviceId);
+                    if (device && device.screen) {
+                        const { screen } = device;
+                        if (width / height > 1) {
+                            device.screen = {
+                                ...screen,
+                                height: screen.width,
+                                width: screen.height
+                            };
+                            Devices.set(deviceId, device);
+                        }
+                    }
+                }
+            }
+
+            // const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
+
             setScreenImageSrc(
                 'data:jpeg;base64,' +
                     crypto.decrypt(screenImageData.substring('data:jpeg;base64_'.length + 5))
@@ -54,9 +77,9 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
             ws: WebSocket
         ) => {
             setIsLogged(true);
-            console.log('action', action, deviceId);
             if (action === 'deviceMsg') {
                 const { screenImage, deviceInfo } = payload;
+                console.log({ deviceInfo });
                 if (screenImage) {
                     handleScreenImage(deviceId, screenImage.data, screenImage.ts);
                 }
@@ -133,10 +156,17 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
     useEffect(() => {
         if (deviceId && localStorage.getItem('disconnect_' + deviceId) !== '1') {
             const device = Devices.get(deviceId)!;
+
             if (device) {
                 const { password, serverApi } = device;
                 if (password && serverApi) {
-                    auth(deviceId, password, serverApi).catch(console.error);
+                    setFirstLoad(r => {
+                        debugger;
+                        if (r) {
+                            auth(deviceId, password, serverApi).catch(console.error);
+                        }
+                        return r;
+                    });
                     return;
                 }
             }
@@ -175,6 +205,11 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                     <DeviceScreenView deviceId={deviceId} ws={ws} screenImageSrc={screenImageSrc} />
                 )}
             </View>
+            {errCode && (
+                <View abs bottom0 h={44} xx0 center>
+                    {errCode}
+                </View>
+            )}
         </View>
     );
 }

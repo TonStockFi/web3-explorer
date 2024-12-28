@@ -65,7 +65,11 @@ interface BrowserContextType {
     browserTabs: Map<string, BrowserTab>;
 }
 export function isDiscoverTab(tabId: string) {
-    return tabId === MAIN_NAV_TYPE.GAME_FI || tabId === MAIN_NAV_TYPE.DISCOVERY;
+    return (
+        tabId === MAIN_NAV_TYPE.GAME_FI ||
+        tabId === MAIN_NAV_TYPE.DISCOVERY ||
+        tabId === MAIN_NAV_TYPE.MOBILE_MONITORS
+    );
 }
 export function formatTabIdByUrl(url: string) {
     const id = md5(url);

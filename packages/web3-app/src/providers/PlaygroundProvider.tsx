@@ -52,6 +52,17 @@ export function isTelegramWeb(url: string) {
     return res;
 }
 
+export function isDeviceMonitor(tab: BrowserTab) {
+    let res = false;
+    if (!tab.url) {
+        return res;
+    }
+    if (tab.url && tab.url.endsWith('#DeviceMonitor')) {
+        res = true;
+    }
+    return res;
+}
+
 export function isTelegramTab(tab: BrowserTab) {
     let res = false;
     if (!tab.url) {
@@ -102,11 +113,13 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     if (
         tabInit &&
         tabInit.url &&
-        (tabInit.url.indexOf(TELEGRAME_WEB) > -1 || tabInit.url.indexOf('t.me/') > -1)
+        (tabInit.url.indexOf(TELEGRAME_WEB) > -1 ||
+            tabInit.url.indexOf('t.me/') > -1 ||
+            isDeviceMonitor(tabInit))
     ) {
         showMobileInit = true;
     }
-    const [showMobile, setShowMobile] = useLocalStorageState<boolean>(
+    const [showMobile, setShowMobile] = useSessionStorageState<boolean>(
         'showMobile_' + (account?.id || '1') + (account?.index || '1') + (tabInit?.tabId || ''),
         showMobileInit
     );
@@ -189,6 +202,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     };
 
     const onChangeCurrentExtension = (v: ExtensionType) => {
+        debugger;
         if (showMobile) {
             onAction('getBounds', { winId: getWinId() })?.then(r => {
                 let { x } = r as { x: number };

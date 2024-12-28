@@ -8,28 +8,46 @@ import TableHead from '@web3-explorer/uikit-mui/dist/mui/TableHead';
 import TableRow from '@web3-explorer/uikit-mui/dist/mui/TableRow';
 import { useCallback, useEffect, useState } from 'react';
 
-import RefreshIcon from '@mui/icons-material/Refresh';
 import { View } from '@web3-explorer/uikit-view';
 import { useInterval } from '@web3-explorer/utils';
 import { useTheme } from 'styled-components';
-import { onAction } from '../../common/electron';
 import { connectWebSocket, wsSendClose, wsSendMessage } from '../../common/ws';
 
-import { Page } from '../../components/Page';
-import { useIAppContext } from '../../providers/IAppProvider';
+import QRCode from 'react-qr-code';
+import { showAlertMessage, showGlobalLoading } from '../../common/helpers';
+import { getUrlQuery, isDesktop } from '../../common/utils';
 import { WsCloseCode } from '../../types';
 
 let ws: WebSocket;
 
 export default function ManagerClients() {
+    const ip = getUrlQuery('ip');
+    const port = 6788;
+    const WS_URL = `ws://${ip}:${port}/api`;
+
     const [clients, setClients] = useState([]);
     const theme = useTheme();
     const [ws, setWs] = useState<WebSocket | null>(null);
     const [serverIsReady, setServerIsReady] = useState<boolean>(false);
+    useEffect(() => {
+        function onServerIsReady(e: any) {
+            console.log('serverIsReady', e.detail.serverIsReady);
+            setServerIsReady(e.detail.serverIsReady);
+            setClients([]);
+            if (e.detail.serverIsReady) {
+                setWs(null);
+            }
+        }
 
+        window.addEventListener('onServerIsReady', onServerIsReady);
+        return () => {
+            window.removeEventListener('onServerIsReady', onServerIsReady);
+        };
+    }, []);
     useInterval(() => {
         if (ws && serverIsReady) wsSendMessage({ action: 'getClients' }, ws);
     });
+
     const onMessage = useCallback(
         async ({ action, payload }: { action: string; payload: any }, ws: WebSocket) => {
             if (action === 'getClients') {
@@ -45,16 +63,16 @@ export default function ManagerClients() {
     const onClose = useCallback(async ({ code, reason }: { code: number; reason: string }) => {
         console.log('onClose');
     }, []);
-    const { env } = useIAppContext();
-    const port = 6788;
+
     useEffect(() => {
-        onAction('serverIsReady')?.then(res => {
-            console.log('serverIsReady', res);
-            setServerIsReady(res as boolean);
-        });
+        if (isDesktop()) {
+            window.__appApi.message({
+                action: 'checkServerIsReady',
+                payload: {}
+            });
+        }
     }, []);
     useEffect(() => {
-        const WS_URL = `ws://${env.ip?.adr}:${port}/api`;
         if (!ws && serverIsReady)
             connectWebSocket(WS_URL, {
                 onLogged: {
@@ -74,43 +92,61 @@ export default function ManagerClients() {
         };
     }, [ws, serverIsReady]);
     return (
-        <Page full>
-            <View row mx12 mb12 jSpaceBetween rowVCenter h={44}>
+        <View>
+            <View row mx12 mb12 jSpaceBetween rowVCenter h={44} mt12>
                 <View>
                     <View
+                        chip="刷新客户端"
                         hide={!serverIsReady}
                         iconButtonSmall
                         onClick={() => {
+                            showGlobalLoading(true, 2);
                             wsSendMessage({ action: 'getClients' }, ws!);
                         }}
                         icon={'Refresh'}
                     />
                 </View>
-                <View
-                    buttonVariant="contained"
-                    button={serverIsReady ? 'Stop Server' : 'Start Server'}
-                    iconButtonSmall
-                    onClick={() => {
-                        onAction(
-                            serverIsReady ? 'stopServer' : 'startServer',
-                            serverIsReady ? {} : { port }
-                        )?.then(res => {
-                            console.log('ws server', res);
-                            onAction('serverIsReady')?.then(res => {
-                                setServerIsReady(res as boolean);
-                                if (!res) {
-                                    setClients([]);
-                                    setWs(null);
+                <View rowVCenter jEnd>
+                    <View
+                        hide={!serverIsReady}
+                        drawer={{
+                            anchor: 'right'
+                        }}
+                        mr12
+                        buttonOutlined={`${WS_URL}`}
+                        iconButtonSmall
+                        onClick={() => {}}
+                    >
+                        <View p12 w={320} center column>
+                            <View center my12>
+                                <View>{WS_URL}</View>
+                            </View>
+                            <View borderRadius={8} center overflowHidden>
+                                <QRCode size={128} value={WS_URL} />
+                            </View>
+                            <View center>
+                                <View mt12 text={'请打开 Web3 Desk 扫描二维码'}></View>
+                            </View>
+                        </View>
+                    </View>
+                    <View
+                        buttonContained={serverIsReady ? '停止服务' : '启动服务'}
+                        iconButtonSmall
+                        onClick={() => {
+                            if (!isDesktop()) {
+                                return showAlertMessage('您需要打开 Web3 Explorer');
+                            }
+                            window.__appApi.message({
+                                action: serverIsReady ? 'onStopServer' : 'onStartServer',
+                                payload: {
+                                    port
                                 }
                             });
-                        });
-                    }}
-                >
-                    <RefreshIcon />
+                        }}
+                    ></View>
                 </View>
             </View>
             <View
-                mx={12}
                 sx={{
                     '& .MuiPaper-root': {
                         bgcolor: theme.backgroundBrowser,
@@ -122,11 +158,11 @@ export default function ManagerClients() {
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>ID</TableCell>
-                                <TableCell align="right">Type</TableCell>
-                                <TableCell align="right">Platform</TableCell>
-                                <TableCell align="right">DeviceId</TableCell>
-                                <TableCell align="right">Password</TableCell>
+                                <TableCell>会话ID</TableCell>
+                                <TableCell align="right">类型</TableCell>
+                                <TableCell align="right">平台</TableCell>
+                                <TableCell align="right">设备ID</TableCell>
+                                {/* <TableCell align="right">密码</TableCell> */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -141,7 +177,7 @@ export default function ManagerClients() {
                                     <TableCell align="right">
                                         {session.device && (
                                             <Chip
-                                                label="D"
+                                                label="远程客户端"
                                                 size={'small'}
                                                 color="primary"
                                                 variant="filled"
@@ -149,7 +185,7 @@ export default function ManagerClients() {
                                         )}
                                         {session.client && (
                                             <Chip
-                                                label="C"
+                                                label="接收端"
                                                 size={'small'}
                                                 color="error"
                                                 variant="filled"
@@ -158,7 +194,7 @@ export default function ManagerClients() {
 
                                         {session.manager && (
                                             <Chip
-                                                label="M"
+                                                label="管理端"
                                                 size={'small'}
                                                 color="warning"
                                                 variant="filled"
@@ -170,19 +206,21 @@ export default function ManagerClients() {
                                         {session.client && `${session.client.platform}`}
                                     </TableCell>
                                     <TableCell align="right">
-                                        {session.device && `${session.device.deviceId}`}
-                                        {session.client && `${session.client.deviceId}`}
+                                        <View useSelectText>
+                                            {session.device && `${session.device.deviceId}`}
+                                            {session.client && `${session.client.deviceId}`}
+                                        </View>
                                     </TableCell>
-                                    <TableCell align="right">
+                                    {/* <TableCell align="right">
                                         {session.device && `${session.device.password}`}
                                         {session.client && `${session.client.password}`}
-                                    </TableCell>
+                                    </TableCell> */}
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             </View>
-        </Page>
+        </View>
     );
 }

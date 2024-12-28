@@ -4,7 +4,7 @@ import { HomHeaderHeight, MainNavList, SiderBarWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import SideProIcon from './SideProIcon';
-import SideSettingIcon from './SideSettingIcon';
+import SideSettings from './SideSettings';
 
 export const SideBarVert = () => {
     const { env, isFullScreen } = useIAppContext();
@@ -80,7 +80,7 @@ export const SideBarVert = () => {
             <View pb12 w100p>
                 <View w100p center column>
                     <SideProIcon />
-                    <SideSettingIcon />
+                    <SideSettings />
                 </View>
             </View>
         </View>

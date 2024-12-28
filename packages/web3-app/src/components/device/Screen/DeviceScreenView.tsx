@@ -3,8 +3,6 @@ import { useTheme } from 'styled-components';
 import { wsSendClientClickEvent, wsSendClientEvent } from '../../../common/ws';
 import { useDevice } from '../../../providers/DevicesProvider';
 
-import DeviceScreenDropdownMenu from './DeviceScreenDropdownMenu';
-
 export function getMonitorImageId(deviceId: string): string | undefined {
     return `monitor_${deviceId}`;
 }
@@ -29,10 +27,10 @@ export default function DeviceScreenView({
 }) {
     const theme = useTheme();
     const { getDeviceInfo } = useDevice();
-    const monitorScale = 0.45;
+    const monitorScale = 0.5;
     const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
     const inputIsOpen = getDeviceInfo(deviceId, 'inputIsOpen', false);
-    // console.log('inputIsOpen', inputIsOpen);
+    console.log('inputIsOpen', screen, inputIsOpen);
     let width = screen.width * monitorScale;
     let height = screen.height * monitorScale;
 
@@ -100,7 +98,7 @@ export default function DeviceScreenView({
         <View
             row
             sx={{
-                height: `${height + 44}px`,
+                height: `${height}px`,
                 borderRadius: '10px',
                 overflow: 'hidden',
                 border: '1px solid rgba(0,0,0,0.9)',
@@ -109,12 +107,6 @@ export default function DeviceScreenView({
             }}
         >
             <View>
-                <View h={44} w100p jSpaceBetween rowVCenter>
-                    <View />
-                    <View rowVCenter mr={6}>
-                        <DeviceScreenDropdownMenu ws={ws} deviceId={deviceId} />
-                    </View>
-                </View>
                 <View
                     sx={{
                         position: 'relative',

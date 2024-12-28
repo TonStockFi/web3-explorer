@@ -150,37 +150,37 @@ export class Tonendpoint {
         const key = this.targetEnv ? "boot_test" : "boot"
         const res = localStorage.getItem(key)
         let body;
+        const fetchConfig = async ()=>{
+            try {
+                const response = await this.fetchApi(
+                    `https://api-explorer.web3r.site/api/app/Settings?${this.toSearchParams()}`,
+                    {
+                        method: 'GET'
+                    }
+                );
+                const body = await response.json();
+                localStorage.setItem(key,JSON.stringify({
+                    body,
+                    ts:+new Date()
+                }))
+                return body
+            } catch (error) {
+                console.error(error)
+                if(body){
+                    return body
+                }
+                return {}
+            }
+        }
         if(res){
             const json = JSON.parse(res)
             if(json){
-                const {ts} = json
-                if(+new Date() - ts < 3600 * 12){
-                    body = json.body
-                    return json.body
-                }
+                body = json.body
+                fetchConfig()
+                return json.body
             }
         }
-        try {
-            const response = await this.fetchApi(
-                `https://api-explorer.web3r.site/api/app/Settings?${this.toSearchParams()}`,
-                {
-                    method: 'GET'
-                }
-            );
-            const body = await response.json();
-            localStorage.setItem(key,JSON.stringify({
-                body,
-                ts:+new Date()
-            }))
-            return body
-        } catch (error) {
-            console.error(error)
-            if(body){
-                return body
-            }
-            return {}
-        }
-    
+        return await fetchConfig()
     };
 
     GET = async <Data>(

@@ -56,6 +56,7 @@ export const GLOBAL_CSS = `
 
 `;
 export const DISCOVER_PID = "DISCOVER_APPS"
+export const DEVICE_PID = "DEVICE"
 export const HeaderHeight = 58;
 export const HomHeaderHeight = 44;
 export const SiderBarWidth = 54;
@@ -66,6 +67,7 @@ export const MAC_TITLE_BAR_WIDTH = 88;
 export const PLAYGROUND_WEBVIEW_WIDTH = 360;
 export const PLAYGROUND_RIGHT_SIDE_WIDTH = 280;
 export const PLAYGROUND_WEBVIEW_HEIGHT = 720;
+export const PLAYGROUND_DEVICE_MONITOR_HEIGHT = 800;
 export const PLAYGROUND_WIN_HEIGHT = 772;
 export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;
 export const WEBVIEW_BORDERRADIUS = 8;
@@ -138,11 +140,11 @@ export const MainNavList : MainNavListItem[] = [
         icon: 'Folder',
         side: false
     },
-
     {
-        name: 'aside_discover',
-        tabId: MAIN_NAV_TYPE.DISCOVERY,
-        icon: 'Explore'
+        name: 'Favor',
+        tabId: MAIN_NAV_TYPE.FAVOR,
+        icon: 'Folder',
+        side: false
     },
     {
         name: 'wallet_multi_send',
@@ -175,7 +177,14 @@ export const MainNavList : MainNavListItem[] = [
         name: 'aside_settings',
         tabId: MAIN_NAV_TYPE.SETTING,
         icon: 'Settings'
-    }
+    },
+
+    {
+        name: 'MobileDevice',
+        tabId: MAIN_NAV_TYPE.MOBILE_MONITORS,
+        icon: 'Devices',
+        side: true
+    },
 ];
 
 

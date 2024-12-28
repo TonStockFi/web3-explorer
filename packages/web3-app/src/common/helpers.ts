@@ -1,15 +1,20 @@
-import { MenuProps } from "@mui/material/Menu/Menu";
-import { DISCOVER_HOST, DISCOVER_HOST_DEV, PLAYGROUND_WEBVIEW_HEIGHT, PLAYGROUND_WEBVIEW_WIDTH, TELEGRAME_WEB } from "../constant";
+import { MenuProps } from '@mui/material/Menu/Menu';
+import {
+    DISCOVER_HOST,
+    DISCOVER_HOST_DEV,
+    PLAYGROUND_WEBVIEW_HEIGHT,
+    PLAYGROUND_WEBVIEW_WIDTH,
+    TELEGRAME_WEB
+} from '../constant';
 
-import { md5 } from "@web3-explorer/lib-crypto/dist/utils";
+import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { v4 as uuidv4 } from 'uuid';
-import { BrowserTab } from "../providers/BrowserProvider";
-import { RoiInfo, SUB_WIN_ID } from "../types";
+import { BrowserTab } from '../providers/BrowserProvider';
+import { RoiInfo, SUB_WIN_ID } from '../types';
 
 export function genId() {
     return uuidv4();
 }
-
 
 export function getPlaygroundScreenSize(tab: BrowserTab) {
     let width = `${PLAYGROUND_WEBVIEW_WIDTH}px`;
@@ -20,43 +25,48 @@ export function getPlaygroundScreenSize(tab: BrowserTab) {
     }
     return { width, height };
 }
- 
-export function getDiscoverHost(isDev: boolean,version?:string) {
-    if(false){
-        return `${DISCOVER_HOST_DEV}?isDev=true&version=${version}`
-    }else{
-        return `${DISCOVER_HOST}?version=${version}`
+
+export function getDiscoverHost(isDev: boolean, version?: string) {
+    if (false) {
+        return `${DISCOVER_HOST_DEV}?isDev=true&version=${version || ''}`;
+    } else {
+        return `${DISCOVER_HOST}?version=${version || ''}`;
     }
-}
- 
-export function showAlertMessage(message:string,hideGlobalLoading?:boolean) {
-    if(hideGlobalLoading){
-        showGlobalLoading(false);   
-    }
-    window.dispatchEvent(new CustomEvent("showAlertMessage",{
-        detail:{
-            message
-        }
-    }))
 }
 
-export function showGlobalLoading(visible:boolean,delay:number  = 0) {
-   if(visible){
-        window.dispatchEvent(new CustomEvent("showGlobalLoading",{
-            detail:{
-                visible:true
+export function showAlertMessage(message: string, hideGlobalLoading?: boolean) {
+    if (hideGlobalLoading) {
+        showGlobalLoading(false);
+    }
+    window.dispatchEvent(
+        new CustomEvent('showAlertMessage', {
+            detail: {
+                message
             }
-        }))
+        })
+    );
+}
 
-   }
-   
-    if(delay || !visible){
-        setTimeout(() => {
-            window.dispatchEvent(new CustomEvent("showGlobalLoading",{
-                detail:{
-                    visible:false
+export function showGlobalLoading(visible: boolean, delay: number = 0) {
+    if (visible) {
+        window.dispatchEvent(
+            new CustomEvent('showGlobalLoading', {
+                detail: {
+                    visible: true
                 }
-            }))
+            })
+        );
+    }
+
+    if (delay || !visible) {
+        setTimeout(() => {
+            window.dispatchEvent(
+                new CustomEvent('showGlobalLoading', {
+                    detail: {
+                        visible: false
+                    }
+                })
+            );
         }, delay * 1000);
     }
 }
@@ -72,28 +82,28 @@ export function isPlaygroundMaster() {
 export function isPlaygroundWebApp() {
     return !isPlaygroundMaster() && location.hash.indexOf(`${SUB_WIN_ID.PLAYGROUND}_`) > -1;
 }
-export function getDropdownMenuOptions(id:string){
+export function getDropdownMenuOptions(id: string) {
     return {
         id,
-        anchorOrigin:{
+        anchorOrigin: {
             vertical: 'bottom',
             horizontal: 'right'
         },
-        transformOrigin:{
+        transformOrigin: {
             vertical: 'top',
             horizontal: 'right'
         },
-        MenuListProps:{
+        MenuListProps: {
             'aria-labelledby': 'fade-button'
         }
-    } as Partial<MenuProps>
+    } as Partial<MenuProps>;
 }
 export const sortPriority = (a: RoiInfo, b: RoiInfo) => b.priority - a.priority;
 
-export function getTelegramChatUrl(chatId:string){
-    return `${TELEGRAME_WEB}#${chatId}`
+export function getTelegramChatUrl(chatId: string) {
+    return `${TELEGRAME_WEB}#${chatId}`;
 }
 
-export function getAccountIdFromAccount(account:{id:string,index:number}){
-    return `${account.index}${md5(account.id+"TON_WEB3"+account.id.substring(0,4))}`
+export function getAccountIdFromAccount(account: { id: string; index: number }) {
+    return `${account.index}${md5(account.id + 'TON_WEB3' + account.id.substring(0, 4))}`;
 }

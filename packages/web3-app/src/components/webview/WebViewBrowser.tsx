@@ -355,9 +355,9 @@ const WebViewBrowser = ({
                 webviewProps?.onStopLoading && webviewProps?.onStopLoading();
                 onEvent('did-stop-loading');
                 TabIdWebviewReadyMap.set(tabId, true);
-                webview.executeJavaScript(`// 防止重复执行的标志位
+                webview.executeJavaScript(`
                     if (!window._observerInitialized) {
-                      window._observerInitialized = true; // 标志为已初始化
+                      window._observerInitialized = true;
                       
                       const observer = new MutationObserver(() => {
                         document.querySelectorAll('a[target="_blank"]').forEach(anchor => {
@@ -367,9 +367,9 @@ const WebViewBrowser = ({
                     
                       observer.observe(document.body, { childList: true, subtree: true });
                       
-                      console.log('MutationObserver initialized');
+                    //   console.log('MutationObserver initialized');
                     } else {
-                      console.log('MutationObserver is already running.');
+                    //   console.log('MutationObserver is already running.');
                     }`);
             },
             'did-fail-load': async ({

@@ -12,8 +12,7 @@ import Select, { SelectChangeEvent } from '@web3-explorer/uikit-mui/dist/mui/Sel
 import { useDevice } from '../../../providers/DevicesProvider';
 import { useIAppContext } from '../../../providers/IAppProvider';
 import DeviceService from '../../../services/DeviceService';
-import { CustomDeviceWsServerHosts, DeviceInfo } from '../../../types';
-import AddServerView from '../Control/AddServerView';
+import { DeviceInfo } from '../../../types';
 import { Devices, ServerHostList } from '../global';
 
 export default function DeviceAuth({
@@ -25,8 +24,7 @@ export default function DeviceAuth({
 }) {
     const { t } = useTranslation();
     const [connecting, setConnecting] = useState(false);
-    const [showAddServer, setShowAddServer] = useState(false);
-    const { customHosts, onSaveCustomHosts, updateGlobalDevice } = useDevice();
+    const { customHosts, updateGlobalDevice } = useDevice();
     const { showSnackbar } = useIAppContext();
     const [deviceId_, setDeviceId] = useState(deviceId || '');
     const device = Devices.get(deviceId);
@@ -92,7 +90,7 @@ export default function DeviceAuth({
                         fullWidth
                         slotProps={{
                             input: {
-                                readOnly: false
+                                readOnly: true
                             }
                         }}
                         value={deviceId_}
@@ -125,27 +123,44 @@ export default function DeviceAuth({
                     />
                 </View>
                 <View mt={6}>
-                    <FormControl fullWidth size={'small'} sx={{ mb: 4 }}>
-                        <InputLabel id="server-hosts-select-label">{t('Server')}</InputLabel>
-                        <Select
-                            inputProps={{ readOnly: false }}
-                            labelId="server-hosts-select-label"
-                            id="server-hosts-select"
-                            value={serverApi}
-                            label={t('Server')}
-                            onChange={(e: SelectChangeEvent) => {
-                                setServerApi(e.target.value);
-                            }}
-                        >
-                            {[...ServerHostList, ...(customHosts || [])].map(
-                                ({ host }: { host: string }) => (
-                                    <MenuItem key={host} value={host}>
-                                        {host}
-                                    </MenuItem>
-                                )
-                            )}
-                        </Select>
-                    </FormControl>
+                    <TextField
+                        fullWidth
+                        slotProps={{
+                            input: {
+                                readOnly: true
+                            }
+                        }}
+                        value={serverApi}
+                        onChange={e => {}}
+                        size={'small'}  
+                        id="serverApi"
+                        label={t('服务器')}
+                        variant="outlined"
+                    />
+
+                    <View hide>
+                        <FormControl fullWidth size={'small'} sx={{ mb: 4 }}>
+                            <InputLabel id="server-hosts-select-label">{t('Server')}</InputLabel>
+                            <Select
+                                inputProps={{ readOnly: false }}
+                                labelId="server-hosts-select-label"
+                                id="server-hosts-select"
+                                value={serverApi}
+                                label={t('Server')}
+                                onChange={(e: SelectChangeEvent) => {
+                                    setServerApi(e.target.value);
+                                }}
+                            >
+                                {[...ServerHostList, ...(customHosts || [])].map(
+                                    ({ host }: { host: string }) => (
+                                        <MenuItem key={host} value={host}>
+                                            {host}
+                                        </MenuItem>
+                                    )
+                                )}
+                            </Select>
+                        </FormControl>
+                    </View>
                 </View>
                 <Divider />
                 <View mt={24} center>
@@ -153,13 +168,14 @@ export default function DeviceAuth({
                         buttonProps={{
                             disabled: connecting
                         }}
+                        buttonSize="medium"
                         buttonContained
                         w100p
                         button={t('ConnectDevice')}
                         onClick={onAuth}
                     />
                 </View>
-                <View mt={16} center>
+                {/* <View mt={16} center>
                     <View
                         buttonProps={{
                             disabled: connecting
@@ -169,9 +185,9 @@ export default function DeviceAuth({
                         button={t('AddServer')}
                         onClick={() => setShowAddServer(true)}
                     />
-                </View>
+                </View> */}
             </View>
-            <AddServerView
+            {/* <AddServerView
                 setCustomHosts={(hsots: CustomDeviceWsServerHosts[]) => {
                     onSaveCustomHosts(hsots);
                 }}
@@ -180,7 +196,7 @@ export default function DeviceAuth({
                 setAddServer={(v: boolean) => {
                     setShowAddServer(v);
                 }}
-            />
+            /> */}
         </View>
     );
 }

@@ -24,7 +24,7 @@ import { currentTs, getPartitionKey } from '../common/utils';
 import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
-import { isTelegramTab } from '../providers/PlaygroundProvider';
+import { isDeviceMonitor, isTelegramTab } from '../providers/PlaygroundProvider';
 import { AccountPublic, MainMessageEvent, RoiInfo, SUB_WIN_ID, WinControlType } from '../types';
 import LLMService, { MessageLLM } from './LLMService';
 
@@ -286,7 +286,6 @@ export default class WebviewMainEventService {
         const { tabId, twa } = tab;
         const topColor = getTopColor(index);
 
-        let resizable_ = true;
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
 
         const playgroundUrl = `${getDiscoverHost(
@@ -296,9 +295,12 @@ export default class WebviewMainEventService {
         )}#${winId}`;
 
         const {width:winWidth} = window.screen
-
-        const minWidth = isTelegramTab(tab) ? 368 : 368 * 3;
+        const isMinWindow = isTelegramTab(tab) || tab.url
+        const minWidth = isMinWindow ? 368 : 368 * 3;
         let height = PLAYGROUND_WIN_HEIGHT;
+        if(isDeviceMonitor(tab)){
+            height = 852
+        }
         let x = winWidth - minWidth - 12;
         let y = 12;
         return {
@@ -308,7 +310,7 @@ export default class WebviewMainEventService {
                 width: minWidth,
                 minWidth: 368,
                 minHeight: height,
-                resizable: !isTelegramTab(tab),
+                resizable: !(isTelegramTab(tab) || isDeviceMonitor(tab)),
                 height: height,
                 x,
                 y,

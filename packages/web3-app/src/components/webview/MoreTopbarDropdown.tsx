@@ -10,8 +10,9 @@ import { useTheme } from 'styled-components';
 import { isPlaygroundWebApp } from '../../common/helpers';
 import { W3C_ChatId } from '../../constant';
 import { BrowserTab } from '../../providers/BrowserProvider';
-import { usePlayground } from '../../providers/PlaygroundProvider';
+import { isDeviceMonitor, isTelegramTab, usePlayground } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
+import TgAuthService from '../../services/TgAuthService';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
@@ -87,6 +88,7 @@ export default function MoreTopbarDropdown({
             }
         }
     };
+    const isDevice = isDeviceMonitor(tab);
 
     return (
         <View empty>
@@ -123,7 +125,7 @@ export default function MoreTopbarDropdown({
                 TransitionComponent={Fade}
             >
                 <View
-                    hide={!isPlaygroundWebApp()}
+                    hide={!isPlaygroundWebApp() || isDevice}
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);
@@ -203,6 +205,26 @@ export default function MoreTopbarDropdown({
 
                 <View
                     menuItem
+                    hide={!isTelegramTab(tab)}
+                    onClick={async () => {
+                        setAnchorEl(null);
+                        if (currentAccount) {
+                            const tgs = new TgAuthService(currentAccount.id, currentAccount.index);
+                            await tgs.remove();
+                            const ws = new WebviewServiceTelegram(tabId);
+                            await ws.removeAuthInfo();
+                            await new TgTwaIframeService(currentAccount, tabId).remove();
+                            ws.goTo(tgUrl!);
+                        }
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={'Logout'} iconSmall />
+                    </ListItemIcon>
+                    <View text={t(`退出Telegram账户`)} textFontSize="0.9rem" />
+                </View>
+                <View
+                    menuItem
                     hide={!tgUrl || !currentAccount}
                     onClick={async () => {
                         setAnchorEl(null);
@@ -234,6 +256,7 @@ export default function MoreTopbarDropdown({
 
                 <View
                     menuItem
+                    hide={isDevice}
                     onClick={async () => {
                         setAnchorEl(null);
                         const ws = new WebviewService(tabId);

@@ -7,7 +7,7 @@ import { useIAppContext } from '../../providers/IAppProvider';
 import { CoinPage } from './coin/DesktopCoinPage';
 
 export function WalletPage() {
-    const { selectedToken, showWalletList, onSelectToken } = useIAppContext();
+    const { selectedToken, onSelectToken } = useIAppContext();
     useEffect(() => {
         onSelectToken('');
     }, []);

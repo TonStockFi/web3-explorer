@@ -20,7 +20,14 @@ export default class WebviewServiceTelegram extends WebviewService {
         console.log('get iframe url', iframeUrl);
         return iframeUrl;
     }
-
+    async removeAuthInfo(): Promise<null | TgAuthinfo> {
+        const webview = this.getWebview();
+        if (!webview) {
+            console.warn('webview is null when isLogged ');
+            return null;
+        }
+        return this.execJs(`localStorage.clear()`);
+    }
     async getAuthInfo(): Promise<null | TgAuthinfo> {
         const webview = this.getWebview();
         if (!webview) {

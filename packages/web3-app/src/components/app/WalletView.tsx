@@ -36,7 +36,7 @@ export const WalletView = () => {
             <View
                 abs
                 top={44}
-                width={390}
+                width={640}
                 height={720}
                 zIdx={100}
                 sx={{

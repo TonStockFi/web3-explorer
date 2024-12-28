@@ -2,6 +2,7 @@ import { default as AccountBalanceIcon } from '@mui/icons-material/AccountBalanc
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AddIcon from '@mui/icons-material/Add';
 import AdsClick from '@mui/icons-material/AdsClick';
+import Android from '@mui/icons-material/Android';
 import BackIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
@@ -125,6 +126,7 @@ export type IconList =
     | 'TG'
     | 'Insights'
     | 'Stop'
+    | 'Android'
     | 'Extension'
     | 'NotificationImportant'
     | 'Https'
@@ -202,6 +204,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     EmojiEvents,
     Person,
     GiClick,
+    Android,
     Stop: StopIcon,
     WifiTetheringError,
     Extension,

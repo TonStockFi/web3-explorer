@@ -159,8 +159,18 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
                 }
             };
         }
+
+        if (buttonText?.indexOf('ws://') === 0) {
+            buttonText = 'ws:' + t(buttonText);
+        } else if (buttonText?.indexOf('http://') === 0) {
+            buttonText = 'http:' + t(buttonText);
+        } else if (buttonText?.indexOf('https://') === 0) {
+            buttonText = 'https:' + t(buttonText);
+        } else {
+            buttonText = t(buttonText);
+        }
         //@ts-ignore
-        const node = <Button {...p2}>{t(buttonText)}</Button>;
+        const node = <Button {...p2}>{buttonText}</Button>;
         if (drawer) {
             return (
                 <>

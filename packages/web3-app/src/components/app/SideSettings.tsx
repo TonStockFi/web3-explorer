@@ -14,7 +14,7 @@ import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
 
-export default function SideSettingIcon() {
+export default function SideSettings() {
     const { t } = useTranslation();
     const theme = useTheme();
     const { openTab } = useBrowserContext();
@@ -143,7 +143,7 @@ export default function SideSettingIcon() {
                     </ListItemIcon>
                     <View text={t('apps_connect')} textFontSize="0.9rem" />
                 </View>
-                {/* <View divider />
+                <View divider />
                 <View
                     hide={!env.isDev}
                     menuItem
@@ -156,7 +156,7 @@ export default function SideSettingIcon() {
                         <View icon="Devices" iconSmall />
                     </ListItemIcon>
                     <View text={t('MobileDevice')} textFontSize="0.9rem" />
-                </View> */}
+                </View>
                 <View hide={!env.isDev} divider />
                 <View
                     menuItem

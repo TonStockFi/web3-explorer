@@ -16,14 +16,15 @@ import { WalletView } from '../components/app/WalletView';
 import { MainMessageDispatcher } from '../components/MainMessageDispatcher';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
+import { DevicesProvider } from '../providers/DevicesProvider';
 import { PlaygroundProvider } from '../providers/PlaygroundProvider';
 import { ProProvider } from '../providers/ProProvider';
 import { RecognitionProvider } from '../providers/RecognitionProvider';
 import { ScreenshotProvider } from '../providers/ScreenshotProvider';
 import { Web3AppThemeWrpper } from '../providers/Web3AppThemeWrpper';
-import DevView from './DevView';
 import { BrowserFavorPage } from './Discover/BrowserFavorPage';
 import { BrowserHistoryPage } from './Discover/BrowserHistoryPage';
+import DevicesPage from './Discover/DevicesPage';
 import { WebviewPage } from './Discover/WebviewPage';
 import { ManageAccountsPage } from './Preferences/ManageAccountsPage';
 import { ConnectedAppsPage } from './Wallet/connect/ConnectedAppsPage';
@@ -42,9 +43,6 @@ function Pages() {
                 <DesktopMultiSendFormPage />
             </View>
 
-            <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.DEV}>
-                <DevView />
-            </View>
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.ACCOUNTS_MANAGE}>
                 <ManageAccountsPage />
             </View>
@@ -54,6 +52,10 @@ function Pages() {
             </View>
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.BROWSER_HISTORY}>
                 <BrowserHistoryPage />
+            </View>
+
+            <View wh100p displayNone={mainNavType !== MAIN_NAV_TYPE.MOBILE_MONITORS}>
+                <DevicesPage />
             </View>
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.CONNECTED_APPS}>
                 <ConnectedAppsPage />
@@ -69,7 +71,7 @@ function Pages() {
 
 export const Web3AppInner = () => {
     const { env, isFullScreen } = useIAppContext();
-    const { theme, t, currentTabId } = useBrowserContext();
+    const { theme, currentTabId } = useBrowserContext();
     let topLeft = 0;
 
     if (env.isMac && !isFullScreen) {
@@ -130,19 +132,21 @@ export const Web3AppInner = () => {
 export const Web3App = () => {
     return (
         <ProProvider>
-            <ScreenshotProvider>
-                <IBrowserProvider>
-                    <FavorProvider>
-                        <PlaygroundProvider>
-                            <RecognitionProvider>
-                                <Web3AppThemeWrpper>
-                                    <Web3AppInner />
-                                </Web3AppThemeWrpper>
-                            </RecognitionProvider>
-                        </PlaygroundProvider>
-                    </FavorProvider>
-                </IBrowserProvider>
-            </ScreenshotProvider>
+            <DevicesProvider>
+                <ScreenshotProvider>
+                    <IBrowserProvider>
+                        <FavorProvider>
+                            <PlaygroundProvider>
+                                <RecognitionProvider>
+                                    <Web3AppThemeWrpper>
+                                        <Web3AppInner />
+                                    </Web3AppThemeWrpper>
+                                </RecognitionProvider>
+                            </PlaygroundProvider>
+                        </FavorProvider>
+                    </IBrowserProvider>
+                </ScreenshotProvider>
+            </DevicesProvider>
         </ProProvider>
     );
 };

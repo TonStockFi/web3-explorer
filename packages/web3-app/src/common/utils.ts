@@ -18,6 +18,11 @@ export function getUrlIsDev(){
     return isDev
 }
 
+export function getUrlQuery(key:string,defaultVal?:any){
+    const uri = new URL(location.href);
+    return uri.searchParams.get(key) || defaultVal
+}
+
 export function waitForResult(
     cb: () => any | Promise<any>,
     timeout: number = -1,
