@@ -20,7 +20,13 @@ import { WsCloseCode } from '../../types';
 
 let ws: WebSocket;
 
-export default function ManagerClients() {
+export default function ManagerClients({
+    serverIsReady,
+    setServerIsReady
+}: {
+    serverIsReady: boolean;
+    setServerIsReady: (v: boolean) => void;
+}) {
     const ip = getUrlQuery('ip');
     const port = 6788;
     const WS_URL = `ws://${ip}:${port}/api`;
@@ -28,7 +34,6 @@ export default function ManagerClients() {
     const [clients, setClients] = useState([]);
     const theme = useTheme();
     const [ws, setWs] = useState<WebSocket | null>(null);
-    const [serverIsReady, setServerIsReady] = useState<boolean>(false);
     useEffect(() => {
         function onServerIsReady(e: any) {
             console.log('serverIsReady', e.detail.serverIsReady);

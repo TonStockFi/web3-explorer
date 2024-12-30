@@ -15,10 +15,9 @@ import { TELEGRAME_WEB } from '../constant';
 import { BoundingClientRect } from '../types';
 
 export default class WebviewService {
-    
     openDevTools() {
-        const webview = this.getWebview()
-        if(!webview){
+        const webview = this.getWebview();
+        if (!webview) {
             return;
         }
         webview.openDevTools();
@@ -57,32 +56,35 @@ export default class WebviewService {
         return getFocusWebviewIsReadyByTabId(this.tabId);
     }
 
-    async waitwebviewIsReady(timeout: number = -1, interval: number = 100): Promise<WebviewTag|null|undefined> {
+    async waitwebviewIsReady(
+        timeout: number = -1,
+        interval: number = 100
+    ): Promise<WebviewTag | null | undefined> {
         const startTime = Date.now();
-    
+
         return new Promise((resolve, reject) => {
             const checkWebviewReady = async () => {
                 try {
                     const isReady = this.webviewIsReady(); // Call the existing `webviewIsReady` method
                     if (isReady) {
-                        const webview = this.getWebview()
+                        const webview = this.getWebview();
                         resolve(webview!); // Webview is ready
                         return;
                     }
-    
+
                     // Check if the timeout has been reached
                     if (Date.now() - startTime > timeout && timeout !== -1) {
                         resolve(null); // Timeout, webview is not ready
                         return;
                     }
-    
+
                     // Retry after the interval
                     setTimeout(checkWebviewReady, interval);
                 } catch (error) {
                     reject(null); // Handle any errors
                 }
             };
-    
+
             checkWebviewReady(); // Start polling
         });
     }
@@ -124,8 +126,8 @@ export default class WebviewService {
             return;
         }
 
-        showGlobalLoading(true)
-        showGlobalLoading(false,2)
+        showGlobalLoading(true);
+        showGlobalLoading(false, 2);
         const code = `
     const currentUrl = window.location.href.split('#')[0];
     const newHash = '#${chatId}';
@@ -142,12 +144,11 @@ export default class WebviewService {
             return;
         }
         if (url) {
-            const {hash,host} = new URL(url)
-            if(TELEGRAME_WEB.indexOf(host) > -1 && hash.startsWith("#")){
-                this.goToTgChat(hash.substring(1))
-            }else{
+            const { hash, host } = new URL(url);
+            if (TELEGRAME_WEB.indexOf(host) > -1 && hash.startsWith('#')) {
+                this.goToTgChat(hash.substring(1));
+            } else {
                 await webview.executeJavaScript(`location.href="${url}";`);
-
             }
         }
     }
@@ -194,6 +195,13 @@ if(element){
             const ele = document.querySelector("${selector}");
             if(ele){return ele["${key}"]}else{return null}`);
     }
+    async dispatchEvent(action: string, payload?: any) {
+        return this.execJs(
+            `window.dispatchEvent(new CustomEvent("${action}",{detail:${JSON.stringify(
+                payload || {}
+            )}}))`
+        );
+    }
     async execJs(code: string): Promise<any | null> {
         const wv = this.getWebview();
         if (!wv) {
@@ -208,7 +216,11 @@ if(element){
             return null;
         }
     }
-    async waitForExecJsResult(code: string, timeout: number = 0,delayMs:number = 800): Promise<any | null> {
+    async waitForExecJsResult(
+        code: string,
+        timeout: number = 0,
+        delayMs: number = 800
+    ): Promise<any | null> {
         let startTs = 0;
         return new Promise(resolve => {
             const interval = setInterval(async () => {
@@ -243,8 +255,8 @@ if(element){
     }
 
     goToTgChat(chatId: string) {
-        showGlobalLoading(true)
-        showGlobalLoading(false,2)
+        showGlobalLoading(true);
+        showGlobalLoading(false, 2);
         const code = `  
 const [currentUrl,hash] = window.location.href.split('#');
 if(hash){
@@ -380,24 +392,24 @@ if(element && element.src){
         });
         await sleep(100);
 
-    // Calculate intermediate steps for smooth dragging
-    const deltaX = (end.x - start.x) / steps;
-    const deltaY = (end.y - start.y) / steps;
+        // Calculate intermediate steps for smooth dragging
+        const deltaX = (end.x - start.x) / steps;
+        const deltaY = (end.y - start.y) / steps;
 
-    for (let i = 1; i <= steps; i++) {
-        const intermediateX = start.x + deltaX * i;
-        const intermediateY = start.y + deltaY * i;
+        for (let i = 1; i <= steps; i++) {
+            const intermediateX = start.x + deltaX * i;
+            const intermediateY = start.y + deltaY * i;
 
-        await wv.sendInputEvent({
-            type: 'mouseMove',
-            x: Math.round(intermediateX),
-            y: Math.round(intermediateY),
-            button: 'left', // Keep the left button pressed during the drag
-        });
+            await wv.sendInputEvent({
+                type: 'mouseMove',
+                x: Math.round(intermediateX),
+                y: Math.round(intermediateY),
+                button: 'left' // Keep the left button pressed during the drag
+            });
 
-        // Optional sleep for smoother visual drag simulation
-        await sleep(50);
-    }
+            // Optional sleep for smoother visual drag simulation
+            await sleep(50);
+        }
         await wv.sendInputEvent({
             type: 'mouseUp',
             x: end.x,

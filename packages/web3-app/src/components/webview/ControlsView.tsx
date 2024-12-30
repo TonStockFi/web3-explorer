@@ -1,5 +1,6 @@
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useState } from 'react';
+import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
@@ -14,7 +15,7 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
     const [findInPage, setFindInPage] = useState<{ text?: string } | null>(null);
     const [contextMenu, setContextMenu] = useState<null | ContextMenuProps>(null);
     const [isMute, setIsMute] = useState(false);
-
+    const { onChangeUrlSearch } = useBrowserContext();
     useEffect(() => {
         _currentTabId = tabId;
         if (tabId) {
@@ -91,6 +92,7 @@ export function ControlsView({ findInPageTop, tabId }: { findInPageTop?: number;
                 if (payload.key === 'Escape') {
                     setFindInPage(null);
                     setContextMenu(null);
+                    onChangeUrlSearch(undefined);
                     onCut(false);
                 }
             }

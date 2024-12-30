@@ -52,7 +52,7 @@ export function isTelegramWeb(url: string) {
     return res;
 }
 
-export function isDeviceMonitor(tab: BrowserTab) {
+export function isDeviceMonitor(tab: Partial<BrowserTab>) {
     let res = false;
     if (!tab.url) {
         return res;
@@ -207,7 +207,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
             onAction('getBounds', { winId: getWinId() })?.then(r => {
                 let { x } = r as { x: number };
                 const { screen } = window;
-                const width = v === ExtensionType.NULL ? 368 : 368 * 3;
+                const width = v === ExtensionType.NULL ? 368 : 368 * 2;
                 if (screen.width < x + width) {
                     x = screen.width - width;
                 }

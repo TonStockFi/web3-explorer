@@ -120,6 +120,7 @@ export type IconList =
     | 'Code'
     | 'MoveDown'
     | 'EmojiEvents'
+    | 'EmojiEvents'
     | 'ArrowUpward'
     | 'ArrowDownward'
     | 'LockOpen'
@@ -217,6 +218,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     VolumeOff,
     VolumeUp,
     NorthEast,
+    EmojiEvents,
     Psychology,
     Tab,
     Logout,

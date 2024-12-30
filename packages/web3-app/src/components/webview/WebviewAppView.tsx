@@ -5,8 +5,10 @@ import { useTheme } from 'styled-components';
 import { START_URL } from '../../constant';
 import { useAccountInfo, useAccountWallePartitionId } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
+import { useIAppContext } from '../../providers/IAppProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import WebviewService from '../../services/WebviewService';
+import WebviewServiceHook from '../../services/WebviewServiceHook';
 import { WebApp, WebveiwEventType } from '../../types';
 import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
@@ -14,7 +16,8 @@ import { WebviewTopBar } from './WebViewTopBar';
 
 export function WebviewAppView({ tabId }: { tabId: string }) {
     const { isCutEnable } = useScreenshotContext();
-    const { currentTabId, openUrl, openTabFromWebview, updateAt, browserTabs, saveTab } =
+    const { showConfirm } = useIAppContext();
+    const { currentTabId, openUrl, openTabFromWebview, closeTab, updateAt, browserTabs, saveTab } =
         useBrowserContext();
 
     const theme = useTheme();
@@ -50,6 +53,15 @@ export function WebviewAppView({ tabId }: { tabId: string }) {
                 break;
             }
 
+            case 'did-stop-loading': {
+                new WebviewServiceHook(tabId, {
+                    openTabFromWebview,
+                    closeTab,
+                    isMain: true,
+                    showConfirm
+                }).handleWebveiw();
+                break;
+            }
             case 'dom-ready': {
                 break;
             }

@@ -55,6 +55,8 @@ interface BrowserContextType {
     onChangeLeftSideActions: (v: MainNavListItem[]) => void;
     t: (v: string) => string;
     openSideWeb: (sideWeb: SideWebProps | null) => void;
+    onChangeUrlSearch: (v?: string) => void;
+    urlSearch: string;
     theme: DefaultTheme;
     updateAt: number;
 
@@ -99,6 +101,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     const { showWalletAside, env } = useIAppContext();
     const [sideWeb, setSideWeb] = useSessionStorageState<null | SideWebProps>('sideWeb', null);
     const [updateAt, setUpdateAt] = useState(currentTs());
+    const [urlSearch, seturlSearch] = useState<undefined | string>(undefined);
 
     const [leftSideActions, setLeftSideActions] = useLocalStorageState<MainNavListItem[]>(
         'LeftSideActions_1',
@@ -160,6 +163,9 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         }
     }, []);
 
+    const onChangeUrlSearch = (v?: string) => {
+        seturlSearch(v);
+    };
     const onChangeLeftSideActions = (actions: MainNavListItem[]) => {
         setLeftSideActions(actions);
     };
@@ -297,6 +303,8 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     return (
         <BrowserContext.Provider
             value={{
+                onChangeUrlSearch,
+                urlSearch,
                 onChangeLeftSideActions,
                 leftSideActions,
                 tabs: Tabs,

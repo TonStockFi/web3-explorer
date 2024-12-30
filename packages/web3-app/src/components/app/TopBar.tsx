@@ -1,5 +1,9 @@
+import Input from '@web3-explorer/uikit-mui/dist/mui/Input';
+import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import { View } from '@web3-explorer/uikit-view';
 import { createRef, useEffect } from 'react';
+import { useTheme } from 'styled-components';
+import { isValidDomain } from '../../common/utils';
 import { AsideWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
@@ -8,7 +12,17 @@ import { TabBar } from './TabBar';
 
 export const TopBar = () => {
     const ref = createRef<HTMLDivElement>();
-    const { currentTabId, updateAt, t, browserTabs, closeTab, openTab } = useBrowserContext();
+    const {
+        currentTabId,
+        urlSearch,
+        onChangeUrlSearch,
+        updateAt,
+        openTabFromWebview,
+        t,
+        browserTabs,
+        closeTab,
+        openTab
+    } = useBrowserContext();
     const { walletAside, showWalletList } = useIAppContext();
 
     useEffect(() => {
@@ -23,6 +37,7 @@ export const TopBar = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
+    const theme = useTheme();
     const firstTabs = [MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY] as string[];
     const tabs = Array.from(browserTabs).map(row => row[1]);
     const mainTabs = tabs.filter(row => !row.tabId.startsWith('tab_')).map(row => row.tabId);
@@ -55,6 +70,92 @@ export const TopBar = () => {
     return (
         <View borderBox relative flx rowVCenter m={8} borderRadius={8} mr={0}>
             <View
+                hide={urlSearch === undefined}
+                zIdx={10000}
+                position={'fixed'}
+                top0
+                bottom0
+                xx0
+                center
+            >
+                <View
+                    zIdx={0}
+                    absFull
+                    onClick={() => {
+                        onChangeUrlSearch(undefined);
+                    }}
+                ></View>
+                <View
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                    // abs
+                    zIdx={1}
+                    mt={-200}
+                    px={24}
+                    py={16}
+                    borderRadius={8}
+                    bgColor={theme.backgroundBrowser}
+                    sx={{
+                        minWidth: 450,
+                        boxShadow: `0px 2px 19px 12px rgb(0 0 0 / 16%)s`
+                    }}
+                >
+                    <View>
+                        <Input
+                            onKeyDown={(e: any) => {
+                                if (e.key === 'Enter') {
+                                    let newUrl = e.target.value;
+                                    if (newUrl.startsWith('chrome://')) {
+                                        return;
+                                    }
+                                    if (!newUrl.startsWith('http')) {
+                                        if (isValidDomain(newUrl)) {
+                                            newUrl = `https://${newUrl}`;
+                                        } else {
+                                            const url = `https://bing.com/search?q=${encodeURIComponent(
+                                                newUrl
+                                            )}`;
+                                            // `https://www.google.com/search?q=${encodeURIComponent(newUrl)}`
+                                            openTabFromWebview({
+                                                url,
+                                                name: '',
+                                                description: '',
+                                                icon: ''
+                                            });
+                                            onChangeUrlSearch(undefined);
+                                            return;
+                                        }
+                                    }
+                                    openTabFromWebview({
+                                        url: newUrl,
+                                        name: '',
+                                        description: '',
+                                        icon: ''
+                                    });
+                                    onChangeUrlSearch(undefined);
+                                }
+                            }}
+                            type="search"
+                            value={urlSearch}
+                            onChange={e => {
+                                onChangeUrlSearch(e.target.value.trim());
+                            }}
+                            placeholder="请输入网址,点击回车键继续"
+                            sx={{ width: '100%' }}
+                            startAdornment={
+                                <InputAdornment position="start">
+                                    <View icon="Search" iconSmall />
+                                </InputAdornment>
+                            }
+                            autoFocus
+                            disableUnderline
+                        ></Input>
+                    </View>
+                </View>
+            </View>
+            <View
                 flex1
                 rowVCenter
                 overflowXAuto
@@ -62,6 +163,14 @@ export const TopBar = () => {
                 mr={walletAside ? AsideWidth : 0}
                 miniScrollBar
             >
+                <View
+                    tips={t('AddTab')}
+                    iconButtonSmall
+                    icon={'Add'}
+                    onClick={() => {
+                        onChangeUrlSearch('');
+                    }}
+                ></View>
                 {[MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY].map(row => {
                     return (
                         <TabBar
@@ -123,17 +232,9 @@ export const TopBar = () => {
                         />
                     );
                 })} */}
-                <View appRegionDrag={!walletAside} flex1 h={36} mr={mr} />
-                <View abs right={12} top={0} rowVCenter hide={!showPlus}>
-                    <View
-                        tips={t('AddTab')}
-                        iconButtonSmall
-                        icon={'Add'}
-                        onClick={() => {
-                            openTab(MAIN_NAV_TYPE.DISCOVERY);
-                        }}
-                    ></View>
-                </View>
+
+                <View appRegionDrag={!walletAside} flex1 h={36} mr={0} />
+                <View abs right={12} top={0} rowVCenter></View>
             </View>
         </View>
     );

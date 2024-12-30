@@ -6,15 +6,17 @@ import React, { createRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { currentTs } from '../../common/utils';
-import { isDiscoverTab } from '../../providers/BrowserProvider';
+import { isDiscoverTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
+import { isDeviceMonitor } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import LLMGeminiService from '../../services/LLMGeminiService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewMuteService from '../../services/WebviewMuteService';
 import WebviewService from '../../services/WebviewService';
-import { ContextMenuProps } from '../../types';
-import { getFocusWebview, getTabIdByWebviewContentsId } from './WebViewBrowser';
+import WebviewServiceDevice from '../../services/WebviewServiceDevice';
+import { ContextMenuProps, GLOBAL_ACTIONS } from '../../types';
+import { getFocusWebview, getTabIdByWebviewContentsId, getUrlByTabId } from './WebViewBrowser';
 
 export default function ContextMenu({
     onHide,
@@ -31,7 +33,7 @@ export default function ContextMenu({
     const { showSnackbar, env } = useIAppContext();
     const { webContentsId } = contextMenu;
     const tabId = getTabIdByWebviewContentsId(webContentsId);
-
+    const { browserTabs } = useBrowserContext();
     const { x, y, selectionText } = contextMenu.params;
     const theme = useTheme();
     const { t, i18n } = useTranslation();
@@ -62,6 +64,7 @@ export default function ContextMenu({
         }
     };
     const isDiscover = tabId && isDiscoverTab(tabId);
+    const isDevice = tabId && isDeviceMonitor({ url: getUrlByTabId(tabId) });
     // console.log('contextMenu >>', contextMenu, tabId, selectionText);
     if (!env.isDev) {
         if (!tabId) {
@@ -112,6 +115,53 @@ export default function ContextMenu({
                 <View
                     menuItem
                     onClick={() => {
+                        const ws = new WebviewServiceDevice(tabId);
+                        if (isDevice) {
+                            ws.onWsAction('GLOBAL_ACTION', {
+                                action: GLOBAL_ACTIONS.GLOBAL_ACTION_HOME
+                            });
+                        } else {
+                            if (ws.getWebview()) {
+                                const tab = browserTabs.get(tabId);
+                                if (tab && tab.url) {
+                                    tab && ws.goTo(tab.url);
+                                }
+                            }
+                        }
+
+                        handleClose();
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={'Home'} iconFontSize="1rem" />
+                    </ListItemIcon>
+                    <View text={t(`home`)} aCenter textFontSize="0.9rem" />
+                </View>
+                <View
+                    menuItem
+                    onClick={() => {
+                        if (isDevice) {
+                            const ws = new WebviewServiceDevice(tabId);
+                            ws.onWsAction('GLOBAL_ACTION', {
+                                action: GLOBAL_ACTIONS.GLOBAL_ACTION_BACK
+                            });
+                        } else {
+                            if (webview && webview.canGoBack()) {
+                                webview.goBack();
+                            }
+                        }
+
+                        handleClose();
+                    }}
+                >
+                    <ListItemIcon>
+                        <View icon={'KeyboardArrowLeft'} iconFontSize="1rem" />
+                    </ListItemIcon>
+                    <View text={t(`back`)} aCenter textFontSize="0.9rem" />
+                </View>
+                <View
+                    menuItem
+                    onClick={() => {
                         if (webview) {
                             webview.reload();
                         }
@@ -122,20 +172,6 @@ export default function ContextMenu({
                         <View icon={'Refresh'} iconFontSize="1rem" />
                     </ListItemIcon>
                     <View text={t(`reload`)} aCenter textFontSize="0.9rem" />
-                </View>
-                <View
-                    menuItem
-                    onClick={() => {
-                        if (webview && webview.canGoBack()) {
-                            webview.goBack();
-                        }
-                        handleClose();
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon={'KeyboardArrowLeft'} iconFontSize="1rem" />
-                    </ListItemIcon>
-                    <View text={t(`back`)} aCenter textFontSize="0.9rem" />
                 </View>
                 <View divider />
                 <View
@@ -195,6 +231,7 @@ export default function ContextMenu({
                 <View hide={isSideWeb} divider />
 
                 <View
+                    hide={!!isDevice}
                     menuItem
                     onClick={() => {
                         handleClose();

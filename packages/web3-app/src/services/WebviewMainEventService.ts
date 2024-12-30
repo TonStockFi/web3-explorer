@@ -129,7 +129,7 @@ export default class WebviewMainEventService {
         const initMessage = this.getInitMessage();
         const url = `${getDiscoverHost(isDev)}&initMessage=${initMessage}#${SUB_WIN_ID.PLAYGROUND}`;
         const width = 910;
-        const height = 720;
+        const height = 440;
         const x = 12;
         const y = winHeight - height - 12;
         await this.openWindow(
@@ -295,8 +295,8 @@ export default class WebviewMainEventService {
         )}#${winId}`;
 
         const {width:winWidth} = window.screen
-        const isMinWindow = isTelegramTab(tab) || tab.url
-        const minWidth = isMinWindow ? 368 : 368 * 3;
+        const isMinWindow = isTelegramTab(tab) || isDeviceMonitor(tab)
+        const minWidth = isMinWindow ? 368 : 368 * 2;
         let height = PLAYGROUND_WIN_HEIGHT;
         if(isDeviceMonitor(tab)){
             height = 852

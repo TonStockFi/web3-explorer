@@ -516,8 +516,7 @@ if (!window._observerInitialized) {
     }, [env]);
     const partition = getPartitionKey(partitionId);
 
-    let webpreferences = '';
-    webpreferences = `contextIsolation=0,nativeWindowOpen=1,nodeIntegration,preload=${env.dirname}/../renderer/site/preload.js`;
+    let webpreferences = `contextIsolation=0,nativeWindowOpen=1,allowRunningInsecureContent,nodeIntegration,preload=${env.dirname}/../renderer/site/preload.js`;
 
     if (!env) {
         return null;

@@ -112,7 +112,7 @@ const DevicesPage = () => {
         }
     };
 
-    if (firstLoad) {
+    if (firstLoad || !env.ip?.adr) {
         return null;
     }
     return (

@@ -216,7 +216,7 @@ export default function SideSettings() {
                 </View> */}
                 <View
                     menuItem
-                    hide
+                    hide={!env.isDev}
                     onClick={async () => {
                         openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
                         setAnchorEl(null);
@@ -230,6 +230,7 @@ export default function SideSettings() {
 
                 <View divider hide={!env.isDev} />
                 <View
+                    hide={!env.isDev}
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);

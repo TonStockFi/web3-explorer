@@ -1,11 +1,19 @@
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { View } from '@web3-explorer/uikit-view';
+import { useLocalStorageState } from '@web3-explorer/utils';
 import DESCrypto from '@web3-explorer/utils/dist/common/DESCrypto';
 import { useCallback, useEffect, useState } from 'react';
-import { connectWebSocket, wsSendClose, wsSendMessage } from '../../common/ws';
+import {
+    connectWebSocket,
+    wsSendClientClickEvent,
+    wsSendClientEvent,
+    wsSendClientEventAction,
+    wsSendClose,
+    wsSendMessage
+} from '../../common/ws';
 import { useDevice } from '../../providers/DevicesProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { ErrCodes, WsCloseCode } from '../../types';
+import { ErrCodes, GLOBAL_ACTIONS, sendMessageParams, WsCloseCode } from '../../types';
 import DeviceAuth from './components/DeviceAuth';
 import { Devices } from './global';
 import DeviceScreenView, { getMonitorImageId } from './Screen/DeviceScreenView';
@@ -13,7 +21,7 @@ import DeviceScreenView, { getMonitorImageId } from './Screen/DeviceScreenView';
 export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
     const { handleClientDeviceInfo } = useDevice();
 
-    const [errCode, setErrCode] = useState<ErrCodes | undefined>(undefined);
+    const [errCode, setErrCode] = useLocalStorageState<ErrCodes | undefined>('errCode', undefined);
     const [isLogged, setIsLogged] = useState(true);
     const [ws, setWs] = useState<WebSocket | undefined>(undefined);
 
@@ -147,6 +155,8 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
             setFirstLoad(false);
             return true;
         } catch (e) {
+            // showSnackbar({ message: '连接失败!' });
+            setErrCode(ErrCodes.CONNECT_ERROR);
             console.error(e);
             setFirstLoad(false);
             return false;
@@ -161,7 +171,6 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                 const { password, serverApi } = device;
                 if (password && serverApi) {
                     setFirstLoad(r => {
-                        debugger;
                         if (r) {
                             auth(deviceId, password, serverApi).catch(console.error);
                         }
@@ -191,7 +200,37 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
             }
         };
     }, [ws]);
+    useEffect(() => {
+        function onWsAction(e: any) {
+            setWs(ws => {
+                const { action, payload } = e.detail as any;
+                switch (action) {
+                    case 'GLOBAL_ACTION': {
+                        wsSendClientEventAction(payload.action as GLOBAL_ACTIONS, ws);
+                        break;
+                    }
+                    case 'CLICK': {
+                        const { x, y } = payload;
+                        wsSendClientClickEvent(x, y, ws);
+                        break;
+                    }
+                    case 'EVENT': {
+                        const { message } = payload as {
+                            message: sendMessageParams;
+                        };
+                        wsSendClientEvent(message, ws);
+                        break;
+                    }
+                }
+                return ws;
+            });
+        }
+        window.addEventListener('onWsAction', onWsAction);
 
+        return () => {
+            window.removeEventListener('onWsAction', onWsAction);
+        };
+    }, []);
     if (firstLoad) {
         return null;
     }

@@ -59,7 +59,7 @@ export default class WebviewServiceTelegram extends WebviewService {
     }
 
     async isLogged(): Promise<boolean> {
-        const userId = this.getAuthUserId();
+        const userId = await this.getAuthUserId();
         return !!userId;
     }
 
