@@ -68,3 +68,4 @@ grep 'version' ${PROJECT_DIR}/apps/desktop/package.json
 cd $PROJECT_DIR
 git add . && git commit -m "add tag: v${TAG}"
 git tag -a v$TAG -m "Release version v${TAG}" && git push origin v$TAG
+git push origin main

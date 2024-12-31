@@ -10,7 +10,6 @@ export const P2E_ChatId = '7363481027';
 
 export const W3C_ChatId = '7469429463';
 export const SWAP_ChatId = '7469429463';
-
 export const SERVICE_ChatId = '7187821521';
 export const TASK_CENTER_ChatId = '7187821521';
 export const BOT_ID_EXTESSION_CENTER = '7168826112';

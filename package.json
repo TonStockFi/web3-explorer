@@ -44,6 +44,7 @@
     "dependencies": {
         "@tonkeeper/uikit": "workspace:^",
         "@web3-explorer/uikit-mui": "workspace:^",
-        "@web3-explorer/uikit-view": "workspace:^"
+        "@web3-explorer/uikit-view": "workspace:^",
+        "react-qr-code": "^2.0.15"
     }
 }

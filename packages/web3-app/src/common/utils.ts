@@ -23,6 +23,34 @@ export function getUrlQuery(key:string,defaultVal?:any){
     return uri.searchParams.get(key) || defaultVal
 }
 
+export function addQauery(key:string,defaultVal?:any){
+    const uri = new URL(location.href);
+    return uri.searchParams.get(key) || defaultVal
+}
+
+export function getWebpageUrlWithQuery(hash: string, query?: Record<string, any>): string {
+    // Parse the current URL
+    const uri = new URL(location.href);
+
+    // Add the hash to the URL
+    if(hash.startsWith("#")){
+        hash = hash.substring(1)
+    }
+    uri.hash = hash;
+
+    // Merge the query into uri.searchParams if provided
+    if (query) {
+        Object.entries(query).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                uri.searchParams.set(key, String(value));
+            }
+        });
+    }
+
+    // Return the assembled URL as a string
+    return uri.toString();
+}
+
 export function waitForResult(
     cb: () => any | Promise<any>,
     timeout: number = -1,
