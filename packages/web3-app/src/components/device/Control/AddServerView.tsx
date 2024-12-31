@@ -1,3 +1,4 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Box from '@web3-explorer/uikit-mui/dist/mui/Box';
 import Button from '@web3-explorer/uikit-mui/dist/mui/Button';
 import Dialog, {
@@ -8,7 +9,6 @@ import Dialog, {
 import TextField from '@web3-explorer/uikit-mui/dist/mui/TextField';
 import { View } from '@web3-explorer/uikit-view';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useIAppContext } from '../../../providers/IAppProvider';
 
 import { CustomDeviceWsServerHosts } from '../../../types';

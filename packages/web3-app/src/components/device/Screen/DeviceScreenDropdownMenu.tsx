@@ -1,6 +1,7 @@
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import GridViewIcon from '@mui/icons-material/GridView';
 import PhonelinkEraseIcon from '@mui/icons-material/PhonelinkErase';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Divider from '@web3-explorer/uikit-mui/dist/mui/Divider';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
@@ -9,7 +10,6 @@ import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import MenuItem from '@web3-explorer/uikit-mui/dist/mui/MenuItem';
 import { View } from '@web3-explorer/uikit-view';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 import { wsSendClientEventAction, wsSendMessage } from '../../../common/ws';
 import { useDevice } from '../../../providers/DevicesProvider';
 import DeviceService from '../../../services/DeviceService';

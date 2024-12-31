@@ -12,12 +12,12 @@ import {
     useMultiSendReceiverValidator
 } from '@tonkeeper/uikit/dist/state/multiSend';
 import { useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import InputBlock from '@web3-explorer/uikit-mui/dist/mui/Input';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';

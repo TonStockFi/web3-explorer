@@ -7,9 +7,9 @@ import {
     useActiveWalletTonConnectConnections,
     useDisconnectTonConnectApp
 } from '@tonkeeper/uikit/dist/state/tonConnect';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
 import { formatDappUrl } from '../../common/utils';
 import { useBrowserContext } from '../../providers/BrowserProvider';

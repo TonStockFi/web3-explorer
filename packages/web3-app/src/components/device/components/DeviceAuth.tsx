@@ -1,7 +1,7 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import TextField from '@web3-explorer/uikit-mui/dist/mui/TextField';
 import { View } from '@web3-explorer/uikit-view';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import Divider from '@web3-explorer/uikit-mui/dist/mui/Divider';
@@ -132,7 +132,7 @@ export default function DeviceAuth({
                         }}
                         value={serverApi}
                         onChange={e => {}}
-                        size={'small'}  
+                        size={'small'}
                         id="serverApi"
                         label={t('服务器')}
                         variant="outlined"

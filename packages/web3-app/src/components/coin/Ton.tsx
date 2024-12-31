@@ -16,8 +16,8 @@ import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useFormatFiat, useRate } from '@tonkeeper/uikit/dist/state/rates';
 import { groupAndFilterTonActivityItems } from '@tonkeeper/uikit/dist/state/ton/tonActivity';
 import { useActiveWallet, useWalletAccountInfo } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { FC, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     const { t } = useTranslation();

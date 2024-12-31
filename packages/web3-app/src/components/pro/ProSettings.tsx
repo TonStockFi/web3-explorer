@@ -8,10 +8,10 @@ import { Radio } from '@tonkeeper/uikit/dist/components/fields/Checkbox';
 import { Input } from '@tonkeeper/uikit/dist/components/fields/Input';
 import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/modals/useSendTransferNotification';
 import { useFormatCoinValue } from '@tonkeeper/uikit/dist/hooks/balance';
-import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useMutateDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useAssets } from '@tonkeeper/uikit/dist/state/home';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -65,6 +65,7 @@ const SelectProPlans: FC<{
     if (isLongProLevel) {
         disabled = true;
     }
+    const { t } = useTranslation();
     return (
         <>
             <ListBlock>
@@ -80,7 +81,7 @@ const SelectProPlans: FC<{
                         <ListItemPayload>
                             <ColumnText
                                 noWrap
-                                text={plan.name}
+                                text={t(plan.name)}
                                 secondary={<>{formatNumberWithComma(Number(plan.amount))} W3C</>}
                             />
                             {currentProInfo?.level === plan.level && (
@@ -129,8 +130,8 @@ export const ProSettings: FC<{
     const { proPlans, onCheckPayCommentOrder, proInfoList, proRecvAddress } = usePro();
     let plans: ProPlan[] = proPlans.map(proPlan => {
         let { description } = proPlan;
-        description = description?.replace('{accountTitle}', accountTitle);
-        description = description?.replace('{walletTitle}', walletTitle);
+        description = t(description!)?.replace('%accountTitle', accountTitle);
+        description = description?.replace('%walletTitle', walletTitle);
         return { ...proPlan, description };
     });
     const currentPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
@@ -262,7 +263,7 @@ export const ProSettings: FC<{
                     mt={-16}
                     textColor={theme.textSecondary}
                     textFontSize="0.8rem"
-                    text={'如果推荐码有效，您和推荐人会分别获得 0.5% W3C 空投'}
+                    text={'推荐码说明'}
                 ></View>
                 {!isLongProLevel && (
                     <Line>
@@ -275,9 +276,9 @@ export const ProSettings: FC<{
                             onClick={onSubmit}
                         >
                             {gasIsEnough && w3cIsEnough ? (
-                                <View>{currentProInfo ? t('升级') : t('wallet_buy')}</View>
+                                <View text={currentProInfo ? '升级' : t('wallet_buy')}></View>
                             ) : (
-                                <View>{t('Ton Gas费 或者 W3C 余额不足')}</View>
+                                <View text={'Ton Gas费 或者 W3C 余额不足'}></View>
                             )}
                         </Button>
                     </Line>

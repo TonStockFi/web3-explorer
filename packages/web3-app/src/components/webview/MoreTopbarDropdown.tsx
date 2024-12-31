@@ -1,3 +1,4 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
@@ -5,7 +6,6 @@ import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { isPlaygroundWebApp } from '../../common/helpers';
 import { W3C_ChatId } from '../../constant';
@@ -58,6 +58,10 @@ export default function MoreTopbarDropdown({
     const handleClose = () => {
         setAnchorEl(null);
     };
+    if (!tab) {
+        return null;
+    }
+    // console.log(tab);
     const isW3CTgChat = tab.url && tab.url.indexOf(W3C_ChatId) > -1;
 
     const slotProps = {

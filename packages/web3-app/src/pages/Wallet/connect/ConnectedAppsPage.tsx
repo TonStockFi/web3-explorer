@@ -4,8 +4,8 @@ import {
     useActiveWalletTonConnectConnections,
     useDisconnectTonConnectApp
 } from '@tonkeeper/uikit/dist/state/tonConnect';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
-import { useTranslation } from 'react-i18next';
 import { ConnectedAppsList } from '../../../components/connect-apps/ConnectedAppsList';
 import { Page } from '../../../components/Page';
 import { WalletHeaderAccount } from '../../../components/wallet/WalletHeaderAccount';

@@ -32,6 +32,7 @@
     "@tonkeeper/uikit": "0.1.0",
     "@web3-explorer/lib-crypto": "1.0.0",
     "@web3-explorer/lib-telegram": "1.0.0",
+    "@web3-explorer/lib-translation": "1.0.0",
     "@web3-explorer/opencv": "1.0.0",
     "@web3-explorer/uikit-mui": "1.0.0",
     "@web3-explorer/uikit-view": "1.0.0",

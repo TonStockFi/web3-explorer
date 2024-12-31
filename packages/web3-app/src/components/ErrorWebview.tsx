@@ -1,6 +1,6 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Typography from '@web3-explorer/uikit-mui/dist/mui/Typography';
 import { View } from '@web3-explorer/uikit-view';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { hexToRGBA } from '../common/utils';
 

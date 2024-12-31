@@ -1,7 +1,7 @@
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { CopyIcon, DoneIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 
 import { View } from '@web3-explorer/uikit-view';
 import { useRef, useState } from 'react';

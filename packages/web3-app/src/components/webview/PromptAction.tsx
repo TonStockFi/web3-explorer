@@ -1,3 +1,4 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
 import FormControl from '@web3-explorer/uikit-mui/dist/mui/FormControl';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
@@ -6,7 +7,6 @@ import TextField from '@web3-explorer/uikit-mui/dist/mui/TextField';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useLocalStorageState } from '@web3-explorer/utils';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 
 import LLMChatGptService from '../../services/LLMChatGptService';

@@ -1,5 +1,5 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ManageAccounts } from '../../components/accounts/ManageAccounts';
 import { ManageSubWalletPage } from '../../components/accounts/ManageSubWalletPage';
 import { Page } from '../../components/Page';

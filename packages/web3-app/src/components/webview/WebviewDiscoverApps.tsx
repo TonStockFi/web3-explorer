@@ -13,6 +13,7 @@ import WebviewService from '../../services/WebviewService';
 import { InitConfig, MAIN_NAV_TYPE, WebApp } from '../../types';
 import { LoadingView } from '../LoadingView';
 
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
@@ -38,6 +39,9 @@ export function WebviewDiscoverApps({
     } = useBrowserContext();
     let tab: BrowserTab | undefined = browserTabs.get(tabId);
 
+    const { i18n } = useTranslation();
+
+    const currentLanguage = i18n.language;
     if (!tab) {
         tab = { tabId: tabId, ts: currentTs() };
     }
@@ -60,7 +64,7 @@ export function WebviewDiscoverApps({
     const url = `${getDiscoverHost(
         env.isDev,
         env.version
-    )}&address=${address}&id=${id1}&index=${index}#${winId}`;
+    )}&address=${address}&id=${id1}&index=${index}&lang=${currentLanguage}#${winId}`;
     // console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({

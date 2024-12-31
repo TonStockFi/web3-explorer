@@ -2,7 +2,7 @@ import { Account, AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useAccountsState, useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import { useState } from 'react';
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 
 import FormControl from '@mui/material/FormControl/FormControl';
 import InputAdornment from '@mui/material/InputAdornment/InputAdornment';

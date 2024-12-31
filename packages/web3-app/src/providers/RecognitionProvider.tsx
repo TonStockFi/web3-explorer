@@ -4,7 +4,6 @@ import { onAction } from '../common/electron';
 import { isPlaygroundMaster } from '../common/helpers';
 import { ENTRY_ID_ROI, MARK_ID_ROI, TASK_ID_ROI } from '../constant';
 
-import ProService from '../services/ProService';
 import RoiService from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { PlaygroundMasterSideAction, ProInfoProps, RoiInfo, SUB_WIN_ID } from '../types';
@@ -167,15 +166,9 @@ export function parseRecognitionCatId(recognitionCatId: string) {
     return { tabId, accountId, accountIndex };
 }
 
-export function getServiceId(recognitionCatId: string, proInfoList: ProInfoProps[]) {
-    const { accountId, accountIndex, tabId } = parseRecognitionCatId(recognitionCatId);
-    const currentProPlan = ProService.getCurrentPlan(proInfoList, accountId, accountIndex);
-    // console.log('getServiceId', currentProPlan, tabId, accountId, accountIndex);
-    if (currentProPlan && (currentProPlan.isLongProLevel || currentProPlan.plan)) {
-        return `${tabId}`;
-    } else {
-        return `${tabId}-${accountId}-${accountIndex}`;
-    }
+export function getServiceId(recognitionCatId: string, proInfoList?: ProInfoProps[]) {
+    const { tabId } = parseRecognitionCatId(recognitionCatId);
+    return `${tabId}`;
 }
 export const RecognitionProvider = (props: { children: ReactNode }) => {
     const { proInfoList } = usePro();
@@ -402,7 +395,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         }
         let name = r.name;
         if (!name) {
-            name = '未设置';
+            name = 'untitled';
         }
         const row: RoiInfo = {
             ...r,
@@ -458,7 +451,6 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const updateRoiArea = (r: RoiInfo) => {
-       
         let pid = r.pid;
         if (r.type === 'task') {
             pid = TASK_ID_ROI;

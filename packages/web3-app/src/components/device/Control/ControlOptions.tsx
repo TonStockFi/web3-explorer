@@ -3,7 +3,7 @@ import Input from '@web3-explorer/uikit-mui/dist/mui/Input';
 import InputLabel from '@web3-explorer/uikit-mui/dist/mui/InputLabel';
 import { View } from '@web3-explorer/uikit-view';
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { wsSendClientEvent } from '../../../common/ws';
 
 export default function ControlOptions({ deviceOptions }: { deviceOptions: any }) {

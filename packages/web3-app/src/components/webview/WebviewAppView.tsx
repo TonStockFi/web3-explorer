@@ -17,6 +17,7 @@ import { WebviewTopBar } from './WebViewTopBar';
 export function WebviewAppView({ tabId }: { tabId: string }) {
     const { isCutEnable } = useScreenshotContext();
     const { showConfirm } = useIAppContext();
+
     const { currentTabId, openUrl, openTabFromWebview, closeTab, updateAt, browserTabs, saveTab } =
         useBrowserContext();
 

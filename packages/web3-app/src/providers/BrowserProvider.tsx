@@ -1,7 +1,7 @@
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { useLocalStorageState, useSessionStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { DefaultTheme, useTheme } from 'styled-components';
 import { currentTs, getSessionCacheInfo } from '../common/utils';
 
@@ -56,7 +56,7 @@ interface BrowserContextType {
     t: (v: string) => string;
     openSideWeb: (sideWeb: SideWebProps | null) => void;
     onChangeUrlSearch: (v?: string) => void;
-    urlSearch: string;
+    urlSearch?: string;
     theme: DefaultTheme;
     updateAt: number;
 

@@ -1,9 +1,9 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Backdrop from '@web3-explorer/uikit-mui/dist/mui/Backdrop';
 import CircularProgress from '@web3-explorer/uikit-mui/dist/mui/CircularProgress';
 import Snackbar from '@web3-explorer/uikit-mui/dist/mui/Snackbar';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useIAppContext } from '../providers/IAppProvider';
 
 export function GlobalUi() {

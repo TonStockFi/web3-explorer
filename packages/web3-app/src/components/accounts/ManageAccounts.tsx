@@ -1,8 +1,8 @@
 import { ListBlockDesktopAdaptive } from '@tonkeeper/uikit/dist/components/List';
 import { useAccountsState } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { AccountsPager } from '../aside/AccountsPager';
 import { AccountRows } from './AccountsRows';

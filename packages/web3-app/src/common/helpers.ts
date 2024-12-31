@@ -27,10 +27,11 @@ export function getPlaygroundScreenSize(tab: BrowserTab) {
 }
 
 export function getDiscoverHost(isDev: boolean, version?: string) {
+    const lang = localStorage.getItem("i18nextLng")
     if (false) {
-        return `${DISCOVER_HOST_DEV}?isDev=true&version=${version || ''}`;
+        return `${DISCOVER_HOST_DEV}?isDev=true&version=${version || ''}&lang=${lang || ''}`;
     } else {
-        return `${DISCOVER_HOST}?version=${version || ''}`;
+        return `${DISCOVER_HOST}?version=${version || ''}&lang=${lang || ''}`;
     }
 }
 

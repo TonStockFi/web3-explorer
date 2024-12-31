@@ -1,10 +1,10 @@
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import List from '@web3-explorer/uikit-mui/dist/mui/List';
 import ListItem from '@web3-explorer/uikit-mui/dist/mui/ListItem';
 import ListItemText from '@web3-explorer/uikit-mui/dist/mui/ListItemText';
 import ListSubheader from '@web3-explorer/uikit-mui/dist/mui/ListSubheader';
-import { useTranslation } from 'react-i18next';
 
 export default function HostListView({
     defaultHosts,

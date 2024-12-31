@@ -1,8 +1,8 @@
 import ReactPortal from '@tonkeeper/uikit/dist/components/ReactPortal';
 import { Label2 } from '@tonkeeper/uikit/dist/components/Text';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
 

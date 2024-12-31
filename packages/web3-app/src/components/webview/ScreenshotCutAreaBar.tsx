@@ -1,8 +1,8 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Paper from '@web3-explorer/uikit-mui/dist/mui/Paper';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { getWinId, showAlertMessage, showGlobalLoading } from '../../common/helpers';
 import { copyImageToClipboard } from '../../common/image';
@@ -188,7 +188,7 @@ export function ScreenshotCutAreaBar({
                                 }
                             }}
                             iconProps={{ sx: { width: 16, height: 16 } }}
-                            tips={`复制坐标: {x:${x}, y:${y}, w:${w}, h:${h}}`}
+                            tips={`${t('复制坐标')}: {x:${x}, y:${y}, w:${w}, h:${h}}`}
                             iconButtonSmall
                             icon="AdsClick"
                         />

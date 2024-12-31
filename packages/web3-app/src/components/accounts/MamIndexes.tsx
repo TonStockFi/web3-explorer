@@ -10,7 +10,7 @@ import {
     useHideMAMAccountDerivation,
     useTonWalletsBalances
 } from '@tonkeeper/uikit/dist/state/wallet';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 
 import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals/RecoveryNotificationControlled';
 import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';

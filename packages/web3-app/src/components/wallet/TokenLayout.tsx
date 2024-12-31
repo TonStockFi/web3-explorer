@@ -1,7 +1,7 @@
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Body2, Label1, Label4 } from '@tonkeeper/uikit/dist/components/Text';
-import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { TokenRate } from '@tonkeeper/uikit/dist/state/rates';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { formatNumberWithComma } from '../../common/utils';

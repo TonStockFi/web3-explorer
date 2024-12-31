@@ -6912,6 +6912,7 @@ __metadata:
     react-error-boundary: "npm:^4.0.13"
     react-ga4: "npm:^2.1.0"
     react-hook-form: "npm:^7.51.2"
+    react-i18next: "npm:^13.5.0"
     react-is: "npm:^18.2.0"
     react-lottie: "npm:^1.2.4"
     react-qrcode-logo: "npm:^2.9.0"
@@ -8454,6 +8455,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@web3-explorer/lib-translation@npm:1.0.0, @web3-explorer/lib-translation@workspace:packages/lib-translation":
+  version: 0.0.0-use.local
+  resolution: "@web3-explorer/lib-translation@workspace:packages/lib-translation"
+  dependencies:
+    "@types/react": "npm:^18.3.3"
+    react: "npm:^18.2.0"
+    react-i18next: "npm:^13.5.0"
+  languageName: unknown
+  linkType: soft
+
 "@web3-explorer/opencv@npm:1.0.0, @web3-explorer/opencv@workspace:packages/opencv":
   version: 0.0.0-use.local
   resolution: "@web3-explorer/opencv@workspace:packages/opencv"
@@ -8517,6 +8528,7 @@ __metadata:
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    "@web3-explorer/lib-translation": "npm:1.0.0"
     eslint: "npm:^9.9.0"
     eslint-plugin-react-hooks: "npm:^5.1.0-rc.0"
     eslint-plugin-react-refresh: "npm:^0.4.9"
@@ -8556,6 +8568,7 @@ __metadata:
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    "@web3-explorer/lib-translation": "npm:1.0.0"
     "@web3-explorer/uikit-mui": "npm:1.0.0"
     eslint: "npm:^9.9.0"
     eslint-plugin-react-hooks: "npm:^5.1.0-rc.0"
@@ -8628,6 +8641,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.3.1"
     "@web3-explorer/lib-crypto": "npm:1.0.0"
     "@web3-explorer/lib-telegram": "npm:1.0.0"
+    "@web3-explorer/lib-translation": "npm:1.0.0"
     "@web3-explorer/opencv": "npm:1.0.0"
     "@web3-explorer/uikit-mui": "npm:1.0.0"
     "@web3-explorer/uikit-view": "npm:1.0.0"

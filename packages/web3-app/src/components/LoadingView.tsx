@@ -1,7 +1,7 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Loading from '@web3-explorer/uikit-mui/dist/components/Loading';
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { currentTs, hexToRGBA } from '../common/utils';
 

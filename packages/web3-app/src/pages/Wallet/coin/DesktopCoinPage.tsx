@@ -22,10 +22,10 @@ import { useAllSwapAssets } from '@tonkeeper/uikit/dist/state/swap/useSwapAssets
 import { useSwapFromAsset } from '@tonkeeper/uikit/dist/state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useIsActiveWalletWatchOnly } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import BigNumber from 'bignumber.js';
 import { FC, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { DesktopHistory } from '../../../components/history/DesktopHistory';

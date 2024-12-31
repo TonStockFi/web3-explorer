@@ -5,6 +5,7 @@ import AdsClick from '@mui/icons-material/AdsClick';
 import Android from '@mui/icons-material/Android';
 import BackIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
@@ -120,7 +121,6 @@ export type IconList =
     | 'Code'
     | 'MoveDown'
     | 'EmojiEvents'
-    | 'EmojiEvents'
     | 'ArrowUpward'
     | 'ArrowDownward'
     | 'LockOpen'
@@ -159,6 +159,7 @@ export type IconList =
     | 'Close'
     | 'Edit'
     | 'OpenInFull'
+    | 'ArrowDropDown'
     | 'PrecisionManufacturing'
     | 'ArrowRight'
     | 'Delete'
@@ -218,7 +219,6 @@ export const IconsMap: Record<string, React.ElementType> = {
     VolumeOff,
     VolumeUp,
     NorthEast,
-    EmojiEvents,
     Psychology,
     Tab,
     Logout,
@@ -232,6 +232,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     BubbleChart,
     Screenshot: ContentCut,
     Save,
+    ArrowDropDown,
     HighlightOff,
     Translate,
     PrecisionManufacturing,

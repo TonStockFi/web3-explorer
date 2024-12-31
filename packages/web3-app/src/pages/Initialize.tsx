@@ -1,9 +1,9 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
 import { H1 } from '@tonkeeper/uikit/dist/components/Text';
 import { Button } from '@tonkeeper/uikit/dist/components/fields/Button';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ImportExistingWallet } from '../components/accounts/ImportExistingWallet';
 import { WalletBatchCreateNumber } from '../components/accounts/WalletBatchCreateNumber';

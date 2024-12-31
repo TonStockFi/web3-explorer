@@ -2,7 +2,7 @@ import Paper from '@web3-explorer/uikit-mui/dist/mui/Paper';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { useTheme } from 'styled-components';
 import { isPlaygroundMaster, showGlobalLoading } from '../../common/helpers';
 import { downloadImage } from '../../common/image';

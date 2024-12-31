@@ -1,9 +1,9 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import CardContent from '@web3-explorer/uikit-mui/dist/mui/CardContent';
 import CardHeader from '@web3-explorer/uikit-mui/dist/mui/CardHeader';
 import TextField from '@web3-explorer/uikit-mui/dist/mui/TextField';
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { formatTs } from '../../common/utils';
 import { SiteFavoricoView } from '../../components/app/SiteFavoricoView';

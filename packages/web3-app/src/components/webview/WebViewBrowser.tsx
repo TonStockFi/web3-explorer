@@ -343,6 +343,11 @@ const WebViewBrowser = ({
                     }
                 }
             },
+
+            'did-finish-load': () => {
+                loadFailed = false;
+                onEvent('did-finish-load');
+            },
             'did-start-loading': () => {
                 loadFailed = false;
                 onEvent('did-start-loading');

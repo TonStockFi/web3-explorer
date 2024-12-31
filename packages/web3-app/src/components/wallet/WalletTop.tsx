@@ -6,6 +6,7 @@ import { useSendTransferNotification } from '@tonkeeper/uikit/dist/components/mo
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useWalletTotalBalance } from '@tonkeeper/uikit/dist/state/asset';
 import { useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import {
     HistoryIcon,
     PhotoLibrary,
@@ -14,7 +15,6 @@ import {
     ShareTwoToneIcon
 } from '@web3-explorer/uikit-mui/dist/mui/Icons';
 import { View } from '@web3-explorer/uikit-view';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { useBlockChainExplorer } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';

@@ -192,13 +192,13 @@ export const ProPlans: ProPlan[] = [
     {
         level: "LONG",
         name: '永久至尊',
-        description: `提供 {accountTitle} 下的不限钱包帐号的无限制无期限使用功能;一对一,7*24小时技术支持;优先获取空投;奖励积分翻倍`,
+        description: `提供 %accountTitle 下的不限钱包帐号的无限制无期限使用功能;一对一,7*24小时技术支持;优先获取空投;奖励积分翻倍`,
         amount: '19999'
     },
     {
         level: "YEAR",
         name: '年付会员',
-        description: `提供 {walletTitle} 下无限制功能,使用期限一年。优先获取空投，工单技术支持`,
+        description: `提供 %walletTitle 下无限制功能,使用期限一年。优先获取空投，工单技术支持`,
         amount: '999'
     },
 ];

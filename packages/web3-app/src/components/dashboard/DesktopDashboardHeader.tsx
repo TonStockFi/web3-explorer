@@ -1,7 +1,7 @@
 import { fallbackRenderOver } from '@tonkeeper/uikit/dist/components/Error';
 import { useAllWalletsTotalBalance } from '@tonkeeper/uikit/dist/state/asset';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useTranslation } from 'react-i18next';
 
 import { View } from '@web3-explorer/uikit-view';
 import { useTheme } from 'styled-components';

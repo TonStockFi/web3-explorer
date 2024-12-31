@@ -1,3 +1,4 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Avatar from '@web3-explorer/uikit-mui/dist/mui/Avatar';
 import Box from '@web3-explorer/uikit-mui/dist/mui/Box';
 import Button from '@web3-explorer/uikit-mui/dist/mui/Button';
@@ -23,7 +24,6 @@ import Alert from '@web3-explorer/uikit-mui/dist/mui/Alert';
 import Tooltip from '@web3-explorer/uikit-mui/dist/mui/Tooltip';
 import Typography from '@web3-explorer/uikit-mui/dist/mui/Typography';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import DialogView from '../components/DialogView';
 import Prompt from '../components/Prompt';
@@ -37,7 +37,6 @@ const handleDrawer = (props: DrawerProps) => {
         ...props
     } as DrawerProps;
 };
-
 //@ts-ignore
 export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     const {
@@ -108,8 +107,10 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         iconButtonProps,
         ...props_
     } = props;
-    const { t } = useTranslation();
+
     const [showDrawer, setShowDrawer] = useState(false);
+    const { t } = useTranslation();
+
     if (hide) return null;
 
     if (loading) {
@@ -121,8 +122,6 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     }
 
     if (button || buttonOutlined || buttonContained) {
-        if (drawer) {
-        }
         let buttonText = button;
         let buttonVariant1 = buttonVariant;
         if (typeof buttonOutlined === 'string') {
@@ -167,7 +166,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         } else if (buttonText?.indexOf('https://') === 0) {
             buttonText = 'https:' + t(buttonText);
         } else {
-            buttonText = t(buttonText);
+            buttonText = t(buttonText!);
         }
         //@ts-ignore
         const node = <Button {...p2}>{buttonText}</Button>;
@@ -337,7 +336,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         const node = (
             <ListItemButton onClick={onClick} selected={listSelected}>
                 {listItemIcon && <ListItemIcon sx={{ minWidth: 36 }}>{listItemIcon}</ListItemIcon>}
-                <ListItemText primary={listItemText} />
+                <ListItemText primary={t(listItemText)} />
                 {listItemRight && listItemRight}
             </ListItemButton>
         );
@@ -391,7 +390,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
                     color={chipColor || 'warning'}
                     size={chipSize || 'small'}
                     {...chipProps}
-                    label={chip}
+                    label={t(chip)}
                 />
             </Box>
         );

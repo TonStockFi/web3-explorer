@@ -10,9 +10,9 @@ import {
     useMutateActiveAccount,
     useMutateActiveTonWallet
 } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useCreateMAMAccountDerivation } from '../../hooks/wallets';
 import { AccountsPager } from '../aside/AccountsPager';

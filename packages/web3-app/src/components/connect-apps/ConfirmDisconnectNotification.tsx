@@ -2,8 +2,8 @@ import { Button } from '@tonkeeper/uikit/dist/components/fields/Button';
 import { Notification } from '@tonkeeper/uikit/dist/components/Notification';
 import { Label1 } from '@tonkeeper/uikit/dist/components/Text';
 import { usePrevious } from '@tonkeeper/uikit/dist/hooks/usePrevious';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
 import { formatDappUrl } from '../../common/utils';
 

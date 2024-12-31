@@ -176,9 +176,7 @@ export default function ManagerClients({
                                     key={session.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell component="th" scope="row">
-                                        {session.id}
-                                    </TableCell>
+                                    <TableCell scope="row">{session.id}</TableCell>
                                     <TableCell align="right">
                                         {session.device && (
                                             <Chip

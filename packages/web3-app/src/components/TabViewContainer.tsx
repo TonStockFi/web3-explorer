@@ -88,7 +88,7 @@ export default function ({
                             icon={tab.icon}
                             disabled={!!tab.disabled}
                             key={index}
-                            label={tab.title}
+                            label={<View text={tab.title}></View>}
                             {...a11yProps(index)}
                             sx={topTabStyle}
                         />

@@ -1,6 +1,6 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { FC, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 
 export const CommentInput: FC<{ index: number }> = ({ index }) => {

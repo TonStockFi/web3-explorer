@@ -2,9 +2,9 @@ import { CenterContainer } from '@tonkeeper/uikit/dist/components/Layout';
 import { Body2, H2 } from '@tonkeeper/uikit/dist/components/Text';
 import { Button } from '@tonkeeper/uikit/dist/components/fields/Button';
 import { Input } from '@tonkeeper/uikit/dist/components/fields/Input';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useIAppContext } from '../../providers/IAppProvider';
 

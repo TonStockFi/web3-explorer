@@ -79,7 +79,7 @@ export enum ExtensionType {
     GEMINI = 'GEMINI',
     JS_CODE = 'JS_CODE',
     DECISION = 'DECISION',
-    CRONTAB = 'CRONTAB',
+    EXTENSION = 'EXTENSION',
     MARKET = 'MARKET',
     EXTENSION_CENTER = 'EXTENSION_CENTER'
 }
@@ -202,7 +202,6 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
     };
 
     const onChangeCurrentExtension = (v: ExtensionType) => {
-        debugger;
         if (showMobile) {
             onAction('getBounds', { winId: getWinId() })?.then(r => {
                 let { x } = r as { x: number };

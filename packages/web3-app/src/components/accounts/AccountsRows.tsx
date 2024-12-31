@@ -6,7 +6,7 @@ import { useDeleteAccountNotification } from '@tonkeeper/uikit/dist/components/m
 import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals/RecoveryNotificationControlled';
 import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { AccountBadge } from '@tonkeeper/uikit/dist/components/account/AccountBadge';

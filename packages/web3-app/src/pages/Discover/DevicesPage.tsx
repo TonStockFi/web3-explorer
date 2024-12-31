@@ -11,6 +11,7 @@ import { DEVICE_PID, START_URL } from '../../constant';
 import WebviewService from '../../services/WebviewService';
 import { MAIN_NAV_TYPE, SUB_WIN_ID, WebApp } from '../../types';
 
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { onAction } from '../../common/electron';
 import { LoadingView } from '../../components/LoadingView';
 import ScreenshotView from '../../components/webview/ScreenshotView';
@@ -39,9 +40,13 @@ const DevicesPage = () => {
         }
     }, [currentTabId]);
     let id1 = Buffer.from(id).toString('hex');
+
+    const { i18n } = useTranslation();
+
+    const currentLanguage = i18n.language;
     const url = `${getDiscoverHost(env.isDev, env.version)}&address=${address}&id=${id1}&ip=${
         env.ip?.adr
-    }&index=${index}#${SUB_WIN_ID.DEVICES}`;
+    }&index=${index}&lang=${currentLanguage}#${SUB_WIN_ID.DEVICES}`;
 
     const onSiteMessage = async ({
         action,

@@ -20,9 +20,9 @@ import {
     useCreateAccountMAM,
     useCreateAccountMnemonic
 } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { useIAppContext } from '../../providers/IAppProvider';
 

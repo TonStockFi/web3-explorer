@@ -1,9 +1,9 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useActiveAccount, useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
-import { useTranslation } from 'react-i18next';
 import { AsideWidth, ChainsList } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';

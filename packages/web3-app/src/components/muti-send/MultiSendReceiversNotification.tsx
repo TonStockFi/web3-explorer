@@ -7,8 +7,8 @@ import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { formatFiatCurrency, formatter } from '@tonkeeper/uikit/dist/hooks/balance';
 import { MultiSendFormTokenized } from '@tonkeeper/uikit/dist/hooks/blockchain/useSendMultiTransfer';
 import { useRate } from '@tonkeeper/uikit/dist/state/rates';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const NotificationStyled = styled(Notification)`

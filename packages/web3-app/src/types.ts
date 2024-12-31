@@ -493,9 +493,9 @@ export enum WebpageNav {
     MALL = 'MALL',
     DAO = 'DAO',
     WEB3_EXPLORER = 'WEB3_EXPLORER',
-    WEB3_REMOTE = 'WEB3_REMOTE',
+    WEB3_DESK = 'WEB3_DESK',
     DISCOVER = 'DISCOVER',
-    GAMES = 'GAMES_FI',
+    GAMES_FI = 'GAMES_FI',
     SWAP = 'SWAP',
     TASK = 'TASK'
 }
@@ -510,12 +510,12 @@ export interface HodlerRow {
 export interface JobItem {
     title: string;
     salary: string;
-    desc: string;
+    desc: Record<string,string>;
 }
 
 export interface ProposalItem {
     title: string;
-    detail: string;
+    detail:Record<string,string>;
     creator: string;
 }
 

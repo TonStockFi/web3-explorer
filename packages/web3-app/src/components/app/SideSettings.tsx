@@ -2,13 +2,13 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { DevSettings } from '@tonkeeper/uikit/dist/pages/settings/Dev';
 import { Localization } from '@tonkeeper/uikit/dist/pages/settings/Localization';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
 import IconButton from '@web3-explorer/uikit-mui/dist/mui/IconButton';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
 import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
@@ -117,61 +117,6 @@ export default function SideSettings() {
                 onClose={handleClose}
                 TransitionComponent={Fade}
             >
-                {/* <View
-                    menuItem
-                    sx={{ width: 300 }}
-                    onClick={async () => {
-                        openTab(MAIN_NAV_TYPE.BROWSER_HISTORY);
-                        setAnchorEl(null);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon="History" iconSmall />
-                    </ListItemIcon>
-                    <View text={t('BrowserHistory')} textFontSize="0.9rem" />
-                </View> */}
-
-                <View
-                    menuItem
-                    onClick={async () => {
-                        openTab(MAIN_NAV_TYPE.CONNECTED_APPS);
-                        setAnchorEl(null);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon="Link" iconSmall />
-                    </ListItemIcon>
-                    <View text={t('apps_connect')} textFontSize="0.9rem" />
-                </View>
-                <View divider />
-                <View
-                    hide={!env.isDev}
-                    menuItem
-                    onClick={async () => {
-                        openTab(MAIN_NAV_TYPE.MOBILE_MONITORS);
-                        setAnchorEl(null);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon="Devices" iconSmall />
-                    </ListItemIcon>
-                    <View text={t('MobileDevice')} textFontSize="0.9rem" />
-                </View>
-                <View hide={!env.isDev} divider />
-                <View
-                    menuItem
-                    onClick={async () => {
-                        setShowDialog(true);
-
-                        setDialogType('FiatCurrency');
-                        setAnchorEl(null);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon="AccountBalance" iconSmall />
-                    </ListItemIcon>
-                    <View text={t('settings_primary_currency')} textFontSize="0.9rem" />
-                </View>
                 <View
                     menuItem
                     onClick={async () => {
@@ -185,23 +130,80 @@ export default function SideSettings() {
                     </ListItemIcon>
                     <View text={t('Localization')} textFontSize="0.9rem" />
                 </View>
-
-                <View divider hide />
-
                 <View
-                    hide
                     menuItem
                     onClick={async () => {
-                        openTab(MAIN_NAV_TYPE.MULTI_SEND);
+                        openTab(MAIN_NAV_TYPE.CONNECTED_APPS);
                         setAnchorEl(null);
                     }}
                 >
                     <ListItemIcon>
-                        <View icon="ShareTwoTone" iconSmall />
+                        <View icon="Link" iconSmall />
                     </ListItemIcon>
-                    <View text={t('wallet_multi_send')} textFontSize="0.9rem" />
+                    <View text={t('apps_connect')} textFontSize="0.9rem" />
                 </View>
-                {/* <View
+                {env.isDev && (
+                    <>
+                        <View divider />
+                        <View
+                            hide={!env.isDev}
+                            menuItem
+                            onClick={async () => {
+                                openTab(MAIN_NAV_TYPE.MOBILE_MONITORS);
+                                setAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="Devices" iconSmall />
+                            </ListItemIcon>
+                            <View text={t('MobileDevice')} textFontSize="0.9rem" />
+                        </View>
+                        <View hide={!env.isDev} divider />
+                        <View
+                            hide
+                            menuItem
+                            onClick={async () => {
+                                setShowDialog(true);
+
+                                setDialogType('FiatCurrency');
+                                setAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="AccountBalance" iconSmall />
+                            </ListItemIcon>
+                            <View text={t('settings_primary_currency')} textFontSize="0.9rem" />
+                        </View>
+                        <View
+                            menuItem
+                            onClick={async () => {
+                                setAnchorEl(null);
+                                setDialogType('Localization');
+                                setShowDialog(true);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="Language" iconSmall />
+                            </ListItemIcon>
+                            <View text={t('Localization')} textFontSize="0.9rem" />
+                        </View>
+
+                        <View divider hide />
+
+                        <View
+                            hide
+                            menuItem
+                            onClick={async () => {
+                                openTab(MAIN_NAV_TYPE.MULTI_SEND);
+                                setAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="ShareTwoTone" iconSmall />
+                            </ListItemIcon>
+                            <View text={t('wallet_multi_send')} textFontSize="0.9rem" />
+                        </View>
+                        {/* <View
                     hide={!env.isDev}
                     menuItem
                     onClick={async () => {
@@ -214,55 +216,70 @@ export default function SideSettings() {
                     </ListItemIcon>
                     <View text={t('aside_dashboard')} textFontSize="0.9rem" />
                 </View> */}
-                <View
+                        <View
+                            menuItem
+                            hide={!env.isDev}
+                            onClick={async () => {
+                                openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
+                                setAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="Style" iconSmall />
+                            </ListItemIcon>
+                            <View text={t('AccountsManage')} textFontSize="0.9rem" />
+                        </View>
+
+                        <View divider hide />
+                        <View
+                            hide
+                            menuItem
+                            onClick={async () => {
+                                setAnchorEl(null);
+                                setDialogType('DevSettings');
+                                setShowDialog(true);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="Code" iconSmall />
+                            </ListItemIcon>
+
+                            <View
+                                text={network !== Network.TESTNET ? '切换到 测试网' : '切换到 主网'}
+                                textFontSize="0.9rem"
+                            />
+                        </View>
+
+                        <View hide={!env.isDev} divider />
+
+                        <View
+                            hide={!env.isDev}
+                            menuItem
+                            onClick={async () => {
+                                openTab(MAIN_NAV_TYPE.DEV);
+                                setAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <View icon="BugReport" iconSmall />
+                            </ListItemIcon>
+                            <View text={'DEV'} textFontSize="0.9rem" />
+                        </View>
+                    </>
+                )}
+                {/* <View
                     menuItem
-                    hide={!env.isDev}
+                    sx={{ width: 300 }}
                     onClick={async () => {
-                        openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
+                        openTab(MAIN_NAV_TYPE.BROWSER_HISTORY);
                         setAnchorEl(null);
                     }}
                 >
                     <ListItemIcon>
-                        <View icon="Style" iconSmall />
+                        <View icon="History" iconSmall />
                     </ListItemIcon>
-                    <View text={t('AccountsManage')} textFontSize="0.9rem" />
-                </View>
-
-                <View divider hide={!env.isDev} />
-                <View
-                    hide={!env.isDev}
-                    menuItem
-                    onClick={async () => {
-                        setAnchorEl(null);
-                        setDialogType('DevSettings');
-                        setShowDialog(true);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon="Code" iconSmall />
-                    </ListItemIcon>
-
-                    <View
-                        text={network !== Network.TESTNET ? '切换到 测试网' : '切换到 主网'}
-                        textFontSize="0.9rem"
-                    />
-                </View>
-
-                <View hide={!env.isDev} divider />
-
-                <View
-                    hide={!env.isDev}
-                    menuItem
-                    onClick={async () => {
-                        openTab(MAIN_NAV_TYPE.DEV);
-                        setAnchorEl(null);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon="BugReport" iconSmall />
-                    </ListItemIcon>
-                    <View text={'DEV'} textFontSize="0.9rem" />
-                </View>
+                    <View text={t('BrowserHistory')} textFontSize="0.9rem" />
+                </View> */}
             </Menu>
             <View
                 dialog={{

@@ -128,7 +128,7 @@ export default class WebviewMainEventService {
         const {height:winHeight} = window.screen
         const initMessage = this.getInitMessage();
         const url = `${getDiscoverHost(isDev)}&initMessage=${initMessage}#${SUB_WIN_ID.PLAYGROUND}`;
-        const width = 910;
+        const width = 1024;
         const height = 440;
         const x = 12;
         const y = winHeight - height - 12;

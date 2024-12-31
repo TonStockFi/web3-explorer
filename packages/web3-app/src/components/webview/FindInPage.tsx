@@ -1,9 +1,9 @@
 import Paper from '@mui/material/Paper';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Divider from '@web3-explorer/uikit-mui/dist/mui//Divider';
 import InputBase from '@web3-explorer/uikit-mui/dist/mui/InputBase';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { focusWebviewFindInPage, focusWebviewStopFindInPage } from './WebViewBrowser';
 

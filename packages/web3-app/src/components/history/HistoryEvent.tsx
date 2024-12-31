@@ -7,8 +7,8 @@ import { Body2 } from '@tonkeeper/uikit/dist/components/Text';
 import { useDateTimeFormatFromNow } from '@tonkeeper/uikit/dist/hooks/useDateTimeFormat';
 import { GenericActivity, GroupedActivityItem } from '@tonkeeper/uikit/dist/state/activity';
 import { MixedActivity } from '@tonkeeper/uikit/dist/state/mixedActivity';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import { FC, MouseEvent, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const EventDivider = styled.div`

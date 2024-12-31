@@ -2,7 +2,7 @@ import { Button } from '@tonkeeper/uikit/dist/components/fields/Button';
 import { ArrowDownIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { Body2, Label2 } from '@tonkeeper/uikit/dist/components/Text';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@web3-explorer/lib-translation';
 import styled from 'styled-components';
 
 const EmptyBody = styled.div`

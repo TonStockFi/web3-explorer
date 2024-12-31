@@ -1,9 +1,9 @@
+import { useTranslation } from '@web3-explorer/lib-translation';
 import Fade from '@web3-explorer/uikit-mui/dist/mui/Fade';
 import ListItemIcon from '@web3-explorer/uikit-mui/dist/mui/ListItemIcon';
 import Menu from '@web3-explorer/uikit-mui/dist/mui/Menu';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import React, { createRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import { currentTs } from '../../common/utils';
 import { isDiscoverTab, useBrowserContext } from '../../providers/BrowserProvider';
