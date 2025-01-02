@@ -40,6 +40,7 @@ const handleDrawer = (props: DrawerProps) => {
 //@ts-ignore
 export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     const {
+        noTrans,
         alert,
         alertProps,
         loading,
@@ -72,6 +73,8 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         tipsPlacement,
         tips,
         text,
+        textSmall,
+        textSmall9,
         textColor,
         textVariant,
         textFontSize,
@@ -109,8 +112,10 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
     } = props;
 
     const [showDrawer, setShowDrawer] = useState(false);
-    const { t } = useTranslation();
-
+    let { t } = useTranslation();
+    if (noTrans) {
+        t = text => text;
+    }
     if (hide) return null;
 
     if (loading) {
@@ -237,16 +242,24 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         const p = handleProps(props_);
         const { children, ...p1 } = p;
         const { sx, ...p2 } = textProps || { sx: {} };
+        let fontSize = textFontSize;
+        if (textSmall) {
+            fontSize = '0.8rem';
+        }
+        if (textSmall9) {
+            fontSize = '0.9rem';
+        }
         return (
             <Box {...p1}>
                 {label && (
                     <Typography
                         sx={{
+                            '& .MuiTypography-root': { fontSize },
                             userSelect: 'none',
                             display: 'inline-flex',
                             width: labelWidth ? `${labelWidth}px` : undefined
                         }}
-                        fontSize={textFontSize}
+                        fontSize={fontSize}
                         fontWeight={700}
                         color={textColor || 'inherit'}
                         variant={textVariant}
@@ -271,7 +284,7 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
                                 : {})
                         }
                     }}
-                    fontSize={textFontSize}
+                    fontSize={fontSize}
                     fontWeight={textBold ? 700 : undefined}
                     color={textColor || 'inherit'}
                     variant={textVariant}

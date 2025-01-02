@@ -2,7 +2,7 @@ import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import TextField from '@web3-explorer/uikit-mui/dist/mui/TextField';
 import { View } from '@web3-explorer/uikit-view/dist/View';
 import { useEffect, useRef, useState } from 'react';
-import { isValidDomain } from '../../common/utils';
+import { goToUrlFromInput } from '../../common/helpers';
 import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import WebviewService from '../../services/WebviewService';
 
@@ -40,46 +40,18 @@ export function UrlInput({
                     return;
                 }
                 if (e.key === 'Enter') {
-                    let newUrl = urlEdit;
+                    const newUrl = urlEdit;
                     if (!newUrl || newUrl.trim() === currentUrl) {
                         if (tab?.tabId) {
                             new WebviewService(tab?.tabId).reloadWebview();
                         }
                         return;
                     }
-                    newUrl = newUrl.trim();
-                    if (newUrl.startsWith('chrome://')) {
-                        return;
-                    }
-                    if (!newUrl.startsWith('http')) {
-                        if (isValidDomain(newUrl)) {
-                            newUrl = `https://${newUrl}`;
-                        } else {
-                            const url = `https://bing.com/search?q=${encodeURIComponent(newUrl)}`;
-                            // `https://www.google.com/search?q=${encodeURIComponent(newUrl)}`
-                            openTabFromWebview({
-                                url,
-                                name: '',
-                                description: '',
-                                icon: ''
-                            });
-                            if (currentUrl) {
-                                setUrlEdit(currentUrl);
-                            }
-
-                            return;
+                    goToUrlFromInput(newUrl, openTabFromWebview, () => {
+                        if (currentUrl) {
+                            setUrlEdit(currentUrl);
                         }
-                    }
-                    openTabFromWebview({
-                        url: newUrl,
-                        name: '',
-                        description: '',
-                        icon: ''
                     });
-
-                    if (currentUrl) {
-                        setUrlEdit(currentUrl);
-                    }
                 }
             }}
             onFocus={e => {

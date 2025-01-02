@@ -126,6 +126,10 @@ export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export function isTMA() {
+    return location.href.indexOf("tgWebAppData") > -1;
+}
+
 export function isDesktop() {
     //@ts-ignore
     return !!window.backgroundApi || !!window.__appApi;

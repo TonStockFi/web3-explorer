@@ -1,4 +1,5 @@
 import { default as AccountBalanceIcon } from '@mui/icons-material/AccountBalance';
+import AccountBalanceOutlined from '@mui/icons-material/AccountBalanceOutlined';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AddIcon from '@mui/icons-material/Add';
 import AdsClick from '@mui/icons-material/AdsClick';
@@ -25,6 +26,7 @@ import DevicesIcon from '@mui/icons-material/Devices';
 import Diamond from '@mui/icons-material/Diamond';
 import EditIcon from '@mui/icons-material/Edit';
 import EmojiEvents from '@mui/icons-material/EmojiEvents';
+import EmojiEventsOutlined from '@mui/icons-material/EmojiEventsOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExploreIcon from '@mui/icons-material/Explore';
 import Extension from '@mui/icons-material/Extension';
@@ -38,6 +40,7 @@ import GridView from '@mui/icons-material/GridView';
 import HighlightOff from '@mui/icons-material/HighlightOff';
 import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
+import HomeOutlined from '@mui/icons-material/HomeOutlined';
 import HttpsIcon from '@mui/icons-material/Https';
 import Info from '@mui/icons-material/Info';
 import InputIcon from '@mui/icons-material/Input';
@@ -134,6 +137,7 @@ export type IconList =
     | 'Remove'
     | 'TabUnselected'
     | 'Style'
+    | 'HomeOutlined'
     | 'Screenshot'
     | 'Gemini'
     | 'StarOutline'
@@ -146,6 +150,7 @@ export type IconList =
     | 'Input'
     | 'ChatGpt'
     | 'VolumeOff'
+    | 'EmojiEventsOutlined'
     | 'ToggleOn'
     | 'PhotoLibrary'
     | 'ToggleOff'
@@ -162,6 +167,7 @@ export type IconList =
     | 'ArrowDropDown'
     | 'PrecisionManufacturing'
     | 'ArrowRight'
+    | 'AccountBalanceOutlined'
     | 'Delete'
     | 'HighlightOff'
     | 'AccountBalance'
@@ -202,11 +208,14 @@ export const IconsMap: Record<string, React.ElementType> = {
     PhotoLibrary,
     AiOutlineUserSwitch,
     AutoFixHigh,
+    EmojiEventsOutlined,
     OpenInFull,
     EmojiEvents,
+    AccountBalanceOutlined,
     Person,
     GiClick,
     Android,
+    HomeOutlined,
     Stop: StopIcon,
     WifiTetheringError,
     Extension,

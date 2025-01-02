@@ -21,6 +21,7 @@ type Color = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' 
 type ButtonColor = 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
 
 export interface UtilsProps {
+    noTrans?:boolean,
     transX?:number,
     transY?:number,
     miniScrollBar?:boolean;
@@ -197,6 +198,8 @@ export interface ComponentsProps {
     labelWidth?: number;
     textVariant?:"h1"|"h6";
     textColor?: string;
+    textSmall?: boolean;
+    textSmall9?: boolean;
     textFontSize?: string;
     textBold?: boolean;
     textProps?: TypographyProps;

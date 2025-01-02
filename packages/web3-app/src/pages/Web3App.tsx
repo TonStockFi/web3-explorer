@@ -10,6 +10,7 @@ import { HomHeaderHeight, SiderBarWidth } from '../constant';
 import { FavorProvider } from '../providers/FavorProvider';
 import { useIAppContext } from '../providers/IAppProvider';
 
+import { useEffect } from 'react';
 import { ChainListView } from '../components/app/ChainListView';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
 import { WalletView } from '../components/app/WalletView';
@@ -83,6 +84,13 @@ export const Web3AppInner = () => {
     if (env.isWin) {
         topLeft = 80;
     }
+    useEffect(() => {
+        const loading = document.querySelector('#__loading');
+        //@ts-ignore
+        document.body.style.appRegion = 'unset';
+        //@ts-ignore
+        if (loading) loading.style.display = 'none';
+    }, []);
 
     return (
         <View

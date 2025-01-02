@@ -11,6 +11,7 @@ import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { BrowserTab } from '../providers/BrowserProvider';
 import { RoiInfo, SUB_WIN_ID } from '../types';
+import { isValidDomain } from './utils';
 
 export function genId() {
     return uuidv4();
@@ -108,3 +109,32 @@ export function getTelegramChatUrl(chatId: string) {
 export function getAccountIdFromAccount(account: { id: string; index: number }) {
     return `${account.index}${md5(account.id + 'TON_WEB3' + account.id.substring(0, 4))}`;
 }
+
+export const goToUrlFromInput = (
+    newUrl: string,
+    openTabFromWebview: any,
+    cb?: () => void
+) => {
+    newUrl = newUrl.trim();
+    if (newUrl.startsWith('chrome://')) {
+        return;
+    }
+    let url = newUrl
+    if (!newUrl.startsWith('http')) {
+        if (isValidDomain(newUrl)) {
+            url = `https://${newUrl}`;
+        } else {
+            // `https://www.google.com/search?q=${encodeURIComponent(newUrl)}`
+            url = `https://bing.com/search?q=${encodeURIComponent(
+                newUrl
+            )}`;
+        }
+    }
+    openTabFromWebview({
+        url,
+        name: '',
+        description: '',
+        icon: ''
+    });
+    cb && cb();
+};

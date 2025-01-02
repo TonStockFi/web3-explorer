@@ -486,6 +486,12 @@ export interface MainMessageEvent {
     __msg_id?: number;
 }
 
+
+export enum TmaPageNav {
+    HOME = 'Home',
+    AIRDROP = 'Airdrop',
+    W3C_TOKEN = 'W3C-Token',
+}
 export enum WebpageNav {
     HOME = 'HOME',
     JOIN_US = 'JOIN_US',

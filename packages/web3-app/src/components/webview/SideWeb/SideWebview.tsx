@@ -64,11 +64,9 @@ export function SideWebview() {
                     <View sx={{ color: 'green' }} rowVCenter>
                         <View iconFontSize="1rem" icon={'Https'} />
                     </View>
-                    <View
-                        ml={6}
-                        userSelectNone
-                        text={sideWeb?.site ? getUrlInfo(sideWeb?.site) : ''}
-                    />
+                    <View ml={6} userSelectNone>
+                        {sideWeb?.site ? getUrlInfo(sideWeb?.site) : ''}
+                    </View>
                 </View>
             </View>
             <View abs left0 right0 top={44 + 36} bottom={0} py={2} px={2} flx>

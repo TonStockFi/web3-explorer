@@ -3,7 +3,7 @@ import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import { View } from '@web3-explorer/uikit-view';
 import { createRef, useEffect } from 'react';
 import { useTheme } from 'styled-components';
-import { isValidDomain } from '../../common/utils';
+import { goToUrlFromInput } from '../../common/helpers';
 import { AsideWidth } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
@@ -107,34 +107,9 @@ export const TopBar = () => {
                             onKeyDown={(e: any) => {
                                 if (e.key === 'Enter') {
                                     let newUrl = e.target.value;
-                                    if (newUrl.startsWith('chrome://')) {
-                                        return;
-                                    }
-                                    if (!newUrl.startsWith('http')) {
-                                        if (isValidDomain(newUrl)) {
-                                            newUrl = `https://${newUrl}`;
-                                        } else {
-                                            const url = `https://bing.com/search?q=${encodeURIComponent(
-                                                newUrl
-                                            )}`;
-                                            // `https://www.google.com/search?q=${encodeURIComponent(newUrl)}`
-                                            openTabFromWebview({
-                                                url,
-                                                name: '',
-                                                description: '',
-                                                icon: ''
-                                            });
-                                            onChangeUrlSearch(undefined);
-                                            return;
-                                        }
-                                    }
-                                    openTabFromWebview({
-                                        url: newUrl,
-                                        name: '',
-                                        description: '',
-                                        icon: ''
+                                    goToUrlFromInput(newUrl, openTabFromWebview, () => {
+                                        onChangeUrlSearch(undefined);
                                     });
-                                    onChangeUrlSearch(undefined);
                                 }
                             }}
                             type="search"
@@ -163,14 +138,6 @@ export const TopBar = () => {
                 mr={walletAside ? AsideWidth : 0}
                 miniScrollBar
             >
-                <View
-                    tips={t('AddTab')}
-                    iconButtonSmall
-                    icon={'Add'}
-                    onClick={() => {
-                        onChangeUrlSearch('');
-                    }}
-                ></View>
                 {[MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY].map(row => {
                     return (
                         <TabBar
@@ -232,6 +199,14 @@ export const TopBar = () => {
                         />
                     );
                 })} */}
+                <View
+                    tips={t('AddTab')}
+                    iconButtonSmall
+                    icon={'Add'}
+                    onClick={() => {
+                        onChangeUrlSearch('');
+                    }}
+                ></View>
 
                 <View appRegionDrag={!walletAside} flex1 h={36} mr={0} />
                 <View abs right={12} top={0} rowVCenter></View>

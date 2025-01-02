@@ -12,7 +12,7 @@ const WebpageContext = createContext<WebpageContextType | undefined>(undefined);
 export const useWebpageContext = () => {
     const context = useContext(WebpageContext);
     if (!context) {
-        throw new Error('useBrowserContext must be used within an FavorProvider');
+        throw new Error('useWebpageContext must be used within an WebpageProvider');
     }
     return context;
 };
