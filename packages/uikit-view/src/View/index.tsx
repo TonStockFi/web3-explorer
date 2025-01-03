@@ -220,7 +220,12 @@ export const View = React.forwardRef<HTMLElement, ViewProps>((props, ref) => {
         const node = <IconButton {...p2}>{node1}</IconButton>;
         if (tips) {
             return (
-                <Tooltip arrow placement={tipsPlacement || 'bottom'} title={t(tips)}>
+                <Tooltip
+                    disableFocusListener
+                    arrow
+                    placement={tipsPlacement || 'bottom'}
+                    title={t(tips)}
+                >
                     <Box {...p1}>{node}</Box>
                 </Tooltip>
             );

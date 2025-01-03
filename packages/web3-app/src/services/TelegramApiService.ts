@@ -7,6 +7,7 @@ export default class TelegramApiService {
     }
     async request(action:TelegramApiAction,payload:TelegramApiPayload){
         const apiHost = `https://telegram-bot.web3r.site/api`
+        // const apiHost = `http://localhost:3201/api`
         const response = await fetch(`${apiHost}/telegram-api/TelegramApiHandler`,{
             method:"POST",
             body:JSON.stringify({

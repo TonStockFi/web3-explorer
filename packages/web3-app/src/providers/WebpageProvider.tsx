@@ -1,6 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { WebpageNav } from '../types';
-export const DEFAULT_FOLDER = 'TempFolder';
 
 interface WebpageContextType {
     currentPageNav: WebpageNav;

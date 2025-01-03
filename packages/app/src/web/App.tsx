@@ -129,7 +129,7 @@ const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'desktop';
 
 // const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
-const langs = 'en,zh_CN';
+const langs = 'en,zh_CN,ru';
 
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;

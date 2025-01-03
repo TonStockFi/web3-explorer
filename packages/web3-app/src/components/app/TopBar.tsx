@@ -61,14 +61,14 @@ export const TopBar = () => {
             );
         })
         .map(row => row.tabId);
-    urlTabs.reverse();
+    // urlTabs.reverse();
     const showPlus = currentTabId !== MAIN_NAV_TYPE.DISCOVERY;
     let mr = showPlus ? 44 : 0;
     if (showWalletList) {
         mr = 380;
     }
     return (
-        <View borderBox relative flx rowVCenter m={8} borderRadius={8} mr={0}>
+        <View borderBox relative h100p flx rowVCenter mt={4} borderRadius={8} mr={0}>
             <View
                 hide={urlSearch === undefined}
                 zIdx={10000}
@@ -98,6 +98,7 @@ export const TopBar = () => {
                     borderRadius={8}
                     bgColor={theme.backgroundBrowser}
                     sx={{
+                        border: `1px solid ${theme.separatorCommon}`,
                         minWidth: 450,
                         boxShadow: `0px 2px 19px 12px rgb(0 0 0 / 16%)s`
                     }}
@@ -112,7 +113,7 @@ export const TopBar = () => {
                                     });
                                 }
                             }}
-                            type="search"
+                            type="text"
                             value={urlSearch}
                             onChange={e => {
                                 onChangeUrlSearch(e.target.value.trim());
@@ -131,12 +132,12 @@ export const TopBar = () => {
                 </View>
             </View>
             <View
-                flex1
+                absFull
+                zIdx={1111}
                 rowVCenter
-                overflowXAuto
+                overflowHidden
                 ref={ref}
-                mr={walletAside ? AsideWidth : 0}
-                miniScrollBar
+                right={walletAside ? AsideWidth : 0}
             >
                 {[MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY].map(row => {
                     return (
@@ -184,21 +185,7 @@ export const TopBar = () => {
                         />
                     );
                 })}
-                {/* {[...currentTabs].map(row => {
-                    return (
-                        <TabBar
-                            key={row}
-                            tabId={row}
-                            minTabBar={false}
-                            onClick={() => {
-                                openTab(row);
-                            }}
-                            onClose={() => {
-                                closeTab(row);
-                            }}
-                        />
-                    );
-                })} */}
+
                 <View
                     tips={t('AddTab')}
                     iconButtonSmall
@@ -209,7 +196,6 @@ export const TopBar = () => {
                 ></View>
 
                 <View appRegionDrag={!walletAside} flex1 h={36} mr={0} />
-                <View abs right={12} top={0} rowVCenter></View>
             </View>
         </View>
     );

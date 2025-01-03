@@ -37,6 +37,7 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import Forum from '@mui/icons-material/Forum';
 import Fullscreen from '@mui/icons-material/Fullscreen';
 import GridView from '@mui/icons-material/GridView';
+import GroupAdd from '@mui/icons-material/GroupAdd';
 import HighlightOff from '@mui/icons-material/HighlightOff';
 import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
@@ -67,6 +68,7 @@ import PhotoLibrary from '@mui/icons-material/PhotoLibrary';
 import PrecisionManufacturing from '@mui/icons-material/PrecisionManufacturing';
 import Psychology from '@mui/icons-material/Psychology';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import Redeem from '@mui/icons-material/Redeem';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Remove from '@mui/icons-material/Remove';
 import Save from '@mui/icons-material/Save';
@@ -135,6 +137,7 @@ export type IconList =
     | 'NotificationImportant'
     | 'Https'
     | 'Remove'
+    | 'GroupAdd'
     | 'TabUnselected'
     | 'Style'
     | 'HomeOutlined'
@@ -187,6 +190,7 @@ export type IconList =
     | 'ContentCopy'
     | 'ExpandMore'
     | 'Settings'
+    | 'Redeem'
     | 'Info'
     | 'KeyboardArrowDown'
     | 'KeyboardArrowUp'
@@ -206,9 +210,11 @@ export const IconsMap: Record<string, React.ElementType> = {
     Remove,
     Comment,
     PhotoLibrary,
+    Redeem,
     AiOutlineUserSwitch,
     AutoFixHigh,
     EmojiEventsOutlined,
+    GroupAdd,
     OpenInFull,
     EmojiEvents,
     AccountBalanceOutlined,

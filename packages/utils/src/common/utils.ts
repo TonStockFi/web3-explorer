@@ -93,6 +93,3 @@ export function deepDiff(obj1: any, obj2: any): boolean {
     findChanges(obj1, obj2);
     return hasDifference;
 }
-
-export const IS_DEV =
-    location.href.indexOf('192.168') > 0 || location.href.indexOf('localhost') > 0;

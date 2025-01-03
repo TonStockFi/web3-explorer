@@ -123,7 +123,7 @@ export default class TelegramApi {
 
   async sendMessage(
     text: string,
-    chatId: string,
+    chatId: string|number,
     replyMarkup?: {
       resize_keyboard?: boolean;
       persistent?: boolean;
@@ -133,7 +133,7 @@ export default class TelegramApi {
     parse_mode?: 'Markdown' | undefined
   ) {
     const message = {
-      chat_id: chatId,
+      chat_id: String(chatId),
       parse_mode,
       text,
       reply_markup: replyMarkup ? JSON.stringify(replyMarkup) : undefined,

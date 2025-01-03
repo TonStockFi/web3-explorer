@@ -38,17 +38,21 @@ export const ImageIconMap = {
 export function ImageIcon({
     icon,
     size,
+    zoom,
     variant
 }: {
     icon: string;
     size?: number;
+    zoom?: number;
     variant?: 'circular' | 'rounded' | 'square';
 }) {
     if (!size) {
         size = 32;
     }
     if (!icon || icon.startsWith('data:') || icon.startsWith('http') || icon.startsWith('icon_')) {
-        let zoom = 1;
+        if (!zoom) {
+            zoom = 1;
+        }
         if (icon && icon.startsWith('icon_')) {
             const k = icon.substring('icon_'.length);
             if (Object.keys(ImageIconMap).indexOf(k) > -1) {
@@ -61,7 +65,13 @@ export function ImageIcon({
         }
         return (
             <View wh={size} relative center>
-                <View wh={size} absFull zIdx={0} bgColor={'#e9e9e9'} borderRadius={10} />
+                <View
+                    wh={size}
+                    absFull
+                    zIdx={0}
+                    bgColor={'#e9e9e9'}
+                    borderRadius={'circular' === variant ? size / 2 : 10}
+                />
 
                 {icon ? (
                     <View

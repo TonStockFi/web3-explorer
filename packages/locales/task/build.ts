@@ -16,7 +16,7 @@ const localeMap = {
 };
 
 
-const validLocale = ['zh_CN',"en"]
+const validLocale = ['zh_CN',"en","ru"]
 
 const dist = './dist';
 const src = './src';

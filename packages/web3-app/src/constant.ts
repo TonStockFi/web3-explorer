@@ -7,6 +7,7 @@ export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
 export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
 
 export const P2E_ChatId = '7363481027';
+export const W3C_BotId = '7891490751';
 
 export const W3C_ChatId = '7469429463';
 export const SWAP_ChatId = '7469429463';

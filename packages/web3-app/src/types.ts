@@ -405,7 +405,7 @@ export interface WebApp {
     mobile?: boolean;
 }
 export interface TonHistoryItem {
-    kind: 'ton'|string;
+    kind: 'ton' | string;
     jetton: {
         address: string;
         name: string;
@@ -486,11 +486,17 @@ export interface MainMessageEvent {
     __msg_id?: number;
 }
 
-
+export interface TMAGlobalInfo {
+    userId?: string;
+    botId?: string;
+    invite_code?: string;
+    reward_points?: number;
+    reward_w3c?: number;
+}
 export enum TmaPageNav {
     HOME = 'Home',
     AIRDROP = 'Airdrop',
-    W3C_TOKEN = 'W3C-Token',
+    W3C_TOKEN = 'W3C-Token'
 }
 export enum WebpageNav {
     HOME = 'HOME',
@@ -516,12 +522,12 @@ export interface HodlerRow {
 export interface JobItem {
     title: string;
     salary: string;
-    desc: Record<string,string>;
+    desc: Record<string, string>;
 }
 
 export interface ProposalItem {
     title: string;
-    detail:Record<string,string>;
+    detail: Record<string, string>;
     creator: string;
 }
 
@@ -534,4 +540,35 @@ export interface MallProduct {
     pirceReal: string;
     desc: string;
     detail: string;
+}
+
+export interface TgUserPublic {
+    id: number;
+    first_name: string;
+    last_name: string;
+    language_code: 'en' | string;
+    allows_write_to_pm: boolean;
+    photo_url: string;
+}
+
+export enum TaskId{
+    INVITE = "INVITE",
+    DAILY_SIGN = "DAILY_SIGN",
+    FOLLOW_W3C_TG_BOT = "FOLLOW_W3C_TG_BOT",
+    FOLLOW_W3C_X = "FOLLOW_W3C_X",
+    FOLLOW_W3C_YOUTUBE = "FOLLOW_W3C_YOUTUBE",
+    LOGIN_W3C_GMAIL = "FOLLOW_W3C_GMAIL",
+    LOGIN_W3C_GEMINI = "FOLLOW_W3C_GEMINI",
+    LOGIN_W3C_CHATGPT = "FOLLOW_W3C_CHATGPT",
+}
+
+export interface TaskItem {
+    taskId: TaskId;
+    title: string;
+    icon?: string;
+    iconUrl?: string;
+    tmaOnly?: boolean;
+    desktopOnly?: boolean;
+    rewarkW3C?: number;
+    rewarkPoints?: number;
 }
