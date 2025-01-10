@@ -1,11 +1,12 @@
-import { TelegramApiAction } from '@web3-explorer/lib-telegram';
+import { TelegramApiAction, TgUserPublic } from '@web3-explorer/lib-telegram';
 import { useLocalStorageState } from '@web3-explorer/utils';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { isTMA } from '../common/utils';
 import { W3C_BotId } from '../constant';
 import TelegramApiService from '../services/TelegramApiService';
-import { TgUserPublic, TMAGlobalInfo, TmaPageNav } from '../types';
+import { TMAGlobalInfo, TmaPageNav } from '../types';
+import { useTaskContext } from './TaskProvider';
 
 interface TmaPageContextType {
     userId: string;
@@ -64,6 +65,7 @@ export const useTmaPageContext = () => {
 export const TmaPageProvider = (props: { children: ReactNode }) => {
     const { children } = props || {};
     const { hash } = new URL(location.href);
+    const { onChangeTasks, onChangeTasksClaimed } = useTaskContext();
     const theme = useTheme();
     let currentTmaPageNav_ = TmaPageNav.HOME;
     if (hash && hash.indexOf('#') === 0) {
@@ -71,6 +73,8 @@ export const TmaPageProvider = (props: { children: ReactNode }) => {
     }
     //@ts-ignore
     const { Telegram } = window;
+
+    let startParam = '';
     let user: TgUserPublic = {
         id: 888888,
         first_name: 'Tom',
@@ -81,8 +85,10 @@ export const TmaPageProvider = (props: { children: ReactNode }) => {
             'https://t.me/i/userpic/320/VGQI8P51tdXVBhF4sFuJzLainaWTBipsC8YKk9UO3W6xEYpRtLCL8EXfcEcSuJ-F.svg'
     };
     if (isTMA()) {
+        const initData = Telegram.WebApp.initDataUnsafe;
+        startParam = initData.start_param;
         Telegram.WebApp.setHeaderColor(theme.backgroundBrowser);
-        user = Telegram.WebApp.initDataUnsafe.user as TgUserPublic;
+        user = initData.user as TgUserPublic;
     }
     const userId = user.id;
 
@@ -110,13 +116,28 @@ export const TmaPageProvider = (props: { children: ReactNode }) => {
     };
 
     useEffect(() => {
+        if (!isTMA()) {
+            return;
+        }
         new TelegramApiService(W3C_BotId)
             .request(TelegramApiAction.GetBotUserInfo, {
-                userId: String(userId)
+                userId: String(userId),
+                user,
+                startParam
             })
             .then(res => {
                 if (res.responseBody && res.responseBody.userInfo) {
-                    setWheelItems(res.responseBody.wheelItems);
+                    if (res.responseBody.wheelItems) {
+                        setWheelItems(res.responseBody.wheelItems);
+                    }
+                    if (res.responseBody.tasks) {
+                        onChangeTasks(res.responseBody.tasks);
+                    }
+
+                    if (res.responseBody.tasksClaimed) {
+                        onChangeTasksClaimed(res.responseBody.tasksClaimed);
+                    }
+
                     const { invite_code, reward_points, reward_w3c } = res.responseBody.userInfo;
                     onChangeGlobalInfo({
                         invite_code,

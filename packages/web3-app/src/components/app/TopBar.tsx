@@ -41,16 +41,7 @@ export const TopBar = () => {
     const firstTabs = [MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY] as string[];
     const tabs = Array.from(browserTabs).map(row => row[1]);
     const mainTabs = tabs.filter(row => !row.tabId.startsWith('tab_')).map(row => row.tabId);
-    const currentTabs = tabs
-        .filter(row => {
-            return (
-                row.tabId.startsWith('tab_') &&
-                currentTabId === row.tabId &&
-                mainTabs.indexOf(row.tabId) === -1 &&
-                firstTabs.indexOf(row.tabId) === -1
-            );
-        })
-        .map(row => row.tabId);
+
     const urlTabs = tabs
         .filter(row => {
             return (

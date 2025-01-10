@@ -33,4 +33,13 @@ export default class TgTwaIframeService {
     async remove() {
         await this.indexedDb.delete(`${this.id}`);
     }
+    
+    async enableIframe(enable:boolean) {
+        await this.indexedDb.put(`${this.id}_enable`, enable);
+    }
+
+    async isEnableIframe() {
+        const res = await this.indexedDb.get(`${this.id}_enable`);
+        return res;
+    }
 }

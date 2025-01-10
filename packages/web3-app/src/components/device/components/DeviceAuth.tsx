@@ -62,7 +62,7 @@ export default function DeviceAuth({
 
         const res = await auth(deviceId_, password, serverApi);
         if (res) {
-            let newDevice: DeviceInfo = {
+            let newDevice: Partial<DeviceInfo> = {
                 deviceId: deviceId_,
                 password,
                 serverApi,
@@ -74,8 +74,8 @@ export default function DeviceAuth({
                     ...newDevice
                 };
             }
-            Devices.set(deviceId, newDevice);
-            await new DeviceService(deviceId).save(newDevice);
+            Devices.set(deviceId, newDevice as DeviceInfo);
+            await new DeviceService(deviceId).save(newDevice as DeviceInfo);
             if (!deviceId) {
                 updateGlobalDevice();
             }
@@ -83,8 +83,8 @@ export default function DeviceAuth({
         setConnecting(false);
     };
     return (
-        <View center wh100p>
-            <View column wh100p pt={24} px12>
+        <View center absFull>
+            <View column sx={{ width: 360 }} borderBox pt={24} px12>
                 <View mb12>
                     <TextField
                         fullWidth

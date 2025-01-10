@@ -42,7 +42,7 @@ export function GlobalUi() {
                 onClose={() => {
                     showSnackbar(false);
                 }}
-                message={snackbar ? snackbar.message : ''}
+                message={snackbar ? t(snackbar.message) : ''}
             />
             <View
                 confirm={{

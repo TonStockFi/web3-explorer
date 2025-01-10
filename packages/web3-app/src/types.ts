@@ -182,6 +182,8 @@ export const GLOBAL_ACTIONS_MAP = {
 
 export interface DeviceInfo {
     deviceId: string;
+    platform:string;
+    arch:string;
     password?: string;
     passwordHash?: string;
     serverApi?: string;
@@ -299,6 +301,14 @@ export interface ExtenssionPublishData {
     rows: ExtenssionPublishDataRow[];
 }
 
+export interface BrowserExtensionInfo {
+    id: string;
+    ts: number;
+    name: string;
+    jsCode: string;
+    desc: string;
+    isEnable?:boolean
+}
 export interface RoiInfo {
     id: string;
     tabId: string;
@@ -459,6 +469,8 @@ export enum PlaygroundMasterSideAction {
 
 export enum WinControlType {
     ALL = 'ALL',
+    CURRENT = 'CURRENT',
+    POSITION = 'POSITION',
     CURRENT_APP = 'CURRENT_APP',
     CURRENT_ACCOUNT = 'CURRENT_ACCOUNT'
 }
@@ -492,6 +504,7 @@ export interface TMAGlobalInfo {
     invite_code?: string;
     reward_points?: number;
     reward_w3c?: number;
+    daily_check_in?: number;
 }
 export enum TmaPageNav {
     HOME = 'Home',
@@ -531,44 +544,10 @@ export interface ProposalItem {
     creator: string;
 }
 
-export interface TaskItem {
-    title: string;
-}
 export interface MallProduct {
     title: string;
     pirce: string;
     pirceReal: string;
     desc: string;
     detail: string;
-}
-
-export interface TgUserPublic {
-    id: number;
-    first_name: string;
-    last_name: string;
-    language_code: 'en' | string;
-    allows_write_to_pm: boolean;
-    photo_url: string;
-}
-
-export enum TaskId{
-    INVITE = "INVITE",
-    DAILY_SIGN = "DAILY_SIGN",
-    FOLLOW_W3C_TG_BOT = "FOLLOW_W3C_TG_BOT",
-    FOLLOW_W3C_X = "FOLLOW_W3C_X",
-    FOLLOW_W3C_YOUTUBE = "FOLLOW_W3C_YOUTUBE",
-    LOGIN_W3C_GMAIL = "FOLLOW_W3C_GMAIL",
-    LOGIN_W3C_GEMINI = "FOLLOW_W3C_GEMINI",
-    LOGIN_W3C_CHATGPT = "FOLLOW_W3C_CHATGPT",
-}
-
-export interface TaskItem {
-    taskId: TaskId;
-    title: string;
-    icon?: string;
-    iconUrl?: string;
-    tmaOnly?: boolean;
-    desktopOnly?: boolean;
-    rewarkW3C?: number;
-    rewarkPoints?: number;
 }

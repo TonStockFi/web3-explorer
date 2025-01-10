@@ -55,7 +55,7 @@ export const DevicesProvider = (props: { children: ReactNode }) => {
             deviceId,
             [key]: value
         };
-        Devices.set(deviceId, newDevice);
+        Devices.set(deviceId, newDevice as DeviceInfo);
     };
     const handleClientDeviceInfo = (deviceId: string, deviceInfo: DeviceInfo) => {
         const {

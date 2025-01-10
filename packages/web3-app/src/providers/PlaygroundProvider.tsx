@@ -3,6 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 
 import { onAction } from '../common/electron';
 import { getWinId, isPlaygroundMaster } from '../common/helpers';
+import { isLocal } from '../common/utils';
 import { T_ME_WEB, TELEGRAME_WEB } from '../constant';
 import WebviewMainEventService from '../services/WebviewMainEventService';
 import { AccountPublic, PlaygroundMasterSideAction } from '../types';
@@ -52,6 +53,23 @@ export function isTelegramWeb(url: string) {
     return res;
 }
 
+export function isWeb3r(url?: string) {
+    if (!url) {
+        return true;
+    } else {
+        if (
+            url.indexOf('web3r') > -1 ||
+            url.indexOf('https://ton.app') > -1 ||
+            url.indexOf('bing.c') > -1 ||
+            url.indexOf('google.c') > -1 ||
+            isLocal(url!)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
 export function isDeviceMonitor(tab: Partial<BrowserTab>) {
     let res = false;
     if (!tab.url) {
@@ -76,9 +94,13 @@ export function isTelegramTab(tab: BrowserTab) {
 
 export enum ExtensionType {
     NULL = 'NULL',
+    OCR = 'OCR',
+    WIN_MANAGE = 'WIN_MANAGE',
+    FEATURE_LIB = 'FEATURE_LIB',
+    DECISION_TREE = 'DECISION_TREE',
+    EXTENSION_LIB = 'EXTENSION_LIB',
     GEMINI = 'GEMINI',
     JS_CODE = 'JS_CODE',
-    DECISION = 'DECISION',
     EXTENSION = 'EXTENSION',
     MARKET = 'MARKET',
     EXTENSION_CENTER = 'EXTENSION_CENTER'
@@ -93,7 +115,8 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
             PlaygroundMasterSideAction.FEATURE
         );
     const [windowStatus, setWindowStatus] = useState<Map<number, boolean>>(new Map());
-    const { currentTabId, newTab, browserTabs } = useBrowserContext();
+    let { currentTabId, openTab, onChangeCurrentTabId, newTab, browserTabs } = useBrowserContext();
+
     const uri = new URL(location.href);
     const initMessage = uri.searchParams.get('initMessage');
     let account = null;
@@ -115,7 +138,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
         tabInit.url &&
         (tabInit.url.indexOf(TELEGRAME_WEB) > -1 ||
             tabInit.url.indexOf('t.me/') > -1 ||
-            isDeviceMonitor(tabInit))
+            (isDeviceMonitor(tabInit) && tabInit.url.indexOf('w=') === -1))
     ) {
         showMobileInit = true;
     }
@@ -136,6 +159,17 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
             newTab({
                 ...tabInit
             });
+        } else {
+            if (isPlaygroundMaster()) {
+                if (localStorage.getItem('currentTabIdMaster')) {
+                    currentTabId = localStorage.getItem('currentTabIdMaster')!;
+                    onChangeCurrentTabId(currentTabId);
+                    tab = browserTabs.get(currentTabId)!;
+                    if (tab) {
+                        openTab(tab.tabId);
+                    }
+                }
+            }
         }
     }, []);
 
@@ -210,6 +244,7 @@ export const PlaygroundProvider = (props: { children: ReactNode }) => {
                 if (screen.width < x + width) {
                     x = screen.width - width;
                 }
+
                 onAction('setBounds', {
                     winId: getWinId(),
                     bounds: {

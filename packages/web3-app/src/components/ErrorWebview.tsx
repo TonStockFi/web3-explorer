@@ -15,6 +15,10 @@ export default function ErrorWebview({
 }) {
     const theme = useTheme();
     const { t } = useTranslation();
+    let url1 = url.split('?')[0];
+    if (url1.indexOf('#') > 0) {
+        url1 = url.split('#')[0];
+    }
     return (
         <View
             absFull
@@ -49,7 +53,7 @@ export default function ErrorWebview({
                         fontSize={'0.8rem'}
                         color={theme.textSecondary}
                     >
-                        {url.split('?')[0]}
+                        {url1}
                     </Typography>
                 </View>
             </View>

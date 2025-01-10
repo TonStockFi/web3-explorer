@@ -1,5 +1,6 @@
 import { getAccountIdFromAccount, showAlertMessage, showGlobalLoading } from '../common/helpers';
 import { sleep } from '../common/utils';
+import { BrowserTab } from '../providers/BrowserProvider';
 import { isTelegramWeb } from '../providers/PlaygroundProvider';
 import { AccountPublic } from '../types';
 import TgAuthService, { TgAuthinfo } from './TgAuthService';
@@ -36,7 +37,7 @@ export default class WebviewServiceTelegram extends WebviewService {
         }
         const code = `
         const user_auth = JSON.parse(localStorage.getItem("user_auth") || "{}")
-        if(user_auth.dcID){
+        if(user_auth.dcID && user_auth.id){
             const hash = JSON.parse(localStorage.getItem("dc"+user_auth.dcID+"_hash") || "")
             const auth_key = JSON.parse(localStorage.getItem("dc"+user_auth.dcID+"_auth_key") || "")
             return {hash,auth_key,user_auth}
@@ -54,7 +55,7 @@ export default class WebviewServiceTelegram extends WebviewService {
         const code = `
         const user_auth = JSON.parse(localStorage.getItem("user_auth") || "{}")
         return user_auth.id || null`;
-        console.debug('getAuthUserId', code);
+        // console.debug('getAuthUserId', code);
         return this.execJs(code);
     }
 
@@ -128,16 +129,29 @@ export default class WebviewServiceTelegram extends WebviewService {
         }
         await sleep(2000);
     }
-    async handleAuth(currentAccount: AccountPublic, urlGoTo: string) {
+    async handleAuth(currentAccount: AccountPublic, tab: BrowserTab,accountBindedMessage:string) {
         const ws = this;
         const url = ws.getWebviewUrl();
 
         if (url && isTelegramWeb(url)) {
             const tgs = new TgAuthService(currentAccount.id, currentAccount.index);
             const authInfo = await tgs.get();
+            
             if (!authInfo) {
                 const userAuthInfo = await ws.getAuthInfo();
                 if (userAuthInfo) {
+                    const rows = await TgAuthService.getAll()
+                    for (let index = 0; index < rows.length; index++) {
+                        const row = rows[index];
+                        if(row.user_auth.id === userAuthInfo.user_auth.id){
+                            await ws.removeAuthInfo();
+                            await sleep(100)
+                            ws.reloadWebview()
+                            await sleep(1000)
+                            alert(accountBindedMessage)
+                            return true;
+                        }
+                    }
                     await new TgAuthService(currentAccount.id, currentAccount.index).save(
                         userAuthInfo
                     );
@@ -157,7 +171,7 @@ export default class WebviewServiceTelegram extends WebviewService {
                     showGlobalLoading(false, 1);
                     await ws.execJs(code);
                     await sleep(1000);
-                    await ws.goTo(urlGoTo);
+                    await ws.goTo(tab.url!);
                 }
             }
         }

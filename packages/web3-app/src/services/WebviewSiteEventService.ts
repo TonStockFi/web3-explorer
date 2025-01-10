@@ -6,6 +6,12 @@ export default class WebviewSiteEventService {
             throw new Error('Application API is not available');
         }
     }
+    async sendAction(action:string,payload?:any){
+        await window.__appApi.message({
+            action,
+            payload:payload||{}
+        });
+    }
     async onOpenWindow(
         winId: SUB_WIN_ID | string,
         url: string,

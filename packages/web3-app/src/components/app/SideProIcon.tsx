@@ -14,7 +14,6 @@ export default function SideProIcon() {
     return (
         <View
             hide={!proPlans || proPlans.length === 0}
-            mb={6}
             iconButton
             iconSmall
             icon={'Diamond'}

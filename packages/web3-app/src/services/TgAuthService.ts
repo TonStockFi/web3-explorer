@@ -3,7 +3,7 @@ import { IndexedDbCache } from '@web3-explorer/utils';
 export interface TgAuthinfo {
     hash: string;
     auth_key: string;
-    user_auth: string;
+    user_auth: {id:string};
 }
 
 export default class TgAuthService {

@@ -130,6 +130,13 @@ export function isTMA() {
     return location.href.indexOf("tgWebAppData") > -1;
 }
 
+export function isLocal(url?:string) {
+    if(!url){
+        url = location.href
+    }
+    return url.indexOf("localhost") > -1 || url.indexOf("127.0.0.1") > -1
+}
+
 export function isDesktop() {
     //@ts-ignore
     return !!window.backgroundApi || !!window.__appApi;

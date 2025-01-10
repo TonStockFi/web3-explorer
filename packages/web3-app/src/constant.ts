@@ -6,14 +6,20 @@ export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdY
 export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
 export const PRO_WHITE_LIST_LONG="TK2Auo2oNlYFYlpWNu-WKDuE"
 
-export const P2E_ChatId = '7363481027';
-export const W3C_BotId = '7891490751';
+export const X_URL ="https://x.com/w3c_official"
+export const YOUTUBE_URL ="https://www.youtube.com/@W3COfficialx1s"
+export const TIKTOK_URL ="https://www.tiktok.com/@w3c_offical"
+
+export const W3C_TMA_URL = 'https://t.me/w3c_official_bot/app';
+export const W3C_BotId = '7684970604';
+export const SERVICE_ChatId = '7733874221';
+export const SWAP_ChatId = '7407758042';
 
 export const W3C_ChatId = '7469429463';
-export const SWAP_ChatId = '7469429463';
-export const SERVICE_ChatId = '7187821521';
+export const P2E_ChatId = '7363481027';
 export const TASK_CENTER_ChatId = '7187821521';
 export const BOT_ID_EXTESSION_CENTER = '7168826112';
+
 export const BOT_ID_SERVICE_CENTER = '7853783224';
 export const TELEGRAME_WEB = 'https://web.telegram.org/a';
 export const T_ME_WEB = 'https://t.me';
@@ -24,7 +30,7 @@ export const OPENCV_URL = 'http://192.168.43.244:3100/opencv.js?v=1';
 export const WS_URL = 'ws://192.168.43.244:6788/api';
 
 export const DISCOVER_API = "https://api-explorer.web3r.site/api"
-export const DISCOVER_HOST = 'https://explorer.web3r.site/';
+export const DISCOVER_HOST = 'https://web3r.site/';
 
 // export const DISCOVER_HOST_DEV = 'http://192.168.43.244:3174/';
 export const DISCOVER_HOST_DEV = 'http://127.0.0.1:3174/';
@@ -107,27 +113,27 @@ export const ChainsList : ChainListItem[] = [
     }
 ]
 export const LeftSideActions : MainNavListItem[] = [
-    {
-        icon: 'BubbleChart',
-        name: 'Market',
-        url: 'https://www.coingecko.com/',
-        tabId: MAIN_NAV_TYPE.MARKET,
-        side: true
-    }
+    // {
+    //     icon: 'BubbleChart',
+    //     name: 'Market',
+    //     url: 'https://www.coingecko.com/',
+    //     tabId: MAIN_NAV_TYPE.MARKET,
+    //     side: true
+    // }
 ]
 
 export const MainNavList : MainNavListItem[] = [
     {
-        name: 'Games',
+        name: '发现',
         tabId: MAIN_NAV_TYPE.GAME_FI,
-        icon: 'SportsEsports',
-        side: false
+        icon: 'Explore',
+        side: true
     },
     {
-        name: 'aside_discover',
+        name: '扩展',
         tabId: MAIN_NAV_TYPE.DISCOVERY,
-        icon: 'Explore',
-        side: false
+        icon: 'Extension',
+        side: true
     },
     {
         name: 'wallet_title',
@@ -180,7 +186,7 @@ export const MainNavList : MainNavListItem[] = [
     },
 
     {
-        name: 'MobileDevice',
+        name: '远程设备',
         tabId: MAIN_NAV_TYPE.MOBILE_MONITORS,
         icon: 'Devices',
         side: true

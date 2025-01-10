@@ -19,13 +19,13 @@ import {
 } from '@mui/material/colors';
 import { BaseWindowConstructorOptions } from 'electron';
 import { onAction, openWindow } from '../common/electron';
-import { getDiscoverHost } from '../common/helpers';
+import { getDiscoverHost, showAlertMessage } from '../common/helpers';
 import { currentTs, getPartitionKey } from '../common/utils';
 import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
-import { isDeviceMonitor, isTelegramTab } from '../providers/PlaygroundProvider';
-import { AccountPublic, MainMessageEvent, RoiInfo, SUB_WIN_ID, WinControlType } from '../types';
+import { ExtensionType, isDeviceMonitor, isTelegramTab } from '../providers/PlaygroundProvider';
+import { AccountPublic, MAIN_NAV_TYPE, MainMessageEvent, RoiInfo, SUB_WIN_ID, WinControlType } from '../types';
 import LLMService, { MessageLLM } from './LLMService';
 
 const colors = [
@@ -118,6 +118,24 @@ export default class WebviewMainEventService {
             });
         }
         await this.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, 'onSelectRoiArea', payload);
+    }
+
+    
+    async sendFeatureAction(action:string,payload?:any){
+        localStorage.setItem(action,JSON.stringify({
+            payload
+        }))
+    }
+    async openFeatureTab(subTabId?:ExtensionType){
+        onAction('main', {
+            action: 'openMainTab',
+            payload: {
+                tabId: MAIN_NAV_TYPE.DISCOVERY
+            }
+        });
+        if(subTabId){
+            localStorage.setItem("ExtensionType",subTabId)
+        }
     }
     async openFeatureWindow(payload?: {
         tab: BrowserTab;
@@ -283,11 +301,11 @@ export default class WebviewMainEventService {
         index: number;
         tab: BrowserTab;
     }) {
-        const { tabId, twa } = tab;
+        const { tabId } = tab;
         const topColor = getTopColor(index);
 
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
-
+        
         const playgroundUrl = `${getDiscoverHost(
             isDev
         )}&winId=${winId}&initMessage=${initMessage}&topColor=${encodeURIComponent(
@@ -296,22 +314,43 @@ export default class WebviewMainEventService {
 
         const {width:winWidth} = window.screen
         const isMinWindow = isTelegramTab(tab) || isDeviceMonitor(tab)
-        const minWidth = isMinWindow ? 368 : 368 * 2;
+        
+        let width = isMinWindow ? 368 : 368 * 2;
         let height = PLAYGROUND_WIN_HEIGHT;
         if(isDeviceMonitor(tab)){
             height = 852
         }
-        let x = winWidth - minWidth - 12;
-        let y = 12;
+        let resizable = !(isTelegramTab(tab) || isDeviceMonitor(tab))
+        
+        if(isDeviceMonitor(tab)&& tab.url  && tab.url?.indexOf("w=") > -1 && tab.url?.indexOf("h=") > -1 ){
+            const uri = new URL(tab.url)
+            const w = Number(uri.searchParams.get("w"))
+            const h = Number(uri.searchParams.get("h"))
+            resizable = false;
+            height = 600
+            width = 1000
+            //1154 775
+            //1440 900
+            //0.8
+            //1152 720
+            width = w *0.8 + 1154 - 1152
+            height = h *0.8 + 775 - 720
+            
+        }
+        console.log({width,height})
+
+        let x = winWidth - width - 12;
+        let y = 12; 
+        
         return {
             winId,
             playgroundUrl,
             options: {
-                width: minWidth,
+                resizable,
+                width,
                 minWidth: 368,
+                height,
                 minHeight: height,
-                resizable: !(isTelegramTab(tab) || isDeviceMonitor(tab)),
-                height: height,
                 x,
                 y,
                 titleBarStyle: 'hiddenInset',
@@ -384,6 +423,7 @@ export default class WebviewMainEventService {
         });
 
         await this.openWindow(winId, playgroundUrl, options, false);
+        return winId
     }
     async openWindow(
         winId: SUB_WIN_ID | string,
@@ -460,7 +500,6 @@ export default class WebviewMainEventService {
         let rows = [];
         for (let i = 0; i < accounts.length; i++) {
             const { index } = accounts[i];
-
             const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
             const res = await this.isWinOpen(winId);
             if (res) {
@@ -494,11 +533,24 @@ export default class WebviewMainEventService {
         return onAction('getAllReadyWin', {  });
     }
     async notifySubWinAction(action: "windowsOpen" | "windowsClose" | string, payload: any, tab:BrowserTab,account:AccountPublic,type: WinControlType) {
-        const windowsReady = await new WebviewMainEventService().getAllReadyWin();
-        
-        (windowsReady as string[][]).forEach(element => {
+        const windowsReady = await new WebviewMainEventService().getAllReadyWin() as string[][];
+        if(windowsReady.length === 0){
+            showAlertMessage("没有找到打开的窗口")
+            return;
+        }
+        (windowsReady).forEach(element => {
             const [winId, isReady] = element;
             if (isReady) {
+                if (type === WinControlType.CURRENT && winId.endsWith(tab.tabId)) {
+                    onAction('subWin', {
+                        toWinId: winId,
+                        action,
+                        payload:{
+                            ...payload,
+                            tabId:tab.tabId
+                        }
+                    });
+                }
                 if (type === WinControlType.CURRENT_APP && winId.endsWith(tab.tabId)) {
                     if(action === "windowsOpen" || action === "windowsClose"){
                         onAction(action === "windowsOpen" ? 'shoWin':"closeWin", {
@@ -560,15 +612,18 @@ export default class WebviewMainEventService {
             }
         });
     }
-
+    
     async makeWindowsAlign(
         action: "rightTopAlignTile"|'leftAlignTile' | 'rightAlignTile' | 'rightTop' | 'rightBottom' | 'leftTop' | 'leftBottom',
         tab:BrowserTab,
         account: AccountPublic,
         type: WinControlType
     ) {
-
-        const windowsReady = await new WebviewMainEventService().getAllReadyWin();
+        const windowsReady = await new WebviewMainEventService().getAllReadyWin() as string[][];
+        if(windowsReady.length === 0){
+            showAlertMessage("没有找到打开的窗口")
+            return;
+        }
         const winIds = (windowsReady as string[][]).map(row=>row[0])
         const { width: screenWidth, height: screenHeight } = window.screen;
 
@@ -645,6 +700,7 @@ export default class WebviewMainEventService {
                     break;
                 }
             }
+            
             onAction('setBounds', {
                 winId:winId1,
                 bounds: {

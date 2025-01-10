@@ -40,10 +40,10 @@ export function ConfirmationDialog(props: ConfirmationDialogProps) {
                     {titleIcon ? (
                         <Stack direction="row" spacing={1}>
                             <Box>{titleIcon}</Box>
-                            <Typography variant="h6">{title}</Typography>
+                            <Typography variant="inherit">{title}</Typography>
                         </Stack>
                     ) : (
-                        <Typography variant="h6">{title}</Typography>
+                        <Typography variant="inherit">{title}</Typography>
                     )}
                 </DialogTitle>
             )}

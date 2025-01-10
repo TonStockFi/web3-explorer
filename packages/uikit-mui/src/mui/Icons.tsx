@@ -22,6 +22,7 @@ import ContentCut from '@mui/icons-material/ContentCut';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DesktopWindows from '@mui/icons-material/DesktopWindows';
 import DevicesIcon from '@mui/icons-material/Devices';
 import Diamond from '@mui/icons-material/Diamond';
 import EditIcon from '@mui/icons-material/Edit';
@@ -67,6 +68,7 @@ import Person from '@mui/icons-material/Person';
 import PhotoLibrary from '@mui/icons-material/PhotoLibrary';
 import PrecisionManufacturing from '@mui/icons-material/PrecisionManufacturing';
 import Psychology from '@mui/icons-material/Psychology';
+import Public from '@mui/icons-material/Public';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import Redeem from '@mui/icons-material/Redeem';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -102,6 +104,7 @@ import { GiClick } from 'react-icons/gi';
 
 export type IconList =
     | 'Folder'
+    | 'DesktopWindows'
     | 'AiOutlineUserSwitch'
     | 'BubbleChart'
     | 'GiClick'
@@ -150,6 +153,7 @@ export type IconList =
     | 'Logout'
     | 'MoreVert'
     | 'OpenInNew'
+    | 'Public'
     | 'Input'
     | 'ChatGpt'
     | 'VolumeOff'
@@ -246,6 +250,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     GridView,
     BubbleChart,
     Screenshot: ContentCut,
+    Public,
     Save,
     ArrowDropDown,
     HighlightOff,
@@ -253,6 +258,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     PrecisionManufacturing,
     Forum,
     Home: HomeIcon,
+    DesktopWindows,
     FolderOpen: FolderOpenIcon,
     Code: CodeIcon,
     Edit: EditIcon,

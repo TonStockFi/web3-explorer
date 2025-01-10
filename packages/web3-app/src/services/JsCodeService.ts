@@ -3,7 +3,7 @@ import { AccountPublic, RoiInfo } from '../types';
 export const MainEntry = `// main 方法是当前模块执行入口
 // 请点击“文档”按钮，查看更多代码示例
 async function main(){
-  console.log("Hello Web3!",F().id,F().name)
+  console.log("Hello Web3!")
 }`
 
 export const DefaultOcrPrompt = `输入： 一张图片。

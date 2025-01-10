@@ -106,13 +106,17 @@ export function TabBar({
         const handleSiteTitleUpated = (event: any) => {
             const { detail } = event as any;
             console.log('handleSite TitleUpated', detail);
-            isDesktop() && setTitle(detail.title);
+            if (!navTab) {
+                isDesktop() && setTitle(detail.title);
+            }
         };
 
         const handleSiteFavorUpdated = (event: any) => {
             const { detail } = event as any;
             console.log('handleSite FavorUpdated', detail);
-            isDesktop() && setIcon(detail.icon);
+            if (!navTab) {
+                isDesktop() && setIcon(detail.icon);
+            }
         };
 
         if (tab && tab.url) {

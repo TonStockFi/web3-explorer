@@ -113,7 +113,7 @@ ${desc}
         const {uri:{hash}} = this.getWebviewUrlUri()
         
         const chatId = SERVICE_ChatId
-
+        alert(2)
         if(hash !== `#${chatId}`){
             await this.goToTgChat(chatId)
         }else{

@@ -1,6 +1,8 @@
+import { aesGcmDecryptToBuffer } from '@web3-explorer/lib-crypto/dist/AESService';
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { View } from '@web3-explorer/uikit-view';
 import { useLocalStorageState } from '@web3-explorer/utils';
+
 import DESCrypto from '@web3-explorer/utils/dist/common/DESCrypto';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -31,13 +33,13 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
 
     const [screenImageSrc, setScreenImageSrc] = useState('');
 
-    const handleScreenImage = (deviceId: string, screenImageData: string, ts: number) => {
+    const handleScreenImage = async (deviceId: string, screenImageData: string, ts: number) => {
         if (!deviceId || !Devices.has(deviceId)) {
             return;
         }
 
         const device = Devices.get(deviceId);
-        if (screenImageData.startsWith('data:jpeg;base64_')) {
+        if (screenImageData.startsWith('data:jpeg;base64_d')) {
             const { password } = device!;
             const crypto = new DESCrypto(password!);
 
@@ -61,12 +63,32 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                 }
             }
 
-            // const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
-
             setScreenImageSrc(
                 'data:jpeg;base64,' +
-                    crypto.decrypt(screenImageData.substring('data:jpeg;base64_'.length + 5))
+                    crypto.decrypt(screenImageData.substring('data:jpeg;base64_d'.length + 5))
             );
+        }
+        if (screenImageData.startsWith('data:jpeg;base64_a')) {
+            const { password } = device!;
+
+            const decrypt = await aesGcmDecryptToBuffer(
+                screenImageData.substring('data:jpeg;base64_a'.length + 5),
+                password!
+            );
+            async function bufferToBlobToBase64(buffer: Buffer, mimeType: string) {
+                const blob = new Blob([buffer], { type: mimeType });
+
+                // Convert Blob to Base64
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onloadend = () => resolve(reader.result); // Extract Base64 string
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob); // Read Blob as a Data URL
+                });
+            }
+            const base64String = await bufferToBlobToBase64(decrypt, 'image/jpeg');
+            setScreenImageSrc(base64String as string);
         } else if (screenImageData.startsWith('data:jpeg;base64')) {
             setScreenImageSrc(screenImageData);
         }
@@ -155,9 +177,14 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
             setFirstLoad(false);
             return true;
         } catch (e) {
-            // showSnackbar({ message: '连接失败!' });
+            //@ts-ignore
+            if (e.error) {
+                showSnackbar({ message: '连接失败!请检查服务端是否启动或者服务端是址是不是正确' });
+            }
+
             setErrCode(ErrCodes.CONNECT_ERROR);
-            console.error(e);
+            //@ts-ignore
+            console.error('auth error', e.error);
             setFirstLoad(false);
             return false;
         }
@@ -244,11 +271,11 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                     <DeviceScreenView deviceId={deviceId} ws={ws} screenImageSrc={screenImageSrc} />
                 )}
             </View>
-            {errCode && (
+            {/* {errCode && (
                 <View abs bottom0 h={44} xx0 center>
                     {errCode}
                 </View>
-            )}
+            )} */}
         </View>
     );
 }

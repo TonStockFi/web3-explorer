@@ -8,11 +8,10 @@ import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import * as React from 'react';
 import { useTheme } from 'styled-components';
 import { isPlaygroundWebApp } from '../../common/helpers';
-import { W3C_ChatId } from '../../constant';
+import { TWA_URL_PREFIX } from '../../constant';
 import { BrowserTab } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
-import { isDeviceMonitor, isTelegramWeb, usePlayground } from '../../providers/PlaygroundProvider';
-import { useScreenshotContext } from '../../providers/ScreenshotProvider';
+import { isDeviceMonitor, usePlayground } from '../../providers/PlaygroundProvider';
 import TgAuthService from '../../services/TgAuthService';
 import TgTwaIframeService from '../../services/TgTwaIframeService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
@@ -34,26 +33,38 @@ export default function MoreTopbarDropdown({
 }) {
     const [isMute, setIsMute] = React.useState(false);
     const { tab } = usePlayground();
+    const isTma = tab.url && tab.url.startsWith(TWA_URL_PREFIX);
+    const [isIframe, setIsIframe] = React.useState(true);
+    const [iframeUrl, setIframeUrl] = React.useState('');
+    const [isTgLogged, setIsTgLogged] = React.useState(false);
+
     const { showConfirm } = useIAppContext();
-    const { isCutEnable, onCut } = useScreenshotContext();
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
+    const { t } = useTranslation();
     const open = Boolean(anchorEl);
-
     const handleClick = async (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
+        const ws = new WebviewServiceTelegram(tabId);
+        const url = ws.getWebviewUrl();
+        if (isTma) {
+            const isLogged = await ws.isLogged();
+            setIsTgLogged(isLogged);
+            const iframeUrl = await ws.checkTgIframeUrl();
+            setIsIframe(!!iframeUrl);
+            if (currentAccount) {
+                const url = await new TgTwaIframeService(currentAccount, tab.tabId).get();
+                setIframeUrl(url || '');
+            }
+        }
         setTimeout(async () => {
-            const ws = new WebviewService(tabId);
-            const url = ws.getWebviewUrl();
             if (url) {
                 const ms = new WebviewMuteService(url, ws.getAccountIndex());
                 const mute = await ms.get();
                 setIsMute(!!mute);
             }
-        }, 800);
+        }, 200);
     };
     const handleClose = () => {
         setAnchorEl(null);
@@ -61,9 +72,6 @@ export default function MoreTopbarDropdown({
     if (!tab) {
         return null;
     }
-    // console.log(tab);
-    const isW3CTgChat = tab.url && tab.url.indexOf(W3C_ChatId) > -1;
-
     const slotProps = {
         paper: {
             elevation: 0,
@@ -146,41 +154,7 @@ export default function MoreTopbarDropdown({
                     <View text={t(`主页`)} textFontSize="0.9rem" />
                 </View>
                 <View
-                    hide={!isW3CTgChat}
-                    menuItem
-                    onClick={async () => {
-                        if (currentAccount) {
-                            const service = new WebviewServiceTelegram(tab.tabId);
-                            service.sendAccountIdAddAddress(currentAccount);
-                        }
-                        setAnchorEl(null);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon={'Person'} iconSmall />
-                    </ListItemIcon>
-                    <View text={t(`发送帐户ID和地址`)} textFontSize="0.9rem" />
-                </View>
-
-                <View
-                    hide={!isPlaygroundWebApp()}
-                    menuItem
-                    onClick={async () => {
-                        setAnchorEl(null);
-                        new WebviewMainEventService().openFeatureWindow({
-                            tab,
-                            account: currentAccount!
-                        });
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon={'PrecisionManufacturing'} iconSmall />
-                    </ListItemIcon>
-                    <View text={t(`控制中心`)} textFontSize="0.9rem" />
-                </View>
-                <View divider hide={!isPlaygroundWebApp()}></View>
-                <View
-                    hide={!isPlaygroundWebApp()}
+                    hide={true}
                     menuItem
                     onClick={async () => {
                         setAnchorEl(null);
@@ -194,24 +168,10 @@ export default function MoreTopbarDropdown({
                     </ListItemIcon>
                     <View text={t(`ChatGpt`)} textFontSize="0.9rem" />
                 </View>
-                <View divider hide={!isPlaygroundWebApp()}></View>
-                <View
-                    hide
-                    menuItem
-                    onClick={async () => {
-                        setAnchorEl(null);
-                        onCut(!isCutEnable);
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon={'ContentCut'} iconSmall />
-                    </ListItemIcon>
-                    <View text={t(`屏幕截图`)} textFontSize="0.9rem" />
-                </View>
-
+                {/* <View divider hide={!isPlaygroundWebApp()}></View> */}
                 <View
                     menuItem
-                    hide={!isTelegramWeb(url || '')}
+                    hide={!isTgLogged}
                     onClick={async () => {
                         setAnchorEl(null);
                         if (currentAccount) {
@@ -241,25 +201,35 @@ export default function MoreTopbarDropdown({
                     <ListItemIcon>
                         <View icon={'Logout'} iconSmall />
                     </ListItemIcon>
-                    <View text={t(`重置Telegram账户`)} textFontSize="0.9rem" />
+                    <View text={t(`退出Telegram账户`)} textFontSize="0.9rem" />
                 </View>
-                <View
-                    menuItem
-                    hide={!tgUrl || !currentAccount}
-                    onClick={async () => {
-                        setAnchorEl(null);
-                        if (currentAccount) {
-                            const ws = new WebviewService(tabId);
-                            await new TgTwaIframeService(currentAccount, tabId).remove();
-                            ws.goTo(tgUrl!);
-                        }
-                    }}
-                >
-                    <ListItemIcon>
-                        <View icon={'Logout'} iconSmall />
-                    </ListItemIcon>
-                    <View text={t(`从Telegram加载`)} textFontSize="0.9rem" />
-                </View>
+                {Boolean(isTma && iframeUrl && currentAccount) && (
+                    <View
+                        menuItem
+                        onClick={async () => {
+                            setAnchorEl(null);
+                            const ws = new WebviewServiceTelegram(tabId);
+                            const ttis = new TgTwaIframeService(currentAccount!, tab.tabId);
+                            if (isIframe) {
+                                await ttis.enableIframe(true);
+                                ws.goTo(iframeUrl);
+                            } else {
+                                await ttis.enableIframe(false);
+                                ws.goTo(tab.url!);
+                                setIframeUrl('');
+                            }
+                        }}
+                    >
+                        <ListItemIcon>
+                            <View icon={'Public'} iconSmall />
+                        </ListItemIcon>
+                        <View
+                            text={t(isIframe ? `使用系统浏览器` : '使用Telegram内置浏览器')}
+                            textFontSize="0.9rem"
+                        />
+                    </View>
+                )}
+
                 <View
                     menuItem
                     onClick={async () => {

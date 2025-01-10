@@ -91,6 +91,12 @@ export const Web3AppInner = () => {
         //@ts-ignore
         if (loading) loading.style.display = 'none';
     }, []);
+    const isMiniSideBar = false;
+
+    let left = SiderBarWidth;
+    if (!isMiniSideBar) {
+        left = 180;
+    }
 
     return (
         <View
@@ -102,7 +108,7 @@ export const Web3AppInner = () => {
             wh100p
         >
             <AppRegionDrag />
-            <SideBarVert />
+            <SideBarVert isMiniSideBar={isMiniSideBar} left={left} />
             <TitleBarControlView main />
             <View
                 borderBox
@@ -114,7 +120,7 @@ export const Web3AppInner = () => {
                 top0
                 right0
                 height={HomHeaderHeight}
-                left={topLeft}
+                left={topLeft + left - SiderBarWidth}
             >
                 <TopBar />
             </View>
@@ -123,7 +129,7 @@ export const Web3AppInner = () => {
                 sx={{
                     transition: 'left 0.2s ease'
                 }}
-                left={SiderBarWidth}
+                left={left}
                 top={HomHeaderHeight}
                 right={0}
             >

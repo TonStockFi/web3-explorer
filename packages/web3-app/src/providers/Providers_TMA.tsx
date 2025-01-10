@@ -11,9 +11,9 @@ export const Providers = ({ children }: { children: ReactNode }) => {
         <IAppProvider>
             <ThemeProvider theme={defaultTheme}>
                 <Web3AppThemeWrpper>
-                    <TmaPageProvider>
-                        <TaskProvider>{children}</TaskProvider>
-                    </TmaPageProvider>
+                    <TaskProvider>
+                        <TmaPageProvider>{children}</TmaPageProvider>
+                    </TaskProvider>
                 </Web3AppThemeWrpper>
             </ThemeProvider>
         </IAppProvider>

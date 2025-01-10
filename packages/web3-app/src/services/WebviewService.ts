@@ -12,7 +12,9 @@ import {
     TabIdWebveiwSizedMap
 } from '../components/webview/WebViewBrowser';
 import { TELEGRAME_WEB } from '../constant';
-import { BoundingClientRect } from '../types';
+import { BrowserTab } from '../providers/BrowserProvider';
+import { AccountPublic, BoundingClientRect } from '../types';
+import TgTwaIframeService from './TgTwaIframeService';
 
 export default class WebviewService {
     openDevTools() {
@@ -190,10 +192,17 @@ if(element){
         console.debug('waitForElemenBoundingClientRect', code);
         return this.waitForExecJsResult(code, timeout || 30000);
     }
-    async querySelector(selector: string, key: string) {
-        return await this.execJs(`
-            const ele = document.querySelector("${selector}");
-            if(ele){return ele["${key}"]}else{return null}`);
+    async querySelector(selector: string, key?: string) {
+        if(key){
+
+            return await this.execJs(`
+                const ele = document.querySelector("${selector}");
+                if(ele){return ele["${key}"]}else{return null}`);
+        }else{
+            return await this.execJs(`
+                const ele = document.querySelector("${selector}");
+                if(ele){return true}else{return null}`);
+        }
     }
     async dispatchEvent(action: string, payload?: any) {
         return this.execJs(
@@ -269,7 +278,61 @@ if(hash){
     `;
         return this.execJs(code);
     }
+    async checkTmeTwa(tab: BrowserTab, currentAccount: AccountPublic, ts: number,showConfirm:any) {
 
+        const ttis = new TgTwaIframeService(currentAccount!, tab.tabId);
+        const iframe = await ttis.get();
+        const isEnableIframe = await ttis.isEnableIframe();
+        if(isEnableIframe && iframe){
+            this.goTo(iframe)
+            return;
+        }
+        const iframeUrl = await this.checkTgIframeUrl();
+        console.log("checkTmeTwa",ts,iframeUrl)
+        if (!iframeUrl) {
+            if(ts >= 8000 && ( ts / 2000) % 8 === 0){
+                if(await this.querySelector(".dialog-buttons .confirm-dialog-button")){
+                    const rect = await this.waitForElemenBoundingClientRect(".dialog-buttons .confirm-dialog-button")
+                    if(rect){
+                        await this.sendClickEventAtRect(rect);
+                    }
+                }
+                showGlobalLoading(false)
+                showConfirm({
+                    id: 'confirm',
+                    title: '提示',
+                    content: '加载的时间有点长, 点击取消继续等待, 点击确定刷新页面',
+                    onConfirm: () => {
+                        this.goTo(tab.url!);
+                        showConfirm(false);
+                    },
+                    onCancel: () => {
+                        showGlobalLoading(true)
+                        setTimeout(() => {
+                            this.checkTmeTwa(tab, currentAccount, ts + 2000,showConfirm);
+                        },1000);
+                        showConfirm(false);
+                    }
+                });
+                
+            }else{
+                setTimeout(() => {
+                    this.checkTmeTwa(tab, currentAccount, ts + 2000,showConfirm);
+                },1000);
+            }
+        } else {
+            showGlobalLoading(false)
+            this.execJs(`
+        const iframe = document.querySelector("iframe");
+        if (iframe && iframe.previousElementSibling && iframe.previousElementSibling.tagName === "DIV") {
+         iframe.previousElementSibling.remove();
+         }`)
+            await new TgTwaIframeService(currentAccount, tab.tabId).save(iframeUrl);
+            if(isEnableIframe){
+                this.goTo(iframeUrl)
+            }
+        }
+    }
     async checkTgIframeUrl(): Promise<null | string> {
         const code = `
 const element = document.querySelector("#portals iframe");

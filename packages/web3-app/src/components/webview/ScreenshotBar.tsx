@@ -5,9 +5,8 @@ import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import { useTranslation } from '@web3-explorer/lib-translation';
 import { useTheme } from 'styled-components';
 import { isPlaygroundMaster, showGlobalLoading } from '../../common/helpers';
-import { downloadImage } from '../../common/image';
-import { urlToBlob } from '../../common/opencv';
-import { currentTs } from '../../common/utils';
+import { ExtensionType } from '../../providers/PlaygroundProvider';
+import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewService from '../../services/WebviewService';
 import { ViewSize, XYWHProps } from '../../types';
 import { DefaultCutRect, isCutAreaExists } from './CutAreaView';
@@ -72,7 +71,7 @@ export function ScreenshotBar({
                     <View
                         hide={isPlaygroundMaster()}
                         mr={4}
-                        buttonVariant="outlined"
+                        buttonVariant="text"
                         onClick={async () => {
                             const ws = new WebviewService(tabId);
                             if (ws.webviewIsReady()) {
@@ -83,11 +82,17 @@ export function ScreenshotBar({
                                     }
                                     showGlobalLoading(true);
                                     const screenImgUrl = await ws.getScreenImageUrl(size);
+
                                     if (screenImgUrl) {
-                                        const blob = await urlToBlob(screenImgUrl);
-                                        if (blob) {
-                                            downloadImage(blob, `${tabId}_${currentTs()}.png`);
-                                        }
+                                        new WebviewMainEventService().sendFeatureAction(
+                                            'onFullscreen',
+                                            {
+                                                screenImgUrl
+                                            }
+                                        );
+                                        new WebviewMainEventService().openFeatureTab(
+                                            ExtensionType.GEMINI
+                                        );
                                     }
                                 } catch (error) {
                                     console.error(error);

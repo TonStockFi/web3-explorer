@@ -6,9 +6,9 @@ import { ENTRY_ID_ROI, MARK_ID_ROI, TASK_ID_ROI } from '../constant';
 
 import RoiService from '../services/RoiService';
 import WebviewMainEventService from '../services/WebviewMainEventService';
+import WebviewSiteEventService from '../services/WebviewSiteEventService';
 import { PlaygroundMasterSideAction, ProInfoProps, RoiInfo, SUB_WIN_ID } from '../types';
-import { getRecoId, usePlayground } from './PlaygroundProvider';
-import { usePro } from './ProProvider';
+import { ExtensionType, getRecoId, usePlayground } from './PlaygroundProvider';
 
 export const CacheImage: Map<string, string> = new Map();
 
@@ -41,6 +41,8 @@ interface AppContextType {
     notifyWindow: (action: string, payload?: any) => void;
     notifyWindows: (action: string, payload?: any) => void;
     loadCacheRoiList: (tabId: string, skipSet?: boolean) => Promise<RoiInfo[]>;
+
+    onChangeRoiAreaList: (roi: RoiInfo[]) => void;
     onSelectPage: (page: string) => void;
     switchIsPage: (v: boolean) => void;
     onShowScreenMirror: (v: boolean) => void;
@@ -171,15 +173,11 @@ export function getServiceId(recognitionCatId: string, proInfoList?: ProInfoProp
     return `${tabId}`;
 }
 export const RecognitionProvider = (props: { children: ReactNode }) => {
-    const { proInfoList } = usePro();
-
     const { children } = props || {};
     const [currentDecision, setCurrentDecision] = useState<RoiRunInfo | null>(null);
 
     const [showScreenMirror, setShowScreenMirror] = useState<boolean>(true);
     const [isPage, setIsPage] = useState<boolean>(false);
-
-    const [roiRunInfo, setRoiRunInfo] = useState<RoiRunInfo | null>(null);
 
     const { accounts, tab, onChangePlaygroundMasterSideAction, currentTabId, currentAccount } =
         usePlayground();
@@ -188,6 +186,10 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     const [clickStopped, setClickStopped] = useState<boolean>(false);
     const recoId = getRecoId(tab || { tabId: currentTabId }, currentAccount!);
 
+    const [roiRunInfo, setRoiRunInfo] = useLocalStorageState<RoiRunInfo | null>(
+        'roiRunInfo_' + recoId,
+        null
+    );
     const [selectedRoiId, setSelectedRoiId] = useLocalStorageState<string>(
         'selectedRoiId_' + recoId,
         ''
@@ -197,9 +199,9 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         'selectedTaskId_' + recoId,
         ''
     );
-    const [recognitionCatId, setRecognitionCatId] = useSessionStorageState(
-        'recognitionCatId_' + index,
-        ''
+    const [recognitionCatId, setRecognitionCatId] = useLocalStorageState(
+        'recognitionCatId_' + recoId,
+        isPlaygroundMaster() ? recoId : ''
     );
     const [selectedPage, setSelectedPage] = useSessionStorageState<string>(
         'selectedPage_' + index,
@@ -225,6 +227,9 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         setSelectedRoiId(i => {
             return id;
         });
+    };
+    const onChangeRoiAreaList = (v: RoiInfo[]) => {
+        setRoiAreaList(v);
     };
 
     const onSelectTask = (id: string) => {
@@ -276,45 +281,35 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
     };
 
     const notifyWindow = (action: string, payload?: any) => {
-        setRecognitionCatId(recognitionCatId => {
-            const { accountIndex, tabId } = parseRecognitionCatId(recognitionCatId);
-            const winId = WebviewMainEventService.getPlaygroundWinId({
-                index: accountIndex,
-                tabId
-            });
-            console.log('notifyWindow', action, winId);
-            onAction('subWin', {
-                toWinId: winId,
-                action,
-                payload: payload || {}
-            });
-            return recognitionCatId;
-        });
-    };
-    const notifyWindows = (action: string, payload?: any) => {
-        //console.log("notifyWindows",{ currentTabId });
         if (!isPlaygroundMaster()) {
             return;
         }
-        setRecognitionCatId((recognitionCatId: string) => {
-            new WebviewMainEventService().notifyWindowAction({
-                accounts,
+        new WebviewSiteEventService().sendAction('notifyWindowAction', {
+            acuccountIndex: currentAccount.index,
+            tabId: currentTabId,
+            action,
+            payload: payload || {}
+        });
+    };
+    const notifyWindows = (action: string, payload?: any) => {
+        if (!isPlaygroundMaster()) {
+            return;
+        }
+        new WebviewSiteEventService().sendAction('notifyWindowsAction', {
+            accounts,
+            tabId: currentTabId,
+            currentAccount,
+            action,
+            payload: {
+                ...(payload || {}),
                 tabId: currentTabId,
-                currentAccount,
-                action,
-                payload: {
-                    ...(payload || {}),
-                    tabId: currentTabId,
-                    recognitionCatId
-                }
-            });
-            return recognitionCatId;
+                recognitionCatId: getRecoId({ tabId: currentTabId }, currentAccount)
+            }
         });
     };
 
     const loadCacheRoiList = async (recognitionCatId: string, skipSet?: boolean) => {
-        // console.log('loadCacheRoiList', recognitionCatId);
-        const rows = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getAll();
+        const rows = await new RoiService(getServiceId(recognitionCatId)).getAll();
         setRoiAreaList(() =>
             rows.map(row => {
                 fixRow(row);
@@ -366,7 +361,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         }, 500);
     };
     const addRoiArea = async (r: RoiInfo, cutImageUrl: string, recognitionCatId: string) => {
-        const id = await new RoiService(getServiceId(recognitionCatId, proInfoList)).getId();
+        const id = await new RoiService(r.tabId).getId();
         if (IdCache.get(id)) {
             return;
         }
@@ -383,19 +378,13 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         let pid = r.pid;
         if (!pid) {
             pid = selectedPage;
-            if (r.type === 'task') {
-                pid = TASK_ID_ROI;
-            }
-            if (r.type === 'mark') {
-                pid = MARK_ID_ROI;
-            }
             if (!pid && r.type === 'reco') {
                 pid = ENTRY_ID_ROI;
             }
         }
         let name = r.name;
         if (!name) {
-            name = 'untitled';
+            name = 'unTitled';
         }
         const row: RoiInfo = {
             ...r,
@@ -408,29 +397,17 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             CacheImage.set(`${recognitionCatId}_${row.id}`, cutImageUrl);
         }
 
-        await new RoiService(getServiceId(recognitionCatId, proInfoList)).save(
-            id,
-            row,
-            cutImageUrl,
-            cutImageUrl.startsWith('data')
-        );
+        await new RoiService(r.tabId).save(id, row, cutImageUrl, cutImageUrl.startsWith('data'));
         if (!isPlaygroundMaster()) {
-            const s = new WebviewMainEventService();
-
+            new WebviewMainEventService().openFeatureTab(ExtensionType.FEATURE_LIB);
             const payload = {
                 account: currentAccount,
                 tab,
                 roiInfo: row
             };
-            new WebviewMainEventService()
-                .openFeatureWindow({
-                    tab,
-                    account: currentAccount
-                })
-                .then(() => {
-                    s.sendMessageToSubWin(SUB_WIN_ID.PLAYGROUND, 'onSelectRoiArea', payload);
-                });
+            new WebviewMainEventService().sendFeatureAction('onSelectRoiArea', payload);
         } else {
+            debugger;
             setRecognitionCatId(r => {
                 return recognitionCatId;
             });
@@ -452,29 +429,21 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
 
     const updateRoiArea = (r: RoiInfo) => {
         let pid = r.pid;
-        if (r.type === 'task') {
-            pid = TASK_ID_ROI;
-        }
-        if (r.type === 'mark') {
-            pid = MARK_ID_ROI;
-        }
-        if (!pid && r.type === 'reco') {
+        if (!pid) {
             pid = ENTRY_ID_ROI;
         }
-        setRecognitionCatId(recognitionCatId => {
-            new RoiService(getServiceId(recognitionCatId, proInfoList)).update(r);
-            setRoiAreaList(prv => {
-                return prv.map(row => {
-                    return row.id !== r.id
-                        ? row
-                        : {
-                              ...r,
-                              pid
-                          };
-                });
-            });
+        new RoiService(r.tabId).update(r).then(() => {
             notifyWindows('onUpdateRoi');
-            return recognitionCatId;
+        });
+        setRoiAreaList(prv => {
+            return prv.map(row => {
+                return row.id !== r.id
+                    ? row
+                    : {
+                          ...r,
+                          pid
+                      };
+            });
         });
     };
 
@@ -482,7 +451,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
         setSelectedRoiId(prev => {
             return r.id === prev ? '' : prev;
         });
-        new RoiService(getServiceId(recognitionCatId, proInfoList)).remove(r.id);
+        new RoiService(r.tabId).remove(r.id);
         setRoiAreaList(prv => {
             return prv.filter(row => row.id !== r.id);
         });
@@ -536,6 +505,7 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
                 onChangeCurrentDecisionn,
                 currentDecision,
                 onShowScreenMirror,
+                onChangeRoiAreaList,
                 showScreenMirror,
                 onChangeRoiRunInfo,
                 roiRunInfo,

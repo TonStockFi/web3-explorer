@@ -1,12 +1,12 @@
 import { View } from '@web3-explorer/uikit-view';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
-import { HomHeaderHeight, MainNavList, SiderBarWidth } from '../../constant';
+import { HomHeaderHeight, MainNavList } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import SideProIcon from './SideProIcon';
 import SideSettings from './SideSettings';
 
-export const SideBarVert = () => {
+export const SideBarVert = ({ isMiniSideBar, left }: { isMiniSideBar: boolean; left: number }) => {
     const { env, isFullScreen } = useIAppContext();
 
     const { t, theme, leftSideActions, openTab, currentTabId } = useBrowserContext();
@@ -17,13 +17,19 @@ export const SideBarVert = () => {
     if (env.isMac && isFullScreen) {
         top = 0;
     }
+    const actionsSide = [
+        ...actions,
+        ...leftSideActions.map(row => {
+            return row;
+        })
+    ].filter(row => row && !row.hide);
     return (
         <View
             userSelectNone
             absFull
             top={top}
             zIdx={1}
-            width={SiderBarWidth}
+            width={left}
             borderBox
             column
             aCenter
@@ -33,15 +39,36 @@ export const SideBarVert = () => {
                 boxShadow: '0px 0px 2px rgba(0, 0, 0, 0.9)'
             }}
         >
-            <View w100p column jStart aCenter pt12>
-                {[
-                    ...actions,
-                    ...leftSideActions.map(row => {
-                        return row;
-                    })
-                ]
-                    .filter(row => !row.hide)
-                    .map(action => {
+            <View w100p column jStart aCenter pt12 px12={!isMiniSideBar} borderBox>
+                <View
+                    list
+                    hide={isMiniSideBar}
+                    sx={{
+                        '& .MuiListItem-root': { mb: 1 },
+                        '& .MuiListItemButton-root': { borderRadius: 2, py: 0.5 },
+                        '& .MuiTypography-root': { fontSize: '1rem' },
+                        '& .Mui-selected': { bgcolor: theme.backgroundBrowserActive }
+                    }}
+                    w100p
+                >
+                    {actionsSide.map(action => {
+                        return (
+                            <View
+                                onClick={() => {
+                                    openTab(action.tabId, action.url, action.icon);
+                                }}
+                                listSelected={action.tabId === currentTabNav}
+                                key={action.name}
+                                listItemIcon={
+                                    <View icon={<ImageIcon icon={action.icon!} size={20} />}></View>
+                                }
+                                listItemText={t(action.name)}
+                            ></View>
+                        );
+                    })}
+                </View>
+                {isMiniSideBar &&
+                    actionsSide.map(action => {
                         return (
                             <View
                                 py={4}
@@ -77,8 +104,13 @@ export const SideBarVert = () => {
                         );
                     })}
             </View>
-            <View pb12 w100p>
-                <View w100p center column>
+            <View pb={6} w100p>
+                <View w100p center column hide={!isMiniSideBar}>
+                    <SideProIcon />
+                    <SideSettings />
+                </View>
+
+                <View w100p borderBox rowVCenter px12 jSpaceBetween hide={isMiniSideBar}>
                     <SideProIcon />
                     <SideSettings />
                 </View>

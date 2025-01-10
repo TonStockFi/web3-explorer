@@ -1,20 +1,23 @@
 import { View } from '@web3-explorer/uikit-view';
 import { WebviewTag } from 'electron';
 import { useEffect, useState } from 'react';
-import { useAccountInfo } from '../../hooks/wallets';
+import { useAccountInfo, usePublicAccountsInfo } from '../../hooks/wallets';
 import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 
 import { getDiscoverHost } from '../../common/helpers';
-import { currentTs } from '../../common/utils';
+import { currentTs, getSessionCacheInfo } from '../../common/utils';
 import { DISCOVER_PID, START_URL } from '../../constant';
 import { usePro } from '../../providers/ProProvider';
 import WebviewService from '../../services/WebviewService';
-import { InitConfig, MAIN_NAV_TYPE, WebApp } from '../../types';
+import { AccountPublic, InitConfig, MAIN_NAV_TYPE, SUB_WIN_ID, WebApp } from '../../types';
 import { LoadingView } from '../LoadingView';
 
 import { useTranslation } from '@web3-explorer/lib-translation';
+import { deepDiff } from '@web3-explorer/utils';
+import { onAction } from '../../common/electron';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
+import WebviewMainEventService from '../../services/WebviewMainEventService';
 import ScreenshotView from './ScreenshotView';
 import WebViewBrowser from './WebViewBrowser';
 import { WebviewTopBar } from './WebViewTopBar';
@@ -50,21 +53,42 @@ export function WebviewDiscoverApps({
     const { updateProPlans } = usePro();
     const { name, emoji, index, id, address } = useAccountInfo();
     const currentAccount = { name, emoji, index, id, address };
-    if (isGames) {
+    const accounts = usePublicAccountsInfo();
+    const [accountsList, setAccountsList] = useState<AccountPublic[]>([]);
+
+    useEffect(() => {
+        if (deepDiff(accounts, accountsList)) {
+            setAccountsList(accounts);
+        }
+    }, [accounts, accountsList]);
+
+    if (!isGames) {
         sessionStorage.setItem('currentAccount', JSON.stringify(currentAccount));
     }
 
+    useEffect(() => {
+        const account = getSessionCacheInfo();
+        const ws = new WebviewService(tabId);
+        if (!isGames && ws.webviewIsReady()) {
+            setAccountsList(r => {
+                ws.dispatchEvent('onPlaygroundMainMessage', {
+                    action: 'onChangeCurrentAccount',
+                    payload: { account, accounts: r }
+                });
+                return r;
+            });
+        }
+    }, [index]);
     const [firstLoad, setFirstLoad] = useState(!isGames);
     useEffect(() => {
         if (currentTabId === MAIN_NAV_TYPE.DISCOVERY && !isGames) {
             setFirstLoad(false);
         }
     }, [currentTabId]);
-    let id1 = Buffer.from(id).toString('hex');
-    const url = `${getDiscoverHost(
-        env.isDev,
-        env.version
-    )}&address=${address}&id=${id1}&index=${index}&lang=${currentLanguage}#${winId}`;
+    // let id1 = Buffer.from(id).toString('hex');
+    const url = `${getDiscoverHost(env.isDev, env.version)}&_a=${address}&_id=${
+        index + id
+    }&lang=${currentLanguage}#${!isGames ? SUB_WIN_ID.PLAYGROUND : 'GAMES_FI'}`;
     // console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({
@@ -74,17 +98,119 @@ export function WebviewDiscoverApps({
         action: string;
         payload?: Record<string, any> | undefined;
     }) => {
+        const ws = new WebviewService(tabId);
+
         if (action === 'initConfig') {
             const { proPlans, proRecvAddress, leftSideActions } = payload as InitConfig;
             updateProPlans({ proPlans, proRecvAddress });
             onChangeLeftSideActions(leftSideActions);
         }
 
+        if (action === 'notifySubWinAction') {
+            const { payload: payload1, action, tab, currentAccount, currentType } = payload as any;
+            new WebviewMainEventService().notifySubWinAction(
+                action,
+                payload1,
+                tab,
+                currentAccount,
+                currentType
+            );
+        }
+        if (action === 'makeWindowsAlign') {
+            const { tab, action, currentAccount, currentType } = payload as any;
+            new WebviewMainEventService().makeWindowsAlign(
+                action,
+                tab,
+                currentAccount,
+                currentType
+            );
+        }
+
+        if (action === 'getCurrentAccount') {
+            if (ws.webviewIsReady()) {
+                const account = getSessionCacheInfo();
+                setAccountsList(r => {
+                    ws.dispatchEvent('onPlaygroundMainMessage', {
+                        action: 'onChangeCurrentAccount',
+                        payload: { account, accounts: r }
+                    });
+                    return r;
+                });
+            }
+        }
+
+        if (action === 'getAllReadyWin') {
+            const windows = await onAction('getAllReadyWin');
+            ws.dispatchEvent('onPlaygroundMainMessage', {
+                action: 'onGetAllReadyWin',
+                payload: { windows }
+            });
+        }
         if (action === 'onOpenTab') {
             const { item } = payload as { item: WebApp };
             openTabFromWebview(item);
         }
 
+        if (action === 'closeWin') {
+            const { winId } = payload as { winId: string };
+            onAction('closeWin', {
+                winId
+            });
+        }
+        if (action === 'openLLMWindow') {
+            const { site, message } = payload as any;
+            await new WebviewMainEventService().openLLMWindow({
+                site,
+                message
+            });
+        }
+        if (action === 'notifyWindowAction') {
+            const winId = WebviewMainEventService.getPlaygroundWinId({
+                index: payload!.acuccountIndex,
+                tabId: payload!.tabId
+            });
+            onAction('subWin', {
+                toWinId: winId,
+                action: payload!.action,
+                payload: payload!.payload
+            });
+        }
+        if (action === 'notifyWindowsAction') {
+            const notifyWindowAction = (data: any) => {
+                const { accounts, tabId, currentAccount, action, payload } = data;
+
+                new WebviewMainEventService().notifyWindowAction({
+                    accounts,
+                    tabId,
+                    currentAccount,
+                    action,
+                    payload
+                });
+            };
+            notifyWindowAction(payload);
+        }
+        if (action === 'openPlaygroundWindow') {
+            const { tab, account, action } = payload as {
+                tab: BrowserTab;
+                action: string;
+                payload: any;
+                account: AccountPublic;
+            };
+            const wmes = new WebviewMainEventService();
+
+            const winId = await wmes.openPlaygroundWindow(tab, account, env);
+            if (action) {
+                const isReady = await wmes.isWinReady(winId);
+                if (!isReady) {
+                    await wmes.waitForIsWinReady(winId);
+                }
+                onAction('subWin', {
+                    toWinId: winId,
+                    action,
+                    payload: payload!.payload
+                });
+            }
+        }
         if (action === 'openMainTabUrl') {
             const { url } = payload as { url: string };
             openUrl(url);
@@ -126,6 +252,7 @@ export function WebviewDiscoverApps({
                 borderBox
             >
                 <WebViewBrowser
+                    preload={'playground'}
                     hideBoxShadow
                     borderRadius={0}
                     url={START_URL}

@@ -190,9 +190,8 @@ export const WalletList = () => {
                             <AsideMenuItem
                                 onClick={() => {
                                     onClickWallet(wallet.activeTonWalletId);
-
                                     if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
-                                        //onShowWalletList(false);
+                                        onShowWalletList(false);
                                     }
                                 }}
                                 isSelected={activeDerivationIndex === wallet.index}

@@ -201,7 +201,7 @@ export class MainWindow {
             width: 1280,
             minWidth: 380,
             height: 840,
-            minHeight: 840,
+            minHeight: 580,
             titleBarStyle: 'hiddenInset',
             titleBarOverlay: false,
             trafficLightPosition: { x: 18, y: 14 },
@@ -706,7 +706,6 @@ export class MainWindow {
             const { workAreaSize, workArea } = screen.getPrimaryDisplay();
             const bounds = this.mainWindow.getBounds();
             const isFullScreen = this.mainWindow.isFullScreen();
-            screen.getCursorScreenPoint;
             return {
                 bounds,
                 version: app.getVersion(),

@@ -7,6 +7,7 @@ import { BrowserTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewService from '../../services/WebviewService';
+import { MAIN_NAV_TYPE } from '../../types';
 import { WalletSide } from '../app/WalletSide';
 import { UrlInput } from './UrlInput';
 
@@ -22,7 +23,7 @@ export function WebviewTopBar({
     currentUrl?: string;
 }) {
     const theme = useTheme();
-    const { closeTab } = useBrowserContext();
+    const { currentTabId } = useBrowserContext();
     const [canGoBack, setCanGoBack] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -49,7 +50,15 @@ export function WebviewTopBar({
             window.addEventListener(`siteLoading_${tab.tabId}`, handleSiteLoading);
         };
     }, []);
-    let hideOpenInNew1 = !!hideOpenInNew;
+
+    let hideUrlInput = false;
+    if (
+        currentTabId === MAIN_NAV_TYPE.DISCOVERY ||
+        currentTabId === 'tab_airdrop' ||
+        currentTabId === 'MOBILE_MONITORS'
+    ) {
+        hideUrlInput = true;
+    }
     return (
         <View aCenter jStart wh100p pr={4} borderBox pl={0}>
             <View empty>
@@ -57,7 +66,7 @@ export function WebviewTopBar({
                     <WalletSide />
                 </View>
             </View>
-            <View h={44} row aCenter ml12 flex1>
+            <View h={44} row aCenter ml12 flex1 hide={hideUrlInput}>
                 <UrlInput
                     urlReadOnly={urlReadOnly}
                     isDiscover={false}
@@ -107,7 +116,7 @@ export function WebviewTopBar({
                     icon={loading ? 'Close' : 'Refresh'}
                 />
                 <View
-                    hide={hideOpenInNew1}
+                    hide={true}
                     borderRadius={8}
                     ml={4}
                     sx={{

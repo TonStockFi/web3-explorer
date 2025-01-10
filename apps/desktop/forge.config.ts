@@ -137,6 +137,12 @@ const config: ForgeConfig = {
                         }
                     },
                     {
+                        name: 'playground',
+                        preload: {
+                            js: './src/preload_playground.ts'
+                        }
+                    },
+                    {
                         name: 'site',
                         preload: {
                             js: './src/preload_site.ts'

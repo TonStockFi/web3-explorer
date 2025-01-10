@@ -29,7 +29,6 @@ export default class WebviewServiceHook extends WebviewService {
         const url = this.getWebviewUrl();
         if (url !== START_URL) {
             const { uri } = this.getWebviewUrlUri();
-           
             if (uri.host == 't.me') {
                 if (this.isMain) {
                     this.openTabFromWebview &&

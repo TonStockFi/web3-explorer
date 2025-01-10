@@ -4,7 +4,12 @@ import { View } from '@web3-explorer/uikit-view/dist/View';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { useEffect } from 'react';
 import { useTheme } from 'styled-components';
-import { getWinId, showAlertMessage, showGlobalLoading } from '../../common/helpers';
+import {
+    getWinId,
+    isPlaygroundWebApp,
+    showAlertMessage,
+    showGlobalLoading
+} from '../../common/helpers';
 import { copyImageToClipboard } from '../../common/image';
 import { urlToDataUri } from '../../common/opencv';
 import { copyTextToClipboard, currentTs } from '../../common/utils';
@@ -27,7 +32,6 @@ export function ScreenshotCutAreaBar({
     tabId: string;
     viewSize: ViewSize;
 }) {
-    const { onChangeCurrentExtension } = usePlayground();
     const { cutAreaRect, onCutting, onCut } = useScreenshotContext();
     const { tab } = usePlayground();
     const { t, i18n } = useTranslation();
@@ -48,8 +52,20 @@ export function ScreenshotCutAreaBar({
     const { showSnackbar } = useIAppContext();
     const theme = useTheme();
     useEffect(() => {
-        if (getWinId() !== SUB_WIN_ID.LLM) {
-            onChangeCurrentExtension(ExtensionType.GEMINI);
+        if (isPlaygroundWebApp()) {
+            new WebviewMainEventService().openFeatureTab(ExtensionType.GEMINI);
+            (async () => {
+                const imgBlob = await CutAreaService.getCutBlob(tabId, cutAreaRect);
+                if (imgBlob) {
+                    const url = URL.createObjectURL(imgBlob);
+                    const imageUrl = await urlToDataUri(url);
+                    new WebviewMainEventService().sendFeatureAction('onCutArea', {
+                        imageUrl,
+                        tabId,
+                        cutAreaRect
+                    });
+                }
+            })();
         }
     }, []);
     return (
@@ -82,7 +98,7 @@ export function ScreenshotCutAreaBar({
                                     height: 24
                                 }
                             }}
-                            hide={true || getWinId() === SUB_WIN_ID.LLM}
+                            hide={getWinId() === SUB_WIN_ID.LLM}
                             iconProps={{ sx: { width: 16, height: 16 } }}
                             tips={t('提取特征')}
                             iconButtonSmall
@@ -153,7 +169,7 @@ export function ScreenshotCutAreaBar({
                                 const imgBlob = await CutAreaService.getCutBlob(tabId, cutAreaRect);
                                 if (imgBlob) {
                                     await copyImageToClipboard(imgBlob);
-                                    showSnackbar({ message: t('CopyOk') });
+                                    showSnackbar({ message: t('复制成功') });
                                     setTimeout(() => {
                                         showSnackbar(false);
                                     }, 3000);
@@ -177,7 +193,7 @@ export function ScreenshotCutAreaBar({
                                     `\n//clickRect and sleep 1 seconds\nawait G.clickRect({x:${x}, y:${y}, w:${w}, h:${h}}, 1)\n`
                                 );
                                 showSnackbar({
-                                    message: `Copied!`
+                                    message: `复制成功!`
                                 });
                                 onCut(false);
                             }}

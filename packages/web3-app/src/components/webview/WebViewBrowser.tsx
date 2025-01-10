@@ -116,12 +116,14 @@ const WebViewBrowser = ({
     url,
     partitionId,
     tabId,
+    preload,
     accountIndex
 }: {
     accountIndex?: number;
     borderRadius?: number;
     hideBoxShadow?: boolean;
     tabId: string;
+    preload?: string;
     webviewProps?: WebviewProps;
     partitionId: string;
     url: string;
@@ -521,7 +523,9 @@ if (!window._observerInitialized) {
     }, [env]);
     const partition = getPartitionKey(partitionId);
 
-    let webpreferences = `contextIsolation=0,nativeWindowOpen=1,allowRunningInsecureContent,nodeIntegration,preload=${env.dirname}/../renderer/site/preload.js`;
+    let webpreferences = `contextIsolation=0,nativeWindowOpen=1,allowRunningInsecureContent,nodeIntegration,preload=${
+        env.dirname
+    }/../renderer/${preload ? preload : 'site'}/preload.js`;
 
     if (!env) {
         return null;

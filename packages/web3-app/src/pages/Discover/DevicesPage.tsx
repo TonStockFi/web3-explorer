@@ -39,12 +39,12 @@ const DevicesPage = () => {
             setFirstLoad(false);
         }
     }, [currentTabId]);
-    let id1 = Buffer.from(id).toString('hex');
+    // let id1 = Buffer.from(id).toString('hex');
 
     const { i18n } = useTranslation();
 
     const currentLanguage = i18n.language;
-    const url = `${getDiscoverHost(env.isDev, env.version)}&address=${address}&id=${id1}&ip=${
+    const url = `${getDiscoverHost(env.isDev, env.version)}&address=${address}&id=${id}&ip=${
         env.ip?.adr
     }&index=${index}&lang=${currentLanguage}#${SUB_WIN_ID.DEVICES}`;
 

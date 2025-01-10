@@ -27,7 +27,8 @@ export default function DeviceScreenView({
 }) {
     const theme = useTheme();
     const { getDeviceInfo } = useDevice();
-    const monitorScale = 0.5;
+    const platform = getDeviceInfo(deviceId, 'platform', null);
+    const monitorScale = platform ? 0.8 : 0.5;
     const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
     const inputIsOpen = getDeviceInfo(deviceId, 'inputIsOpen', false);
     console.log('inputIsOpen', screen, inputIsOpen);
