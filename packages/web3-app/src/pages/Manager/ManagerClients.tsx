@@ -18,8 +18,6 @@ import { showAlertMessage, showGlobalLoading } from '../../common/helpers';
 import { getUrlQuery, isDesktop } from '../../common/utils';
 import { WsCloseCode } from '../../types';
 
-let ws: WebSocket;
-
 export default function ManagerClients({
     serverIsReady,
     setServerIsReady
@@ -163,11 +161,9 @@ export default function ManagerClients({
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>会话ID</TableCell>
+                                <TableCell>设备ID</TableCell>
                                 <TableCell align="right">类型</TableCell>
                                 <TableCell align="right">平台</TableCell>
-                                <TableCell align="right">设备ID</TableCell>
-                                {/* <TableCell align="right">密码</TableCell> */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -176,11 +172,17 @@ export default function ManagerClients({
                                     key={session.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell scope="row">{session.id}</TableCell>
+                                    <TableCell align="right">
+                                        <View useSelectText>
+                                            {session.device && `${session.device.deviceId}`}
+                                            {session.client && `${session.client.deviceId}`}
+                                        </View>
+                                    </TableCell>
+                                    {/* <TableCell scope="row">{session.id}</TableCell> */}
                                     <TableCell align="right">
                                         {session.device && (
                                             <Chip
-                                                label="远程客户端"
+                                                label="推送端"
                                                 size={'small'}
                                                 color="primary"
                                                 variant="filled"
@@ -208,16 +210,6 @@ export default function ManagerClients({
                                         {session.device && `${session.device.platform}`}
                                         {session.client && `${session.client.platform}`}
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <View useSelectText>
-                                            {session.device && `${session.device.deviceId}`}
-                                            {session.client && `${session.client.deviceId}`}
-                                        </View>
-                                    </TableCell>
-                                    {/* <TableCell align="right">
-                                        {session.device && `${session.device.password}`}
-                                        {session.client && `${session.client.password}`}
-                                    </TableCell> */}
                                 </TableRow>
                             ))}
                         </TableBody>

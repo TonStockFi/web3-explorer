@@ -345,7 +345,7 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
             });
         } else {
             if (currentTabId === tabId) {
-                setCurentTabId(MAIN_NAV_TYPE.DISCOVERY);
+                setCurentTabId(MAIN_NAV_TYPE.GAME_FI);
             } else {
                 setCurentTabId_(r => {
                     if (r === tabId) {

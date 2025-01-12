@@ -109,7 +109,7 @@ export class MainWindow {
         tray.setToolTip(name || 'Web3 Explorer');
         tray.on('click', () => {
             console.log('tray clicked');
-            let win = this.windows.get('LLM');
+            let win = this.mainWindow
             if (win) {
                 if (win.isMinimized()) {
                     win.restore();
@@ -157,14 +157,14 @@ export class MainWindow {
                 ...props1
             });
             this.windows.set(winId, win);
-            win.on('close', (e: any) => {
-                let w = this.windows.get(winId);
-                if (w && winId === 'LLM') {
-                    console.log('LLM window closed');
-                    e.preventDefault();
-                    w.hide();
-                }
-            });
+            // win.on('close', (e: any) => {
+            //     let w = this.windows.get(winId);
+            //     if (w && winId === 'LLM') {
+            //         console.log('LLM window closed');
+            //         e.preventDefault();
+            //         w.hide();
+            //     }
+            // });
 
             win.on('closed', (e: any) => {
                 let w = this.windows.get(winId);
@@ -175,9 +175,6 @@ export class MainWindow {
                 this.windows.delete(winId);
             });
             url && win.loadURL(url);
-            if (winId === 'LLM') {
-                this.createTray();
-            }
             this.onWinEvent(win);
             this.handleFocusAndBlure(win);
         } else {
@@ -199,7 +196,7 @@ export class MainWindow {
             x: 64,
             y:64,
             width: 1280,
-            minWidth: 380,
+            minWidth: 1280,
             height: 840,
             minHeight: 580,
             titleBarStyle: 'hiddenInset',
@@ -270,6 +267,7 @@ export class MainWindow {
             this.checkShortcutKeys()
         },2000)
         this.onWinEvent(this.mainWindow);
+        this.createTray();
         this.mainWindow.webContents.on('dom-ready', () => {
             this.mainWindow.show();
         });

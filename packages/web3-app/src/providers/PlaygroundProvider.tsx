@@ -56,6 +56,8 @@ export function isTelegramWeb(url: string) {
 export function isWeb3r(url?: string) {
     if (!url) {
         return true;
+    } else if (url.indexOf('gemini') > -1) {
+        return false;
     } else {
         if (
             url.indexOf('web3r') > -1 ||

@@ -62,13 +62,12 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                     }
                 }
             }
-
-            setScreenImageSrc(
-                'data:jpeg;base64,' +
-                    crypto.decrypt(screenImageData.substring('data:jpeg;base64_d'.length + 5))
+            const imageDagta = crypto.decrypt(
+                screenImageData.substring('data:jpeg;base64_d'.length + 5)
             );
-        }
-        if (screenImageData.startsWith('data:jpeg;base64_a')) {
+            const img = 'data:jpeg;base64,' + imageDagta;
+            setScreenImageSrc(img);
+        } else if (screenImageData.startsWith('data:jpeg;base64_a')) {
             const { password } = device!;
 
             const decrypt = await aesGcmDecryptToBuffer(
@@ -109,11 +108,12 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
             setIsLogged(true);
             if (action === 'deviceMsg') {
                 const { screenImage, deviceInfo } = payload;
-                console.log({ deviceInfo });
+
                 if (screenImage) {
                     handleScreenImage(deviceId, screenImage.data, screenImage.ts);
                 }
                 if (deviceInfo) {
+                    console.log({ deviceInfo });
                     console.log('onMessage deviceInfo', deviceInfo);
                     handleClientDeviceInfo(deviceId!, deviceInfo);
                 }
@@ -123,12 +123,12 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
     );
 
     const onClose = async (
-        { code, reason }: { code: WsCloseCode; reason: string },
+        { code, reason }: { code: WsCloseCode | number; reason: string },
         ws: WebSocket
     ) => {
         console.log('onClose', code, reason);
         setWs(undefined);
-        if (code && code >= WsCloseCode.WS_CLOSE_STOP_RECONNECT) {
+        if ((code && code >= WsCloseCode.WS_CLOSE_STOP_RECONNECT) || code === 1006) {
             setIsLogged(false);
         }
     };

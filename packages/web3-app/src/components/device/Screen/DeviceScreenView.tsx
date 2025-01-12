@@ -15,7 +15,7 @@ let mouseDown = false;
 
 let startX = 0;
 let startY = 0;
-
+let isRightClick = false;
 export default function DeviceScreenView({
     deviceId,
     ws,
@@ -28,10 +28,10 @@ export default function DeviceScreenView({
     const theme = useTheme();
     const { getDeviceInfo } = useDevice();
     const platform = getDeviceInfo(deviceId, 'platform', null);
-    const monitorScale = platform ? 0.8 : 0.5;
+    const monitorScale = platform === 'darwin' ? 0.8 : 0.5;
     const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
     const inputIsOpen = getDeviceInfo(deviceId, 'inputIsOpen', false);
-    console.log('inputIsOpen', screen, inputIsOpen);
+    // console.log('inputIsOpen', screen, inputIsOpen);
     let width = screen.width * monitorScale;
     let height = screen.height * monitorScale;
 
@@ -70,7 +70,30 @@ export default function DeviceScreenView({
                     }
                 }
             },
+
+            onContextMenu: (e: any) => {
+                isRightClick = true;
+                const { buttons } = e;
+                console.log('onContextMenu', { buttons });
+                const { x, y } = e.target.getBoundingClientRect();
+                const { pageX, pageY } = e;
+                const scrollTop = document.documentElement.scrollTop;
+                const x1 = (pageX - x) / monitorScale;
+                const y1 = (pageY - y - scrollTop) / monitorScale;
+                const payload = {
+                    eventType: 'rightClick',
+                    x: x1,
+                    y: y1
+                };
+                wsSendClientEvent(payload, ws);
+                e.stopPropagation();
+                e.preventDefault();
+            },
             onMouseUp: (e: any) => {
+                if (isRightClick) {
+                    isRightClick = false;
+                    return;
+                }
                 const { buttons } = e;
                 console.log('onMouseUp', { buttons });
                 const { x, y } = e.target.getBoundingClientRect();
@@ -93,6 +116,10 @@ export default function DeviceScreenView({
                 mouseDown = false;
             }
         };
+        if (platform === 'darwin') {
+            //@ts-ignore
+            delete propsMonitor.onContextMenu;
+        }
     }
 
     return (

@@ -71,7 +71,9 @@ export default function ContextMenu({
             return null;
         }
     }
-
+    if (tabId && getUrlByTabId(tabId).indexOf('w=') > -1) {
+        return null;
+    }
     if (!tabId || isCutEnable) {
         return null;
     }
