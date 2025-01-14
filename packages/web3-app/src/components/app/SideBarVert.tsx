@@ -47,7 +47,12 @@ export const SideBarVert = ({ isMiniSideBar, left }: { isMiniSideBar: boolean; l
                         '& .MuiListItem-root': { mb: 1 },
                         '& .MuiListItemButton-root': { borderRadius: 2, py: 0.5 },
                         '& .MuiTypography-root': { fontSize: '1rem' },
-                        '& .Mui-selected': { bgcolor: theme.backgroundBrowserActive }
+                        '& .Mui-selected': {
+                            borderTopLeftRadius: 4,
+                            borderBottomLeftRadius: 4,
+                            borderLeft: `3px solid ${theme.buttonPrimaryBackgroundDisabled}`,
+                            bgcolor: theme.backgroundPage
+                        }
                     }}
                     w100p
                 >

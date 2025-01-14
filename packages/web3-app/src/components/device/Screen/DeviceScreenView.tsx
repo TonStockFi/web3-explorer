@@ -40,6 +40,21 @@ export default function DeviceScreenView({
 
     if (enableInput) {
         propsMonitor = {
+            onKeyDown: (e: any) => {
+                //code:"KeyS"
+                //key:"s"
+                //which or keyCode:83
+                //type:"keydown"
+                const { code, ctrlKey, altKeymetaKey, shiftKey, which, key, keyCode, type } = e;
+                const payload = {
+                    eventType: 'keyDown',
+                    keyEvent: { code, ctrlKey, altKeymetaKey, shiftKey, which, key, keyCode, type }
+                };
+                wsSendClientEvent(payload, ws);
+
+                e.stopPropagation();
+                e.preventDefault();
+            },
             onMouseDown: (e: any) => {
                 const { pageX, pageY } = e;
                 startX = pageX;
@@ -134,27 +149,30 @@ export default function DeviceScreenView({
                 alignItems: 'flex-start'
             }}
         >
-            <View>
+            <View
+                sx={{
+                    position: 'relative',
+                    width: `${width}px`,
+                    height: `${height}px`,
+                    bgcolor: theme.backgroundContent
+                }}
+            >
+                {Boolean(screenImageSrc) && (
+                    <img
+                        id={getMonitorImageId(deviceId)}
+                        draggable="false"
+                        style={{ width: '100%', height: '100%' }}
+                        src={screenImageSrc}
+                    />
+                )}
                 <View
+                    contentEditable
+                    absFull
                     sx={{
-                        position: 'relative',
-                        width: `${width}px`,
-                        height: `${height}px`,
-                        bgcolor: theme.backgroundContent,
                         cursor: enableInput ? 'pointer' : undefined
                     }}
                     {...propsMonitor}
-                >
-                    {Boolean(screenImageSrc) && (
-                        <img
-                            id={getMonitorImageId(deviceId)}
-                            draggable="false"
-                            style={{ width: '100%', height: '100%' }}
-                            src={screenImageSrc}
-                            alt=""
-                        />
-                    )}
-                </View>
+                ></View>
             </View>
         </View>
     );

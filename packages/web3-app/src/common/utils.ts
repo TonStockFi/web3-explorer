@@ -134,7 +134,7 @@ export function isLocal(url?:string) {
     if(!url){
         url = location.href
     }
-    return url.indexOf("localhost") > -1 || url.indexOf("127.0.0.1") > -1
+    return (url.indexOf("localhost") > -1 || url.indexOf("127.0.0.1") > -1) && url.indexOf(":3174") > 0
 }
 
 export function isDesktop() {
