@@ -268,9 +268,10 @@ export class MainWindow {
         },2000)
         this.onWinEvent(this.mainWindow);
         this.createTray();
-        this.mainWindow.webContents.on('dom-ready', () => {
-            this.mainWindow.show();
-        });
+        this.mainWindow.show();
+        // this.mainWindow.webContents.on('dom-ready', () => {
+        //     this.mainWindow.show();
+        // });
         ipcMain.handle('siteMessage', (event, message: { action: string; payload: any }) => {
             try {
                 return this.onSiteMessage(message, event.sender.id);
