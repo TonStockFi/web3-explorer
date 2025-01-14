@@ -34,7 +34,7 @@ export function t(key: string) {
 let flagDev = isDev;
 
 contextMenu({
-    showInspectElement: flagDev,
+    showInspectElement: true,
     showSaveImageAs: false,
     showSearchWithGoogle: false,
     showLookUpSelection: false,
