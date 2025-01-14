@@ -118,6 +118,19 @@ export const Web3AppInner = () => {
                 userSelectNone
                 abs
                 top0
+                left={80}
+                appRegionDrag
+                height={HomHeaderHeight}
+                w={topLeft + left - SiderBarWidth - 80}
+            ></View>
+            <View
+                borderBox
+                sx={{
+                    transition: 'left 0.2s ease'
+                }}
+                userSelectNone
+                abs
+                top0
                 right0
                 height={HomHeaderHeight}
                 left={topLeft + left - SiderBarWidth}

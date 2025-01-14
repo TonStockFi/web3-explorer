@@ -153,7 +153,7 @@ export class Tonendpoint {
         const fetchConfig = async ()=>{
             try {
                 const response = await this.fetchApi(
-                    `https://api-explorer.web3r.site/api/app/Settings?${this.toSearchParams()}`,
+                    `https://api-web3r.site/api/app/Settings?${this.toSearchParams()}`,
                     {
                         method: 'GET'
                     }

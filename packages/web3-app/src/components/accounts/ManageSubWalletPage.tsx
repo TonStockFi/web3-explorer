@@ -14,6 +14,7 @@ import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { showGlobalLoading } from '../../common/helpers';
 import { useCreateMAMAccountDerivation } from '../../hooks/wallets';
 import { AccountsPager } from '../aside/AccountsPager';
 import { AccountsMoreView } from './AccountsMoreView';
@@ -134,6 +135,7 @@ export const ManageSubWalletPage = () => {
                                         }}
                                         submitHandler={async ({ count }: { count: number }) => {
                                             setOpenSetCountDialog(false);
+                                            showGlobalLoading(true);
                                             const d = await createDerivation({
                                                 accountId: accountMAM.id,
                                                 count: count
@@ -146,6 +148,7 @@ export const ManageSubWalletPage = () => {
                                             if (total + count > limit) {
                                                 setPage(Math.ceil((total + count) / limit) - 1);
                                             }
+                                            showGlobalLoading(false);
                                         }}
                                     />
                                 </View>

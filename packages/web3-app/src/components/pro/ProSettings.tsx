@@ -235,7 +235,7 @@ export const ProSettings: FC<{
                 <Block>
                     <Icon
                         style={{ marginBottom: 1, paddingBottom: 0, width: 100, height: 100 }}
-                        src="https://explorer.web3r.site/logo-128x128.png"
+                        src="https://web3r.site/logo-128x128.png"
                     />
                     <Title style={{ marginTop: 0, paddingTop: 0 }}>{t('Web3 Explorer')}</Title>
                     <Description>{selectedPlan.description}</Description>

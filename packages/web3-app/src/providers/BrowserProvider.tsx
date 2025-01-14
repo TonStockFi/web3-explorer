@@ -253,7 +253,23 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
         BrowserTabs.set(tabId, tab);
         setTimeout(async () => {
             if (!isPlaygroundMaster()) {
-                localStorage.setItem('BrowserTab_' + tabId, JSON.stringify(tab));
+                const tab1 = localStorage.getItem('BrowserTab_' + tabId);
+                let tab2 = tab;
+                if (tab1) {
+                    const tab3 = JSON.parse(tab1);
+                    let name = tab.name;
+                    let icon = tab.icon;
+                    if (!name) {
+                        name = tab3.name;
+                    }
+                    tab2 = {
+                        ...tab3,
+                        ...tab,
+                        icon,
+                        name
+                    };
+                }
+                localStorage.setItem('BrowserTab_' + tabId, JSON.stringify(tab2));
             }
             localStorage.setItem('BrowserTabs', JSON.stringify(Array.from(BrowserTabs)));
         });
