@@ -1,7 +1,7 @@
 {
     "name": "@web3-explorer/desktop",
     "license": "Apache-2.0",
-    "version": "1.0.98",
+    "version": "1.0.99",
     "description": "web3-explorer desktop",
     "main": ".webpack/main",
     "repository": {
