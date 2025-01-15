@@ -8,7 +8,6 @@ import { useIAppContext } from '../../providers/IAppProvider';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
 import WebviewService from '../../services/WebviewService';
 import { MAIN_NAV_TYPE } from '../../types';
-import { WalletSide } from '../app/WalletSide';
 import { UrlInput } from './UrlInput';
 
 export function WebviewTopBar({
@@ -61,11 +60,11 @@ export function WebviewTopBar({
     }
     return (
         <View aCenter jStart wh100p pr={4} borderBox pl={0}>
-            <View empty>
+            {/* <View empty>
                 <View>
                     <WalletSide />
                 </View>
-            </View>
+            </View> */}
             <View h={44} row aCenter ml12 flex1 hide={hideUrlInput}>
                 <UrlInput
                     urlReadOnly={urlReadOnly}
@@ -75,7 +74,7 @@ export function WebviewTopBar({
                 />
             </View>
 
-            <View ml12 rowVCenter>
+            <View ml12 rowVCenter hide>
                 <View
                     hide
                     center

@@ -16,22 +16,25 @@ import FormControl from '@web3-explorer/uikit-mui/dist/mui/FormControl';
 import Input from '@web3-explorer/uikit-mui/dist/mui/Input';
 import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import { View } from '@web3-explorer/uikit-view';
+import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { useTheme } from 'styled-components';
 import { hexToRGBA } from '../../common/utils';
+import { ChainsList } from '../../constant';
 import { useCreateMAMAccountDerivation } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
+import { AccountMoreView } from '../accounts/AccountMoreView';
 import { WalletBatchCreateNumber } from '../accounts/WalletBatchCreateNumber';
 import { AccountsPager } from '../aside/AccountsPager';
 import { AddressWithCopy } from '../wallet/AddressWithCopy';
 import { ToggleActiveAccount } from '../wallet/ToggleActiveAccount';
 import { WalletEmoji } from '../WalletEmoji';
+import { ChainListView } from './ChainListView';
 
 const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     border-radius: ${p => p.theme.corner2xSmall};
     box-sizing: border-box;
-    cursor: pointer;
     padding: 6px 10px;
     width: 100%;
     height: 36px;
@@ -43,7 +46,7 @@ const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     & > * {
         text-overflow: ellipsis;
         white-space: nowrap;
-        overflow: hidden;
+        // overflow: hidden;
     }
 
     transition: background-color 0.15s ease-in-out;
@@ -57,7 +60,9 @@ const AsideMenuItem = styled.div<{ isSelected: boolean }>`
 export const WalletList = () => {
     const activeAcount = useActiveAccount();
     const accounts = useAccountsState();
+    const { currentChainCode } = useIAppContext();
 
+    const { showWalletAside } = useIAppContext();
     const { t, currentTabId } = useBrowserContext();
     const [searchVal, setSearchVal] = useState('');
 
@@ -76,7 +81,7 @@ export const WalletList = () => {
     const { derivations, activeDerivationIndex } = accountMAM;
     const limit = 16;
     const [page, setPage] = useState(Math.floor(activeDerivationIndex / limit));
-    const { onShowWalletList } = useIAppContext();
+    const { onShowWalletList, onShowChainList } = useIAppContext();
 
     const onCreateDerivation = async () => {
         setOpenSetCountDialog(true);
@@ -104,6 +109,8 @@ export const WalletList = () => {
 
     walletsList.sort((a, b) => a.index - b.index);
     let wallets = walletsList.slice(page * limit, (page + 1) * limit);
+    const currentChain = ChainsList.find(row => row.chain === currentChainCode);
+
     return (
         <View absFull>
             <View
@@ -122,7 +129,7 @@ export const WalletList = () => {
             >
                 <View mt={3} mb={2} borderBox pl12 rowVCenter jSpaceBetween aCenter w100p>
                     <View aCenter flex1>
-                        <View text={'切换钱包'}></View>
+                        <View text={'切换帐户'}></View>
                         <View hide>
                             <FormControl
                                 size="small"
@@ -164,6 +171,23 @@ export const WalletList = () => {
                     </View>
                     <View aCenter jEnd>
                         <View
+                            ml={6}
+                            iconButtonSmall
+                            onClick={() => onShowChainList(true)}
+                            tips={currentChain?.name}
+                            icon={<ImageIcon size={20} icon={currentChain?.icon!} />}
+                        ></View>
+                        <ChainListView />
+                        <View
+                            ml={6}
+                            tips={t('切换主账户')}
+                            onClick={() => showWalletAside(true)}
+                            sx={{ '& svg': { zoom: 1.5 } }}
+                            iconButtonSmall
+                            icon={'AiOutlineUserSwitch'}
+                        ></View>
+                        <View
+                            ml={6}
                             iconButtonSmall
                             icon={'Add'}
                             tips={t('add_sub_wallet')}
@@ -186,18 +210,21 @@ export const WalletList = () => {
                 {wallets.map(wallet => {
                     const address = formatAddress(wallet.tonWallets[0].rawAddress);
                     return (
-                        <View key={wallet.index}>
-                            <AsideMenuItem
-                                onClick={() => {
-                                    onClickWallet(wallet.activeTonWalletId);
-                                    if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
-                                        onShowWalletList(false);
-                                    }
-                                }}
-                                isSelected={activeDerivationIndex === wallet.index}
-                            >
+                        <View key={wallet.index} mb={6}>
+                            <AsideMenuItem isSelected={activeDerivationIndex === wallet.index}>
                                 <View wh100p jSpaceBetween aCenter row>
-                                    <View aCenter jStart row>
+                                    <View
+                                        aCenter
+                                        pointer
+                                        jStart
+                                        row
+                                        onClick={() => {
+                                            onClickWallet(wallet.activeTonWalletId);
+                                            if (currentTabId !== MAIN_NAV_TYPE.WALLET) {
+                                                onShowWalletList(false);
+                                            }
+                                        }}
+                                    >
                                         <ToggleActiveAccount
                                             isActived={
                                                 wallet.index === accountMAM.activeDerivationIndex
@@ -215,7 +242,18 @@ export const WalletList = () => {
                                             {'#' + (wallet.index + 1)}
                                         </WalletIndexBadge>
                                     </View>
-                                    <AddressWithCopy hideChainView showAddress address={address} />
+                                    <View rowVCenter aCenter jEnd>
+                                        <AddressWithCopy address={address} />
+                                        <View rowVCenter ml12>
+                                            <AccountMoreView
+                                                derivationIndex={wallet.index}
+                                                name={wallet.name}
+                                                accountId={activeAcount.id}
+                                                right="-14px"
+                                                top="32px"
+                                            />
+                                        </View>
+                                    </View>
                                 </View>
                             </AsideMenuItem>
                         </View>

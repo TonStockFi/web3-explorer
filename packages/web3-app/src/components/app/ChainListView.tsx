@@ -1,56 +1,30 @@
 import { View } from '@web3-explorer/uikit-view';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { hexToRGBA } from '../../common/utils';
-import { ChainsList } from '../../constant';
+import { AsideWidth, ChainsList } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 
 export const ChainListView = () => {
-    const { currentChainCode, onChangeCurrentChainCode, showChainList, onShowChainList } =
-        useIAppContext();
+    const { currentChainCode, showChainList, onShowChainList } = useIAppContext();
     const { theme } = useBrowserContext();
+
     return (
-        <View hide={!showChainList}>
+        <View
+            drawer={{
+                sx: { '& .MuiPaper-root': { top: 0 } },
+                open: showChainList,
+                anchor: 'right',
+                onClose: () => onShowChainList(false)
+            }}
+        >
             <View
-                position={'fixed'}
-                onClick={() => onShowChainList(false)}
-                xx0
-                zIdx={99}
-                top0
-                bottom0
-            ></View>
-            <View
-                sx={{
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    content: '""',
-                    display: 'block',
-                    position: 'absolute',
-                    top: 44,
-                    left: 24,
-                    width: 10,
-                    height: 10,
-                    opacity: 1,
-                    backgroundColor: theme.backgroundBrowser,
-                    transform: 'translateY(-50%) rotate(45deg)',
-                    zIndex: 101,
-                    transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms'
-                }}
-            ></View>
-            <View
-                abs
-                top={44}
-                width={390}
-                height={720}
-                zIdx={100}
-                sx={{
-                    border: `1px solid ${theme.separatorCommon}`,
-                    boxShadow: ' 0px 4px 16px rgba(0, 0, 0, 0.16)'
-                }}
-                left={0}
-                bgColor={theme.backgroundBrowser}
-                borderBox
-                borderRadius={8}
-                overflowHidden
+                sx={{ color: theme.textPrimary }}
+                column
+                h100vh
+                w={AsideWidth}
+                bgColor={`${theme.backgroundContent}`}
+                relative
             >
                 <View absFull>
                     <View

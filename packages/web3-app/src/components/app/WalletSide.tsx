@@ -9,13 +9,15 @@ import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { AsideMenu } from '../aside/AsideMenu';
 import { WalletEmoji } from '../WalletEmoji';
+import { WalletList } from './WalletList';
 
 export const WalletSide = () => {
     const account = useActiveAccount();
     const { currentChainCode } = useIAppContext();
     let accountEmoji = account.emoji;
     let accountTitle = `${account.name}`;
-    const { walletAside, showWalletAside, onShowChainList, onShowWallet } = useIAppContext();
+    const { walletAside, onShowWalletList, showWalletList, showWalletAside, onShowChainList } =
+        useIAppContext();
     const { theme } = useBrowserContext();
     const network = useActiveTonNetwork();
 
@@ -24,7 +26,6 @@ export const WalletSide = () => {
         accountEmoji = account.activeDerivation.emoji;
         const { activeDerivationIndex } = account as AccountMAM;
         accountTitle = `# ${activeDerivationIndex + 1} ${name}`;
-        // address = account.derivations[activeDerivationIndex].tonWallets[0].rawAddress;
         if (name.indexOf(` ${activeDerivationIndex + 1}`) > -1) {
             accountTitle = `${name}`;
         }
@@ -32,30 +33,44 @@ export const WalletSide = () => {
     const { t } = useTranslation();
     const currentChain = ChainsList.find(row => row.chain === currentChainCode);
     return (
-        <View center w100p h100p relative>
+        <View jStart aCenter w100p h100p relative p12>
             <View
+                drawer={{
+                    onClose: () => {
+                        onShowWalletList(false);
+                    },
+                    open: showWalletList,
+                    anchor: 'right'
+                }}
+            >
+                <View width={440}>
+                    <WalletList></WalletList>
+                </View>
+            </View>
+            <View
+                hide
                 iconButtonSmall
                 onClick={() => onShowChainList(true)}
                 tips={currentChain?.name}
                 icon={<ImageIcon size={20} icon={currentChain?.icon!} />}
             ></View>
+
             <View
-                mr={4}
-                tips={t('切换账户')}
-                onClick={() => showWalletAside(true)}
-                sx={{ '& svg': { zoom: 1.5 } }}
-                iconButtonSmall
-                icon={'AiOutlineUserSwitch'}
-            ></View>
-            <View
-                buttonOutlined={`${accountEmoji} ${accountTitle}`}
-                onClick={() => onShowWallet(true)}
-                tips={t('wallet_title')}
-                icon={'AccountBalanceWallet'}
-                buttonEndIcon={
-                    <View iconProps={{ sx: { width: 14, height: 12 } }} icon={'ExpandMore'}></View>
-                }
-            ></View>
+                rowVCenter
+                pointer
+                hoverBgColor={theme.backgroundContentAttention}
+                onClick={() => onShowWalletList(true)}
+                px={12}
+                py={2}
+                borderRadius={4}
+                border={`1px solid ${theme.separatorCommon}`}
+            >
+                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={accountEmoji} />
+                <View ml={8} mr={6} text={`${accountTitle}`} textSmall></View>
+                <View mt={4}>
+                    <View iconProps={{ sx: { width: 14, height: 12 } }} icon={'MoreVert'}></View>
+                </View>
+            </View>
             <View
                 hide
                 hoverBgColor={theme.backgroundContentAttention}

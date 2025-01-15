@@ -218,7 +218,7 @@ export default function SideSettings() {
                 </View> */}
                         <View
                             menuItem
-                            hide={!env.isDev}
+                            hide
                             onClick={async () => {
                                 openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
                                 setAnchorEl(null);

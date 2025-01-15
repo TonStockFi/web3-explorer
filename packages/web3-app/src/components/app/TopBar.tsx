@@ -56,7 +56,7 @@ export const TopBar = () => {
     const showPlus = currentTabId !== MAIN_NAV_TYPE.DISCOVERY;
     let mr = showPlus ? 44 : 0;
     if (showWalletList) {
-        mr = 380;
+        mr = 440;
     }
     return (
         <View borderBox relative h100p flx rowVCenter mt={4} borderRadius={8} mr={0}>
@@ -178,7 +178,7 @@ export const TopBar = () => {
                 })}
 
                 <View
-                    tips={t('AddTab')}
+                    tips={'添加网址'}
                     iconButtonSmall
                     icon={'Add'}
                     onClick={() => {
@@ -186,7 +186,7 @@ export const TopBar = () => {
                     }}
                 ></View>
 
-                <View appRegionDrag={!walletAside} flex1 h={36} mr={0} />
+                <View appRegionDrag={!walletAside} flex1 h={36} mr={mr} />
             </View>
         </View>
     );

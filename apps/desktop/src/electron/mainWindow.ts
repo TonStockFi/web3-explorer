@@ -205,7 +205,7 @@ export class MainWindow {
             frame: false,
             autoHideMenuBar: true
         });
-
+        console.log(this.currentUrl)
         if (flagDev) {
             const pathLoadFromLocal =
                 process.platform === 'darwin' ? '/Users/ton/url.txt' : 'd:\\projects\\url.txt';

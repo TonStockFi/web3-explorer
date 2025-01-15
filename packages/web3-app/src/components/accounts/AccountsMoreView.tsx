@@ -1,4 +1,4 @@
-import { KeyIcon, PencilIcon, PlusIcon } from '@tonkeeper/uikit/dist/components/Icon';
+import { KeyIcon, PlusIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { useDeleteAccountNotification } from '@tonkeeper/uikit/dist/components/modals/DeleteAccountNotificationControlled';
 import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals/RecoveryNotificationControlled';
 import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
@@ -6,7 +6,6 @@ import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/R
 import { useTranslation } from '@web3-explorer/lib-translation';
 
 import { useAccountsState, useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
-import { View } from '@web3-explorer/uikit-view';
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { AccountMenu } from './AccountMenu';
@@ -66,27 +65,6 @@ export const AccountsMoreView: FC<{
                             onImport && onImport();
                         },
                         icon: <KeyIcon />
-                    },
-                    {
-                        name: t('settings_backup_seed'),
-                        onClick: () => recovery({ accountId: activeAccount.id }),
-                        icon: <KeyIcon />
-                    },
-                    {
-                        name: t('Rename'),
-                        onClick: () => onRename({ accountId: activeAccount.id }),
-                        icon: <PencilIcon />
-                    },
-                    {
-                        hide: accounts.length === 1,
-                        name: t('settings_delete_account'),
-                        onClick: () => {
-                            if (accounts.length < 2) {
-                                return;
-                            }
-                            onDelete({ accountId: activeAccount.id });
-                        },
-                        icon: <View icon="Delete" iconSmall />
                     }
                 ]}
             />

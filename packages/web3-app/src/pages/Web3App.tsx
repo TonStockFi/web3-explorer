@@ -11,9 +11,8 @@ import { FavorProvider } from '../providers/FavorProvider';
 import { useIAppContext } from '../providers/IAppProvider';
 
 import { useEffect } from 'react';
-import { ChainListView } from '../components/app/ChainListView';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
-import { WalletView } from '../components/app/WalletView';
+import { WalletSide } from '../components/app/WalletSide';
 import { MainMessageDispatcher } from '../components/MainMessageDispatcher';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
@@ -64,8 +63,7 @@ function Pages() {
             <View wh100p hide={mainNavType !== MAIN_NAV_TYPE.FAVOR}>
                 <BrowserFavorPage />
             </View>
-            <WalletView />
-            <ChainListView />
+            {/* <WalletView /> */}
         </>
     );
 }
@@ -119,10 +117,12 @@ export const Web3AppInner = () => {
                 abs
                 top0
                 left={80}
-                appRegionDrag
+                rowVCenter
                 height={HomHeaderHeight}
-                w={topLeft + left - SiderBarWidth - 80}
-            ></View>
+                w={topLeft + left - SiderBarWidth}
+            >
+                <WalletSide></WalletSide>
+            </View>
             <View
                 borderBox
                 sx={{
@@ -133,7 +133,7 @@ export const Web3AppInner = () => {
                 top0
                 right0
                 height={HomHeaderHeight}
-                left={topLeft + left - SiderBarWidth}
+                left={topLeft + left - SiderBarWidth + 80}
             >
                 <TopBar />
             </View>

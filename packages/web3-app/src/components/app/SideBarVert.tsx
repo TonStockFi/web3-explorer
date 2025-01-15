@@ -40,6 +40,8 @@ export const SideBarVert = ({ isMiniSideBar, left }: { isMiniSideBar: boolean; l
             }}
         >
             <View w100p column jStart aCenter pt12 px12={!isMiniSideBar} borderBox>
+                {/* <View pb={16} h={44} center>
+                </View> */}
                 <View
                     list
                     hide={isMiniSideBar}

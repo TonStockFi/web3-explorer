@@ -1,9 +1,35 @@
-import React, { FC, useContext, useMemo, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { TonKeychainRoot } from '@ton-keychain/core';
+import {
+    Account,
+    AccountMAM,
+    AccountTonMnemonic,
+    getAccountByWalletById
+} from '@tonkeeper/core/dist/entries/account';
+import { WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    mnemonicToKeypair,
+    validateMnemonicStandardOrBip39Ton
+} from '@tonkeeper/core/dist/service/mnemonicService';
+import {
+    createStandardTonAccountByMnemonic,
+    getStandardTonWalletVersions
+} from '@tonkeeper/core/dist/service/walletService';
+import { FC, useContext, useMemo, useState } from 'react';
+import { AccountIsAlreadyAdded } from '../../components/create/AccountIsAlreadyAdded';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
+import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportWords } from '../../components/create/Words';
+import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
+import {
+    OnCloseInterceptor,
+    useSetNotificationOnBack,
+    useSetNotificationOnCloseInterceptor
+} from '../../components/Notification';
+import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { FinalView } from './Password';
-import { Subscribe } from './Subscribe';
+import { useUserFiat } from '../../state/fiat';
 import {
     useAccountsState,
     useActiveTonNetwork,
@@ -12,34 +38,8 @@ import {
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
-import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
-import {
-    AccountMAM,
-    AccountTonMnemonic,
-    getAccountByWalletById
-} from '@tonkeeper/core/dist/entries/account';
-import {
-    createStandardTonAccountByMnemonic,
-    getStandardTonWalletVersions
-} from '@tonkeeper/core/dist/service/walletService';
-import { useAppContext } from '../../hooks/appContext';
-import { WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { AccountIsAlreadyAdded } from '../../components/create/AccountIsAlreadyAdded';
-import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
-import { AddWalletContext } from '../../components/create/AddWalletContext';
-import {
-    OnCloseInterceptor,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../../components/Notification';
-import { TonKeychainRoot } from '@ton-keychain/core';
-import {
-    mnemonicToKeypair,
-    validateMnemonicStandardOrBip39Ton
-} from '@tonkeeper/core/dist/service/mnemonicService';
-import { useMutation } from '@tanstack/react-query';
-import { useUserFiat } from '../../state/fiat';
+import { FinalView } from './Password';
+import { Subscribe } from './Subscribe';
 
 const useProcessMnemonic = () => {
     const { mutateAsync: createAccountMam } = useCreateAccountMAM();
@@ -109,7 +109,6 @@ const useProcessMnemonic = () => {
             const existingAcc = getAccountByWalletById(accounts, w.id);
             if (existingAcc) {
                 return { type: 'exisiting', account: existingAcc, walletId: w.id };
-                break;
             }
         }
     });
