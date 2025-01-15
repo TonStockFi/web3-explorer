@@ -1,7 +1,7 @@
 import { bool } from '@web3-explorer/opencv/dist/types/opencv';
 import { IndexedDbCache } from '@web3-explorer/utils';
 import { urlToDataUri } from '../common/opencv';
-import { ENTRY_ID_ROI, TASK_ID_ROI } from '../constant';
+import { ENTRY_ID_ROI, START_ID_ROI, TASK_ID_ROI } from '../constant';
 import { ExtenssionPublishData, RoiInfo } from '../types';
 
 
@@ -47,7 +47,7 @@ export default class RoiService {
     async getId() {
         let id = await this.indexedDbIds.get(this.tabId);
         if (!id) {
-            id = ENTRY_ID_ROI;
+            id = START_ID_ROI;
         } else {
             id = `#${id + 1}`;
         }

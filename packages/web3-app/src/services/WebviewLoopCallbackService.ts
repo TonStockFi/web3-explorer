@@ -293,6 +293,7 @@ export default class WebviewLoopCallbackService extends WebviewService {
                     await ws.sendClickEvent(action.x, action.y);
                     await this.responseActionResult(ts,true)
                 }
+                
                 if (type === 'onMatch') {
                     const res = await this.onMatch(feature);
                     await this.responseActionResult(ts,res)

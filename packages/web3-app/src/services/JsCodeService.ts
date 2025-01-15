@@ -272,6 +272,36 @@ class G {
         res && window.__ActionResults.delete(ts)
         return res
     }
+
+    static dispatchEvent(action,payload){
+        window.dispatchEvent(new CustomEvent(action,{detail:payload}))
+    }
+
+    static onRemote(action,payload){
+        window.dispatchEvent(new CustomEvent("onWsAction",{detail:{action,payload}}))
+    }
+
+    static onRemoteAndroidGlobalAction(action){
+        window.dispatchEvent(new CustomEvent("onWsAction",{detail:{action:"GLOBAL_ACTION",payload:{action}}}))
+    }
+    
+    static onRemoteClick(x,y){
+        window.dispatchEvent(new CustomEvent("onWsAction",{detail:{action:"CLICK",payload:{x,y}}}))
+    }
+
+    static onRemoteEvent(message){
+        window.dispatchEvent(new CustomEvent("onWsAction",{detail:{action:"EVENT",payload:{message}}}))
+    }
+
+    static onRemotePyAutoGui(pyAutoGuisScript){
+        window.dispatchEvent(new CustomEvent("onWsAction",{detail:{action:"PY_AUTO_GUI",payload:{pyAutoGuisScript}}}))
+    }
+
+    static dispatchEvent(action,payload){
+        window.dispatchEvent(new CustomEvent(action,{detail:payload}))
+    }
+
+
     static click({ x, y }) {
         const ts = +new Date();
         console.log("G.click", x, y);

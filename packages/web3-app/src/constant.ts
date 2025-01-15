@@ -227,6 +227,7 @@ export const DropDownMenuSx = {
 };
 
 export const ENTRY_ID_ROI = "#100"
+export const START_ID_ROI = "#101"
 export const MARK_ID_ROI = "#1"
 export const TASK_ID_ROI = "#2"
 export const ALL_ID_ROI = ""
