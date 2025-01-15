@@ -282,9 +282,9 @@ export const IBrowserProvider = (props: { children: ReactNode }) => {
     };
 
     const openTab = (tabId: string | MAIN_NAV_TYPE, url?: string, icon?: string, name?: string) => {
-        if (tabId === currentTabId) {
-            return;
-        }
+        // if (tabId === currentTabId) {
+        //     return;
+        // }
         onCut(false);
         let tab = BrowserTabs.get(tabId);
         const account = getSessionCacheInfo();

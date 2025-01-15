@@ -236,6 +236,15 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                         wsSendClientEventAction(payload.action as GLOBAL_ACTIONS, ws);
                         break;
                     }
+                    case 'PY_AUTO_GUI': {
+                        const { pyAutoGuisScript } = payload;
+                        const payload1 = {
+                            eventType: 'pyautogui',
+                            pyAutoGuisScript
+                        };
+                        wsSendClientEvent(payload1, ws);
+                        break;
+                    }
                     case 'CLICK': {
                         const { x, y } = payload;
                         wsSendClientClickEvent(x, y, ws);

@@ -1,6 +1,8 @@
 import { CHAIN, ChainListItem, MAIN_NAV_TYPE, MainNavListItem, ProPlan } from './types';
 export const PRO_RECV_ADDRESS="UQDUawBs8JDdr3QR4dYDkJq2ic9_0yNRSp-6eq29MKZKUkT-"
 
+export const WIDTH_PLAYGROUND_WIN_GAP = 8
+export const HEIGHT_PLAYGROUND_WIN_GAP = 52
 export const W3C_JETTON_CONTRACT  = '0:3f145e2bd301b31329418ca3b8aea0d6c44f0ecfa85b5b412787d87c55284e76'
 export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdYGAl8I2,0|TK1z-z7apmAbgW_o6toLWx1T,0"
 export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"

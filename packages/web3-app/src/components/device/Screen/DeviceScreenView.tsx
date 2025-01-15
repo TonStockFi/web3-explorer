@@ -1,4 +1,5 @@
 import { View } from '@web3-explorer/uikit-view';
+import { useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { wsSendClientClickEvent, wsSendClientEvent } from '../../../common/ws';
 import { useDevice } from '../../../providers/DevicesProvider';
@@ -27,9 +28,33 @@ export default function DeviceScreenView({
 }) {
     const theme = useTheme();
     const { getDeviceInfo } = useDevice();
-    const platform = getDeviceInfo(deviceId, 'platform', null);
-    const monitorScale = platform === 'darwin' ? 0.8 : 0.5;
     const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
+
+    const platform = getDeviceInfo(deviceId, 'platform', null);
+    const width1 = window.innerWidth;
+    let monitorScale1 = 0.5;
+    if (platform === 'darwin' || platform === 'win32') {
+        monitorScale1 = width1 / screen.width;
+    }
+    // debugger;
+    const [monitorScale, setMonitorScale] = useState(monitorScale1);
+    useEffect(() => {
+        const handleResize = () => {
+            const newWidth = window.innerWidth;
+            let newMonitorScale = 0.5;
+            if (platform === 'darwin' || platform === 'win32') {
+                newMonitorScale = newWidth / screen.width;
+            }
+            setMonitorScale(newMonitorScale);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup function to remove the event listener
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
     const inputIsOpen = getDeviceInfo(deviceId, 'inputIsOpen', false);
     // console.log('inputIsOpen', screen, inputIsOpen);
     let width = screen.width * monitorScale;
@@ -100,7 +125,13 @@ export default function DeviceScreenView({
                     x: x1,
                     y: y1
                 };
-                wsSendClientEvent(payload, ws);
+                // wsSendClientEvent(payload, ws);
+
+                const payload1 = {
+                    eventType: 'pyautogui',
+                    pyAutoGuisScript: `pyautogui.rightClick(${x1},${y1})`
+                };
+                wsSendClientEvent(payload1, ws);
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -131,7 +162,7 @@ export default function DeviceScreenView({
                 mouseDown = false;
             }
         };
-        if (platform === 'darwin') {
+        if (!(platform === 'darwin' || platform === 'win32')) {
             //@ts-ignore
             delete propsMonitor.onContextMenu;
         }
@@ -169,7 +200,7 @@ export default function DeviceScreenView({
                     contentEditable
                     absFull
                     sx={{
-                        cursor: enableInput ? 'pointer' : undefined
+                        cursor: enableInput ? 'move' : undefined
                     }}
                     {...propsMonitor}
                 ></View>

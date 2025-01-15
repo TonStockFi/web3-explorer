@@ -21,7 +21,7 @@ import { BaseWindowConstructorOptions } from 'electron';
 import { onAction, openWindow } from '../common/electron';
 import { getDiscoverHost, showAlertMessage } from '../common/helpers';
 import { currentTs, getPartitionKey } from '../common/utils';
-import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
+import { DISCOVER_PID, HEIGHT_PLAYGROUND_WIN_GAP, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB, WIDTH_PLAYGROUND_WIN_GAP } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
 import { ExtensionType, isDeviceMonitor, isTelegramTab } from '../providers/PlaygroundProvider';
@@ -320,24 +320,25 @@ export default class WebviewMainEventService {
         if(isDeviceMonitor(tab)){
             height = 852
         }
+        let minHeight = height
+        let minWidth = 368
         let resizable = !(isTelegramTab(tab) || isDeviceMonitor(tab))
-        
         if(isDeviceMonitor(tab)&& tab.url  && tab.url?.indexOf("w=") > -1 && tab.url?.indexOf("h=") > -1 ){
             const uri = new URL(tab.url)
             const w = Number(uri.searchParams.get("w"))
             const h = Number(uri.searchParams.get("h"))
-            resizable = false;
-            height = 600
-            width = 1000
-            //1154 775
-            //1440 900
-            //0.8
-            //1152 720
-            width = w *0.8 + 1154 - 1152
-            height = h *0.8 + 775 - 720
-            
+            resizable = true;
+            width = 1024 + WIDTH_PLAYGROUND_WIN_GAP
+            height = width * h / w +HEIGHT_PLAYGROUND_WIN_GAP
+            minHeight = height /2
+            minWidth = width / 2
+            // //1154 775
+            // //1440 900
+            // //0.8
+            // //1146 720
+            // width = w *0.8 + 1154 - 1146
+            // height = h *0.8 + 775 - 723
         }
-        console.log({width,height})
 
         let x = winWidth - width - 12;
         let y = 12; 
@@ -348,9 +349,9 @@ export default class WebviewMainEventService {
             options: {
                 resizable,
                 width,
-                minWidth: 368,
+                minWidth,
                 height,
-                minHeight: height,
+                minHeight,
                 x,
                 y,
                 titleBarStyle: 'hiddenInset',
