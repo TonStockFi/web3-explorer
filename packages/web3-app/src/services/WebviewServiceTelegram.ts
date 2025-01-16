@@ -157,6 +157,26 @@ export default class WebviewServiceTelegram extends WebviewService {
                     );
                 }
             } else {
+                const user_id = authInfo.user_auth.id
+                const state = await ws.getTgGlobalState()
+
+                try{
+                    const userInfo = state.users.byId[user_id]
+                    const {firstName,lastName,usernames,phoneNumber,avatarPhotoId} = userInfo
+                    let username = ""
+                    if(usernames && usernames.length > 0){
+                        username = usernames[0].username
+                    }
+                    const avatar = await ws.getAvatar(user_id,avatarPhotoId)
+
+                    alert(JSON.stringify(avatar.length))
+                    // const {byChatId} =  state.user
+                    // const messages = Object.values(byChatId[chatId].byId)
+                    // const message = messages[messages.length - 1];
+
+                }catch(e){
+                }
+
                 const userAuthInfo = await ws.getAuthInfo();
                 if (!userAuthInfo) {
                     const dcID = authInfo.user_auth.dcID;
@@ -177,7 +197,7 @@ export default class WebviewServiceTelegram extends WebviewService {
         }
     }
 
-    async getAvatar(userId: string, accessKey: string) {
+    async getAvatar(userId: number, accessKey: string) {
         try {
             const res = await this.execJs(`
 async function getCachedImageAsDataUri(userId,accessKey){

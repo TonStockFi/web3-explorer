@@ -19,6 +19,7 @@ export const rendererConfig: Configuration = {
         alias: {
             stream: 'stream-browserify', // Use the browser-compatible stream implementation
             assert: 'assert', // Map 'assert' to the installed polyfill
+            // assert: 'assert', // Map 'assert' to the installed polyfill
             react: path.resolve(__dirname, './node_modules/react'),
             'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
             'react-router-dom': path.resolve(__dirname, './node_modules/react-router-dom'),
@@ -38,6 +39,7 @@ export const rendererConfig: Configuration = {
         },
         fallback: {
             vm: false,
+            events: require.resolve('events/'),
             buffer: require.resolve('buffer/'),
             stream: require.resolve('stream-browserify'),
             crypto: require.resolve('crypto-browserify')

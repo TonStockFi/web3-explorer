@@ -10,6 +10,7 @@ import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals
 import Mnemonic from '@web3-explorer/lib-crypto/dist/Mnemonic';
 import Wallet from '@web3-explorer/lib-crypto/dist/Wallet';
 import { View } from '@web3-explorer/uikit-view/dist/View';
+import { QRCode } from 'react-qrcode-logo';
 import styled, { useTheme } from 'styled-components';
 import { useGetMnemonic } from '../../hooks/wallets';
 import { CHAIN } from '../../types';
@@ -117,7 +118,7 @@ export const ChainMore: FC<{
                             setPrvKey('');
                         },
                         sx: {
-                            '& .MuiDialog-paper': { width: 850, height: 400 }
+                            '& .MuiDialog-paper': { width: 850, height: 550 }
                         }
                     },
                     content: (
@@ -134,12 +135,29 @@ export const ChainMore: FC<{
                             ></View>
                             <View
                                 p={24}
-                                w={280}
+                                w={400}
+                                center
                                 bgColor={theme.backgroundBrowserActive}
                                 border={`1px solid ${theme.separatorCommon}`}
                                 borderRadius={8}
+                                column
                             >
-                                <View text={prvKey}></View>
+                                <View mb12 px12>
+                                    <View text={prvKey}></View>
+                                </View>
+                                <View borderRadius={12} overflowHidden>
+                                    <QRCode
+                                        size={240}
+                                        value={prvKey}
+                                        logoImage={'https://web3r.site/coin-256x256.png'}
+                                        logoPadding={8}
+                                        qrStyle="dots"
+                                        eyeRadius={{
+                                            inner: 2,
+                                            outer: 16
+                                        }}
+                                    />
+                                </View>
                             </View>
                         </View>
                     )

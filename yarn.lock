@@ -7466,6 +7466,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/events@npm:^3":
+  version: 3.0.3
+  resolution: "@types/events@npm:3.0.3"
+  checksum: 10/50af9312fab001fd6bd4bb3ff65830f940877e6778de140a92481a0d9bf5f4853d44ec758a8800ef60e0598ac43ed1b5688116a3c65906ae54e989278d6c7c82
+  languageName: node
+  linkType: hard
+
 "@types/eventsource@npm:^1.1.15":
   version: 1.1.15
   resolution: "@types/eventsource@npm:1.1.15"
@@ -7631,15 +7638,6 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10/fa86d5397c021f6c824d1143a206009bfb64ff703da32fb30f6176c603daf6c24ce3a28daf26b3945c94dd10f9d76f07ea7a6a2c3e9b710e00ff42da32e08dea
-  languageName: node
-  linkType: hard
-
-"@types/inherits@npm:^2":
-  version: 2.0.0
-  resolution: "@types/inherits@npm:2.0.0"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/a5ad788e01d5554c30d1e7a8868be63250b835dd11366d7b34978088cf43f43d63cff04504e3bb2373a6b4d226f3b8c6b620fe830370d1ddfb970e4120ea4625
   languageName: node
   linkType: hard
 
@@ -8634,6 +8632,7 @@ __metadata:
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
+    "@types/events": "npm:^3"
     "@types/eventsource": "npm:^1.1.15"
     "@types/node": "npm:^20.10.3"
     "@types/react": "npm:^18.0.26"
@@ -8665,6 +8664,7 @@ __metadata:
     eslint-plugin-import: "npm:^2.25.0"
     eslint-plugin-react-hooks: "npm:^5.1.0-rc.0"
     eslint-plugin-react-refresh: "npm:^0.4.9"
+    events: "npm:^3.3.0"
     eventsource: "npm:^2.0.2"
     fork-ts-checker-webpack-plugin: "npm:^7.2.13"
     i18next: "npm:^23.7.7"
@@ -8699,7 +8699,6 @@ __metadata:
     "@ton-keychain/core": "npm:^0.0.4"
     "@types/bn.js": "npm:5.1.1"
     "@types/elliptic": "npm:6.4.14"
-    "@types/inherits": "npm:^2"
     assert: "npm:^2.1.0"
     bip39: "npm:^3.0.4"
     bn.js: "npm:^4.12.0"
@@ -8709,9 +8708,7 @@ __metadata:
     elliptic: "npm:6.5.4"
     ethereum-cryptography: "npm:0.1.3"
     ethereumjs-wallet: "npm:^1.0.2"
-    inherits: "npm:^2.0.4"
     js-sha3: "npm:^0.9.3"
-    stream-browserify: "npm:^3.0.0"
     typescript: "npm:^4.9.4"
   languageName: unknown
   linkType: soft
@@ -8948,6 +8945,7 @@ __metadata:
     react-i18next: "npm:^13.5.0"
     react-markdown: "npm:^9.0.1"
     react-qr-code: "npm:^2.0.15"
+    react-qrcode-logo: "npm:^3.0.0"
     react-router-dom: "npm:^6.4.5"
     react-transition-group: "npm:^4.4.5"
     storybook: "npm:^8.2.9"
@@ -22722,6 +22720,19 @@ __metadata:
     react: ">=16.4.1"
     react-dom: ">=16.4.1"
   checksum: 10/b4b693013acbac77515d4131992599afd0bc08da3734cb8bc2619b4ce9ea8562bdc973b66a56b34311450392e6de92db92bb8abe20862a52e1009d5372e46c8b
+  languageName: node
+  linkType: hard
+
+"react-qrcode-logo@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-qrcode-logo@npm:3.0.0"
+  dependencies:
+    lodash.isequal: "npm:^4.5.0"
+    qrcode-generator: "npm:^1.4.4"
+  peerDependencies:
+    react: ">=18.0.0"
+    react-dom: ">=18.0.0"
+  checksum: 10/d720103b6a8497c265d70ce794c6391eba98e387e817ffeb51a09f7ce2d4f38305b7f8acdb454856b515d98ab5abef904b9eaf56d7cd03e0775ea461c9ee6547
   languageName: node
   linkType: hard
 

@@ -273,10 +273,10 @@ export const WalletList = () => {
                                             buttonStartIcon={
                                                 <View
                                                     iconProps={{ sx: { width: 10 } }}
-                                                    icon={'AccountBalance'}
+                                                    icon={'AccountBalanceWallet'}
                                                 ></View>
                                             }
-                                            buttonOutlined="区块链"
+                                            buttonOutlined="数字钱包"
                                             onClick={() => {
                                                 onSelectChainAccount({
                                                     walletIndex: wallet.index,
