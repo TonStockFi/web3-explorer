@@ -24,13 +24,32 @@ const ButtonsContainer = styled.div`
 
 export const AccountMoreView: FC<{
     derivationIndex?: number;
+    address?: string;
+    walletIndex?: number;
     accountId: string;
     right?: string;
     top?: string;
+    onSelectChainAccount?: ({
+        walletIndex,
+        address
+    }: {
+        walletIndex: number;
+        address: string;
+    }) => void;
     name: string;
-}> = ({ accountId, derivationIndex, name, right, top }) => {
+}> = ({
+    accountId,
+    address,
+    onSelectChainAccount,
+    walletIndex,
+    derivationIndex,
+    name,
+    right,
+    top
+}) => {
     const accounts = useAccountsState();
     const { t } = useTranslation();
+
     const { onOpen: recovery } = useRecoveryNotification();
 
     const { onOpen: onRename } = useRenameNotification();
@@ -91,17 +110,17 @@ export const AccountMoreView: FC<{
                             icon: <PencilIcon />
                         },
                         {
-                            name: t('修改图标'),
+                            name: t('修改头像'),
                             onClick: () => onRename({ accountId: accountId, derivationIndex }),
-                            icon: <PencilIcon />
+                            icon: <View iconSmall icon="Person" />
                         },
                         {
                             hide: derivationIndex !== undefined,
-
-                            name: t('显示当助记词'),
+                            name: t('显示助记词'),
                             onClick: () => recovery({ accountId: accountId }),
                             icon: <KeyIcon />
                         },
+
                         {
                             hide: accounts.length === 1 || derivationIndex !== undefined,
                             name: t('删除帐户'),

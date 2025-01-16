@@ -31,10 +31,6 @@ export const DialogChangeName = ({
                                 defaultName={name}
                                 submitHandler={async ({ name }: { name: string }) => {
                                     onConfirm(name);
-                                    renameWallet({
-                                        id: accountId,
-                                        name
-                                    });
                                 }}
                             />
                         </View>

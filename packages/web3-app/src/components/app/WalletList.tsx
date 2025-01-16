@@ -16,10 +16,8 @@ import FormControl from '@web3-explorer/uikit-mui/dist/mui/FormControl';
 import Input from '@web3-explorer/uikit-mui/dist/mui/Input';
 import InputAdornment from '@web3-explorer/uikit-mui/dist/mui/InputAdornment';
 import { View } from '@web3-explorer/uikit-view';
-import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { useTheme } from 'styled-components';
 import { hexToRGBA } from '../../common/utils';
-import { ChainsList } from '../../constant';
 import { useCreateMAMAccountDerivation } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
@@ -27,15 +25,15 @@ import { MAIN_NAV_TYPE } from '../../types';
 import { AccountMoreView } from '../accounts/AccountMoreView';
 import { WalletBatchCreateNumber } from '../accounts/WalletBatchCreateNumber';
 import { AccountsPager } from '../aside/AccountsPager';
-import { AddressWithCopy } from '../wallet/AddressWithCopy';
 import { ToggleActiveAccount } from '../wallet/ToggleActiveAccount';
 import { WalletEmoji } from '../WalletEmoji';
 import { ChainListView } from './ChainListView';
+import { SocialPlatformListView } from './SocialPlatformListView';
 
 const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     border-radius: ${p => p.theme.corner2xSmall};
     box-sizing: border-box;
-    padding: 6px 10px;
+    padding: 0px 10px;
     width: 100%;
     height: 36px;
     min-height: 36px;
@@ -81,7 +79,8 @@ export const WalletList = () => {
     const { derivations, activeDerivationIndex } = accountMAM;
     const limit = 16;
     const [page, setPage] = useState(Math.floor(activeDerivationIndex / limit));
-    const { onShowWalletList, onShowChainList } = useIAppContext();
+    const { onShowWalletList, onShowChainList, onShowSocialPlatformList, showSocialPlatformList } =
+        useIAppContext();
 
     const onCreateDerivation = async () => {
         setOpenSetCountDialog(true);
@@ -109,10 +108,17 @@ export const WalletList = () => {
 
     walletsList.sort((a, b) => a.index - b.index);
     let wallets = walletsList.slice(page * limit, (page + 1) * limit);
-    const currentChain = ChainsList.find(row => row.chain === currentChainCode);
-
+    const [selectChainAccount, onSelectChainAccount] = useState<null | {
+        walletIndex: number;
+        walletId?: string;
+        address: string;
+    }>(null);
     return (
         <View absFull>
+            {selectChainAccount && (
+                <SocialPlatformListView selectChainAccount={selectChainAccount} />
+            )}
+            {selectChainAccount && <ChainListView selectChainAccount={selectChainAccount} />}
             <View
                 flx
                 aCenter
@@ -170,14 +176,6 @@ export const WalletList = () => {
                         </View>
                     </View>
                     <View aCenter jEnd>
-                        <View
-                            ml={6}
-                            iconButtonSmall
-                            onClick={() => onShowChainList(true)}
-                            tips={currentChain?.name}
-                            icon={<ImageIcon size={20} icon={currentChain?.icon!} />}
-                        ></View>
-                        <ChainListView />
                         <View
                             ml={6}
                             tips={t('切换主账户')}
@@ -243,11 +241,58 @@ export const WalletList = () => {
                                         </WalletIndexBadge>
                                     </View>
                                     <View rowVCenter aCenter jEnd>
-                                        <AddressWithCopy address={address} />
+                                        <View rowVCenter mx12>
+                                            <View
+                                                buttonProps={{
+                                                    sx: {
+                                                        fontSize: '0.7rem'
+                                                    }
+                                                }}
+                                                buttonStartIcon={
+                                                    <View
+                                                        iconProps={{ sx: { width: 10 } }}
+                                                        icon={'Diversity1'}
+                                                    ></View>
+                                                }
+                                                buttonOutlined="社交"
+                                                onClick={() => {
+                                                    onSelectChainAccount({
+                                                        walletIndex: wallet.index,
+                                                        address
+                                                    });
+                                                    onShowSocialPlatformList(true);
+                                                }}
+                                            ></View>
+                                        </View>
+                                        <View
+                                            buttonProps={{
+                                                sx: {
+                                                    fontSize: '0.7rem'
+                                                }
+                                            }}
+                                            buttonStartIcon={
+                                                <View
+                                                    iconProps={{ sx: { width: 10 } }}
+                                                    icon={'AccountBalance'}
+                                                ></View>
+                                            }
+                                            buttonOutlined="区块链"
+                                            onClick={() => {
+                                                onSelectChainAccount({
+                                                    walletIndex: wallet.index,
+                                                    walletId: wallet.activeTonWalletId,
+                                                    address
+                                                });
+                                                onShowChainList(true);
+                                            }}
+                                        ></View>
                                         <View rowVCenter ml12>
                                             <AccountMoreView
+                                                onSelectChainAccount={v => onSelectChainAccount(v)}
+                                                address={address}
                                                 derivationIndex={wallet.index}
                                                 name={wallet.name}
+                                                walletIndex={wallet.index}
                                                 accountId={activeAcount.id}
                                                 right="-14px"
                                                 top="32px"

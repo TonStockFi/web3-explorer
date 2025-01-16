@@ -33,7 +33,7 @@ export default function MoreTopbarDropdown({
 }) {
     const [isMute, setIsMute] = React.useState(false);
     const { tab } = usePlayground();
-    const isTma = tab.url && tab.url.startsWith(TWA_URL_PREFIX);
+    const isTma = tab && tab.url && tab.url.startsWith(TWA_URL_PREFIX);
     const [isIframe, setIsIframe] = React.useState(true);
     const [iframeUrl, setIframeUrl] = React.useState('');
     const [isTgLogged, setIsTgLogged] = React.useState(false);

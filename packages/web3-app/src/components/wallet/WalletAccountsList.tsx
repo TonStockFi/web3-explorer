@@ -1,6 +1,7 @@
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { AccountBadge } from '@tonkeeper/uikit/dist/components/account/AccountBadge';
+import { KeyIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { useAccountsState } from '@tonkeeper/uikit/dist/state/accounts';
 import { useActiveAccount, useMutateActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import { View } from '@web3-explorer/uikit-view';
@@ -10,7 +11,6 @@ import { hexToRGBA } from '../../common/utils';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { AccountMoreView } from '../accounts/AccountMoreView';
-import { AccountsMoreView } from '../accounts/AccountsMoreView';
 import { DialogCreateAccount } from '../accounts/DialogCreateAccount';
 import { ImportExistingWallet } from '../accounts/ImportExistingWallet';
 import { WalletEmoji } from '../WalletEmoji';
@@ -36,25 +36,9 @@ export function WalletAccountsList() {
         <View overflowHidden wh100p column px={8} borderBox>
             <View borderBox h={48} jSpaceBetween aCenter relative>
                 <View rowVCenter>
-                    {/* <View
-                        hide={account.type !== 'mam'}
-                        iconSmall
-                        iconButtonSmall
-                        iconButton
-                        onClick={() => {
-                            showWalletAside(false);
-                        }}
-                        iconProps={{ sx: { width: 16, height: 16, color: theme.textPrimary } }}
-                        icon="Back"
-                    /> */}
                     <View ml12 mr12 h100p row aCenter>
                         <View text={'主帐户'} mr12 />
-                        <AccountsMoreView
-                            onImport={() => setImportDialog(true)}
-                            onCreateAccount={() => setOpenCreateAccountDialog(true)}
-                            right="-180px"
-                            top="24px"
-                        />
+                        <View></View>
                         <View
                             dialog={{
                                 dialogProps: {
@@ -83,15 +67,31 @@ export function WalletAccountsList() {
                                 onClose: () => {
                                     setOpenCreateAccountDialog(false);
                                 },
-                                onConfirm: () => {
-                                    // setPage(Math.ceil((total + 1) / limit) - 1);
-                                }
+                                onConfirm: () => {}
                             }}
                         />
                     </View>
                     {/* <NetworkView /> */}
                 </View>
                 <View rowVCenter jEnd aCenter>
+                    <View
+                        ml={6}
+                        tips={'导入助记词'}
+                        iconButtonSmall
+                        icon={<KeyIcon></KeyIcon>}
+                        onClick={() => {
+                            setImportDialog(true);
+                        }}
+                    ></View>
+                    <View
+                        ml={6}
+                        tips={'添加主帐户'}
+                        iconButtonSmall
+                        icon={'Add'}
+                        onClick={() => {
+                            setOpenCreateAccountDialog(true);
+                        }}
+                    ></View>
                     <View
                         ml={6}
                         mr12
@@ -103,19 +103,6 @@ export function WalletAccountsList() {
                         }}
                     ></View>
                 </View>
-                {/* <View
-                    mr={4}
-                    tips={t('Settings')}
-                    iconButton
-                    iconButtonSmall
-                    iconSmall
-                    iconProps={{ sx: { color: theme.textPrimary } }}
-                    icon={'Settings'}
-                    onClick={() => {
-                        showWalletAside(false);
-                        openTab(MAIN_NAV_TYPE.ACCOUNTS_MANAGE);
-                    }}
-                /> */}
             </View>
             <View divider />
             <View pb={8} pt={4} flex1 column overflowYAuto>

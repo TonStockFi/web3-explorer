@@ -17,6 +17,8 @@ export const rendererConfig: Configuration = {
     resolve: {
         extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
         alias: {
+            stream: 'stream-browserify', // Use the browser-compatible stream implementation
+            assert: 'assert', // Map 'assert' to the installed polyfill
             react: path.resolve(__dirname, './node_modules/react'),
             'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
             'react-router-dom': path.resolve(__dirname, './node_modules/react-router-dom'),

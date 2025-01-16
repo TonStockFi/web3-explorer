@@ -4,7 +4,7 @@ import {
   mnemonicToEntropy,
   mnemonicToSeedSync,
   setDefaultWordlist,
-  validateMnemonic,
+  validateMnemonic
 } from 'bip39';
 
 export type MnemonicLangEnum = 'english' | 'chinese_simplified';
@@ -33,7 +33,7 @@ export default class Mnemonic {
 
     setDefaultWordlist(this.lang!);
     if (!words) {
-      words = generateMnemonic();
+      words = generateMnemonic(256);
     }
 
     Object.defineProperty(this, 'words', {

@@ -496,5 +496,6 @@
     "all_assets_jettons": "所有资产",
     "appExtensionDescription": "你在 Open Network 上的扩展钱包",
     "appName": "Web3 Explorer",
-    "appTitle": "Web3 Explorer — wallet for TON"
+    "appTitle": "Web3 Explorer — wallet for TON",
+    "secret_words_account_title": "您的助记词"
 }

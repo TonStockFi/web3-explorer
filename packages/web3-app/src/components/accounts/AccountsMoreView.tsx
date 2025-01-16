@@ -1,11 +1,8 @@
 import { KeyIcon, PlusIcon } from '@tonkeeper/uikit/dist/components/Icon';
-import { useDeleteAccountNotification } from '@tonkeeper/uikit/dist/components/modals/DeleteAccountNotificationControlled';
 import { useRecoveryNotification } from '@tonkeeper/uikit/dist/components/modals/RecoveryNotificationControlled';
-import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
 
 import { useTranslation } from '@web3-explorer/lib-translation';
 
-import { useAccountsState, useActiveAccount } from '@tonkeeper/uikit/dist/state/wallet';
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { AccountMenu } from './AccountMenu';
@@ -22,14 +19,8 @@ export const AccountsMoreView: FC<{
     right?: string;
     top?: string;
 }> = ({ right, top, onImport, onCreateAccount }) => {
-    const accounts = useAccountsState();
-    const activeAccount = useActiveAccount();
-    const wallet = activeAccount.activeTonWallet;
     const { t } = useTranslation();
     const { onOpen: recovery } = useRecoveryNotification();
-
-    const { onOpen: onRename } = useRenameNotification();
-    const { onOpen: onDelete } = useDeleteAccountNotification();
 
     useEffect(() => {
         const on_backup = (event: CustomEvent) => {

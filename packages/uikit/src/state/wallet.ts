@@ -23,6 +23,7 @@ import {
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
+import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
 import {
     getActiveWalletConfig,
     setActiveWalletConfig
@@ -36,22 +37,21 @@ import {
     getStandardTonWalletVersions,
     getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
-import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountsApi, Account as TonapiAccount } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
+import { useAccountsState, useAccountsStateQuery } from './accounts';
 import { useDevSettings } from './dev';
+import { useDeleteFolder } from './folders';
+import { useGlobalPreferences } from './global-preferences';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
-import { useAccountsStateQuery, useAccountsState } from './accounts';
-import { useGlobalPreferences } from './global-preferences';
-import { useDeleteFolder } from './folders';
 
-export { useAccountsStateQuery, useAccountsState };
+export { useAccountsState, useAccountsStateQuery };
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();

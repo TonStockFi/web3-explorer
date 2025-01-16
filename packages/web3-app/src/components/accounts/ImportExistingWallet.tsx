@@ -101,11 +101,12 @@ export const ImportExistingWallet: FC<{ onClose?: () => void; afterCompleted?: (
     const { showSnackbar } = useIAppContext();
     const { mutateAsync: processMnemonic, isLoading: isProcessMnemonic } = useProcessMnemonic();
     const { t } = useTranslation();
+
     const onMnemonic = async (m: string[]) => {
         const isMam = await TonKeychainRoot.isValidMnemonic(m);
         if (!isMam) {
             showSnackbar({
-                message: t('需要支持多子帐户的助记词')
+                message: t('需要支持TON链上支持多子帐户的助记词')
             });
             return;
         }

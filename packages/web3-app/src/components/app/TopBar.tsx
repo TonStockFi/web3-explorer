@@ -4,7 +4,7 @@ import { View } from '@web3-explorer/uikit-view';
 import { createRef, useEffect } from 'react';
 import { useTheme } from 'styled-components';
 import { goToUrlFromInput } from '../../common/helpers';
-import { AsideWidth } from '../../constant';
+import { AsideWidth, WALLET_LIST_WIDTH } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
@@ -56,7 +56,7 @@ export const TopBar = () => {
     const showPlus = currentTabId !== MAIN_NAV_TYPE.DISCOVERY;
     let mr = showPlus ? 44 : 0;
     if (showWalletList) {
-        mr = 440;
+        mr = WALLET_LIST_WIDTH;
     }
     return (
         <View borderBox relative h100p flx rowVCenter mt={4} borderRadius={8} mr={0}>

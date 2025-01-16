@@ -36,6 +36,7 @@ interface AppContextType {
     walletAside: boolean;
     showWallet: boolean;
     showChainList: boolean;
+    showSocialPlatformList: boolean;
     currentChainCode: CHAIN;
     windowSize: { width: number; height: number };
     alert: undefined | AlertProps;
@@ -47,6 +48,7 @@ interface AppContextType {
     onShowWallet: (v: boolean) => void;
     onSelectToken: (v: string | 'ton') => void;
     onShowChainList: (v: boolean) => void;
+    onShowSocialPlatformList: (v: boolean) => void;
     onChangeCurrentChainCode: (v: CHAIN) => void;
     showBackdrop: (visible: boolean) => void;
     showSnackbar: (snackbar: boolean | SnackbarProps) => void;
@@ -66,6 +68,10 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     );
     const [walletAside, setWalletAside] = useSessionStorageState('ui_walletAside', false);
     const [showWallet, setShowWallet] = useSessionStorageState('showWallet', false);
+    const [showSocialPlatformList, setShowSocialPlatformList] = useSessionStorageState(
+        'showSocialPlatformList',
+        false
+    );
     const [showChainList, setShowChainList] = useSessionStorageState('showChainList', false);
     const [showWalletList, setShowWalletList] = useSessionStorageState('showWalletList', false);
     const [backdrop, setBackdrop] = useState(false);
@@ -99,6 +105,7 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     const showWalletAside = (visible: boolean) => setWalletAside(visible);
     const onShowWalletList = (visible: boolean) => setShowWalletList(visible);
     const onShowChainList = (visible: boolean) => setShowChainList(visible);
+    const onShowSocialPlatformList = (visible: boolean) => setShowSocialPlatformList(visible);
     const showBackdrop = (visible: boolean) => setBackdrop(visible);
     const showSnackbar = (v: boolean | SnackbarProps) =>
         setSnackbar(v ? (v as SnackbarProps) : undefined);
@@ -168,6 +175,8 @@ export const IAppProvider = (props: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
+                onShowSocialPlatformList,
+                showSocialPlatformList,
                 onChangeCurrentChainCode,
                 currentChainCode,
                 onShowChainList,

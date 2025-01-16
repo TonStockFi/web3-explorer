@@ -12,6 +12,8 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
 import BubbleChart from '@mui/icons-material/BubbleChart';
+import Diversity1 from '@mui/icons-material/Diversity1';
+
 import BugReportIcon from '@mui/icons-material/BugReport';
 import CloseIcon from '@mui/icons-material/Close';
 import CodeIcon from '@mui/icons-material/Code';
@@ -105,6 +107,7 @@ import { GiClick } from 'react-icons/gi';
 export type IconList =
     | 'Folder'
     | 'DesktopWindows'
+    | 'Diversity1'
     | 'AiOutlineUserSwitch'
     | 'BubbleChart'
     | 'GiClick'
@@ -210,6 +213,7 @@ export const IconsMap: Record<string, React.ElementType> = {
     ArrowDownward,
     ContentCut,
     Info,
+    Diversity1,
     Diamond,
     Remove,
     Comment,

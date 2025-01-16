@@ -72,6 +72,8 @@ export const AsideWidth = 360;
 export const FEATUR_STUDIO_RIGHT_WIDTH = 280;
 export const WIN_TITLE_BAR_WIDTH = 0;
 export const MAC_TITLE_BAR_WIDTH = 88;
+
+export const WALLET_LIST_WIDTH = 540;
 export const PLAYGROUND_WEBVIEW_WIDTH = 360;
 export const PLAYGROUND_RIGHT_SIDE_WIDTH = 280;
 export const PLAYGROUND_WEBVIEW_HEIGHT = 720;
@@ -81,38 +83,55 @@ export const PLAYGROUND_WEBVIEW_TOP_BAR_HEIGHT = 44;
 export const WEBVIEW_BORDERRADIUS = 8;
 export const BG_COLOR_ACE = "#272822";
 
-
 export const ChainsList : ChainListItem[] = [
     {
         icon: 'https://wallet.tonkeeper.com/img/toncoin.svg',
-        name: 'TON',
+        name: 'Toncoin',
         chain: CHAIN.TON,
+        isOnDev:false,
     },
     {
-        icon: 'https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400',
-        name: 'BTC',
-        chain: CHAIN.BTC,
+        icon: 'https://assets.coingecko.com/coins/images/1094/standard/tron-logo.png?1696502193',
+        name: 'TRON',
+        chain: CHAIN.TRX,
+        isOnDev:false,
     },
     {
         icon: 'https://assets.coingecko.com/coins/images/279/standard/ethereum.png?1696501628',
-        name: 'ETH',
+        name: 'Ethereum',
         chain: CHAIN.ETH,
+        isOnDev:false,
     },
     {
         icon: 'https://assets.coingecko.com/coins/images/825/standard/bnb-icon2_2x.png?1696501970',
         name: 'BNB',
         chain: CHAIN.BNB,
+        isOnDev:false,
     },
     {
-        icon: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756',
-        name: 'SOL',
-        chain: CHAIN.SOL,
+        icon: 'https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400',
+        name: 'Bitcoin',
+        chain: CHAIN.BTC,
+        isOnDev:true,
     },
-    {
-        icon: 'https://assets.coingecko.com/coins/images/26375/standard/sui-ocean-square.png?1727791290',
-        name: 'SUI',
-        chain: CHAIN.SUI,
-    }
+    // {
+    //     icon: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756',
+    //     name: 'Solana',
+    //     chain: CHAIN.SOL,
+    //     isOnDev:true,
+    // },
+    // {
+    //     icon: 'https://assets.coingecko.com/coins/images/26375/standard/sui-ocean-square.png?1727791290',
+    //     name: 'Sui',
+    //     chain: CHAIN.SUI,
+    //     isOnDev:true,
+    // },
+    // {
+    //     icon: 'https://assets.coingecko.com/coins/images/26455/standard/aptos_round.png?1696525528',
+    //     name: 'Aptos',
+    //     chain: CHAIN.APT,
+    //     isOnDev:true,
+    // }
 ]
 export const LeftSideActions : MainNavListItem[] = [
     // {

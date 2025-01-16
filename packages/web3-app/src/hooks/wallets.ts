@@ -33,7 +33,7 @@ import {
     getPasswordByNotification
 } from '@tonkeeper/uikit/dist/state//mnemonic';
 import { useCheckTouchId } from '@tonkeeper/uikit/dist/state/password';
-import { AccountPublic } from '../types';
+import { AccountPublic, CHAIN } from '../types';
 
 async function getRelevantMAMTonAccountsToImport(
     root: TonKeychainRoot,
@@ -289,11 +289,47 @@ export function useBlockChainExplorerTonViewer() {
     return `https://${network === Network.TESTNET ? 'testnet.' : ''}tonviewer.com/%s`;
 }
 
-export function useBlockChainExplorer(network1?:Network) {
+export function useBlockChainExplorer(network1?: Network, chain?: CHAIN) {
     const network = useActiveTonNetwork();
-    let network2 = network1 || network
-    return `https://${network2 === Network.TESTNET ? 'testnet.' : ''}tonscan.org/address/%s`;
+    let network2 = network1 || network;
+    switch (chain) {
+        case CHAIN.ETH:
+            return `https://${network2 === Network.TESTNET ? 'goerli.' : ''}etherscan.io/address/%s`;
+        case CHAIN.BNB:
+            return `https://${network2 === Network.TESTNET ? 'testnet.' : ''}bscscan.com/address/%s`;
+        case CHAIN.TRX:
+            return `https://${network2 === Network.TESTNET ? 'nile.' : ''}tronscan.org/#/address/%s`;
+        case CHAIN.SOL:
+            return `https://${network2 === Network.TESTNET ? 'explorer.solana.com/address/%s?cluster=testnet' : 'solscan.io/account/%s'}`;
+        case CHAIN.SUI:
+            return `https://${network2 === Network.TESTNET ? 'testnet.' : ''}suiexplorer.com/address/%s`;
+        case CHAIN.BTC:
+            return `https://${network2 === Network.TESTNET ? 'mempool.space/testnet' : 'mempool.space'}/address/%s`;
+        case CHAIN.APT:
+            return `https://${network2 === Network.TESTNET ? 'explorer.aptoslabs.com/?network=testnet' : 'explorer.aptoslabs.com'}/account/%s`;
+        case CHAIN.TON:
+        default:
+            return `https://${network2 === Network.TESTNET ? 'testnet.' : ''}tonscan.org/address/%s`;
+    }
 }
+
+export const useGetMnemonic = () => {
+    const storage = useAccountsStorage();
+    const sdk = useAppSdk();
+
+    return useMutation<string, Error, {  accountId: AccountId,checkTouchId?: () => Promise<void> }>(
+        async ({  accountId,checkTouchId }) => {
+            const account = await storage.getAccount(accountId);
+            if (!account || account.type !== 'mam') {
+                throw new Error('Account not found');
+            }
+            const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId ? checkTouchId:async ()=>{});
+            return mnemonic.join(" ");
+        }
+    );
+};
+
+
 export const useCreateMAMAccountDerivation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
@@ -307,6 +343,7 @@ export const useCreateMAMAccountDerivation = () => {
             if (!count) {
                 count = 1;
             }
+            
             const account = await storage.getAccount(accountId);
             if (!account || account.type !== 'mam') {
                 throw new Error('Account not found');
@@ -370,6 +407,7 @@ export const useCreateAccountMAM = () => {
             selectAccount?: boolean;
         }
     >(async ({ selectedDerivations, mnemonic, password, selectAccount }) => {
+        
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
                 selectedDerivations,
@@ -377,7 +415,7 @@ export const useCreateAccountMAM = () => {
                     kind: 'keychain'
                 }
             });
-
+            
             await sdk.keychain.setPassword(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 mnemonic.join(' ')

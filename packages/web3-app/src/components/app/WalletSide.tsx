@@ -4,7 +4,7 @@ import { useActiveAccount, useActiveTonNetwork } from '@tonkeeper/uikit/dist/sta
 import { useTranslation } from '@web3-explorer/lib-translation';
 import { View } from '@web3-explorer/uikit-view';
 import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
-import { AsideWidth, ChainsList } from '../../constant';
+import { AsideWidth, ChainsList, WALLET_LIST_WIDTH } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { AsideMenu } from '../aside/AsideMenu';
@@ -43,7 +43,7 @@ export const WalletSide = () => {
                     anchor: 'right'
                 }}
             >
-                <View width={440}>
+                <View width={WALLET_LIST_WIDTH}>
                     <WalletList></WalletList>
                 </View>
             </View>

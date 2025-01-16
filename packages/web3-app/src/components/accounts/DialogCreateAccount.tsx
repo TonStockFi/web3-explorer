@@ -34,7 +34,6 @@ export const DialogCreateAccount = ({
                                 submitHandler={async ({ count }: { count: number }) => {
                                     showBackdrop(true);
                                     onClose();
-
                                     const { mnemonic } = await TonKeychainRoot.generate();
                                     const accountMAM = await createWalletsAsync({
                                         mnemonic,

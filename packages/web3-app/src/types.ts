@@ -142,6 +142,7 @@ export interface AccountPublic {
     isActive?: boolean;
     isHide?: boolean;
     address: string;
+    chainAddress?:Record<CHAIN,string>;
     name: string;
     index: number;
     emoji: string;
@@ -479,15 +480,18 @@ export enum CHAIN {
     TON = 'TON',
     ETH = 'ETH',
     BNB = 'BNB',
+    TRX = 'TRX',
     SOL = 'SOL',
     SUI = 'SUI',
-    BTC = 'BTC'
+    BTC = 'BTC',
+    APT = 'APT'
 }
 
 export interface ChainListItem {
     chain: CHAIN;
     name: string;
     icon: string;
+    isOnDev:boolean;
 }
 
 export interface MainMessageEvent {

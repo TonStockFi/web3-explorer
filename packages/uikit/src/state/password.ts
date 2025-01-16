@@ -43,7 +43,9 @@ const isTouchIdEnabled = async (sdk: IAppSdk): Promise<boolean> => {
     }
 
     const touchId = await sdk.storage.get<boolean>(AppKey.TOUCH_ID);
-
+    if(touchId === null){
+        return false
+    }
     return touchId ?? true;
 };
 

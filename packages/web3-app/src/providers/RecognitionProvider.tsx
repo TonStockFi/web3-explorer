@@ -407,7 +407,6 @@ export const RecognitionProvider = (props: { children: ReactNode }) => {
             };
             new WebviewMainEventService().sendFeatureAction('onSelectRoiArea', payload);
         } else {
-            debugger;
             setRecognitionCatId(r => {
                 return recognitionCatId;
             });

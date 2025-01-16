@@ -20,7 +20,6 @@ import { useBlockChainExplorer } from '../../hooks/wallets';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
-import { WalletList } from '../app/WalletList';
 import { NetworkView } from '../aside/NetworkView';
 import { DesktopHeaderBalance } from '../dashboard/DesktopHeaderElements';
 import { WalletEmoji } from '../WalletEmoji';
@@ -120,9 +119,9 @@ export function WalletTop() {
                     anchor: 'right'
                 }}
             >
-                <View width={380}>
+                {/* <View width={380}>
                     <WalletList></WalletList>
-                </View>
+                </View> */}
             </View>
             <View w100p center column>
                 <View w100p center mb12 relative>
