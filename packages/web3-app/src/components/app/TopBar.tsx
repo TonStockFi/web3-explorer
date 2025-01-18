@@ -126,7 +126,7 @@ export const TopBar = () => {
                 absFull
                 zIdx={1111}
                 rowVCenter
-                overflowHidden
+                overflowXAuto
                 ref={ref}
                 right={walletAside ? AsideWidth : 0}
             >

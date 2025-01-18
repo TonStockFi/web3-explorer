@@ -89,7 +89,7 @@ export const Web3AppInner = () => {
         //@ts-ignore
         if (loading) loading.style.display = 'none';
     }, []);
-    const isMiniSideBar = false;
+    const isMiniSideBar = true;
 
     let left = SiderBarWidth;
     if (!isMiniSideBar) {
@@ -119,7 +119,7 @@ export const Web3AppInner = () => {
                 left={80}
                 rowVCenter
                 height={HomHeaderHeight}
-                w={topLeft + left - SiderBarWidth}
+                w={topLeft + 180 - SiderBarWidth}
             >
                 <WalletSide></WalletSide>
             </View>
@@ -133,7 +133,7 @@ export const Web3AppInner = () => {
                 top0
                 right0
                 height={HomHeaderHeight}
-                left={topLeft + left - SiderBarWidth + 80}
+                left={topLeft + 180 - SiderBarWidth + 60}
             >
                 <TopBar />
             </View>

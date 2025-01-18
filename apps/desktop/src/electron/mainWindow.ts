@@ -637,7 +637,7 @@ export class MainWindow {
             }
         } else if (messageAction === 'getTrayBounds') {
             return this.tray ? this.tray.getBounds() : null;
-        } else if (messageAction === 'setBounds') {
+        }  else if (messageAction === 'setBounds') {
             const { winId, bounds, animate } = messageValue || {};
             const win = this.getWinById(winId||"main");
             if(win){

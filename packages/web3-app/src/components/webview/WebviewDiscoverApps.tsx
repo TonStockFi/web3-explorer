@@ -88,7 +88,7 @@ export function WebviewDiscoverApps({
     // let id1 = Buffer.from(id).toString('hex');
     const url = `${getDiscoverHost(env.isDev, env.version)}&_a=${address}&_id=${
         index + id
-    }&lang=${currentLanguage}#${!isGames ? SUB_WIN_ID.PLAYGROUND : 'GAMES_FI'}`;
+    }&lang=${currentLanguage}#${!isGames ? SUB_WIN_ID.PLAYGROUND : 'Desktop'}`;
     // console.log({ tab, currentTabId, firstLoad });
 
     const onSiteMessage = async ({
@@ -229,7 +229,7 @@ export function WebviewDiscoverApps({
             wh100p
             relative
         >
-            <View abs xx0 top0 borderBox w100p h={44} px={12} aCenter row jSpaceBetween>
+            <View hide abs xx0 top0 borderBox w100p h={44} px={12} aCenter row jSpaceBetween>
                 <View aCenter jStart flex1>
                     <WebviewTopBar
                         hideOpenInNew
@@ -248,7 +248,7 @@ export function WebviewDiscoverApps({
                 right={8}
                 left={8}
                 bottom={8}
-                top={44}
+                top={8}
                 borderBox
             >
                 <WebViewBrowser

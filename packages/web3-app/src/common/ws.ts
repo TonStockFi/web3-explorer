@@ -13,11 +13,13 @@ export const connectWebSocket = (
         };
         onLoginError?: (message: { errCode:ErrCodes }, ws: WebSocket) => void;
         onMessage: (message: { action: string,payload:any,errCode:ErrCodes }, ws: WebSocket) => void;
+        onBufferMessage?: (message: ArrayBuffer, ws: WebSocket) => void;
         onClose: (e: { code: number; reason: string }, ws: WebSocket) => void;
     }
 ) => {
     return new Promise<WebSocket>((resolve, reject) => {
         const ws = new WebSocket(wsUrl);
+        ws.binaryType = 'arraybuffer'
         ws.onopen = () => {
             if(options.onLogged){
                 wsSendMessage(
@@ -29,18 +31,23 @@ export const connectWebSocket = (
             }
         };
         ws.onmessage = e => {
-            const message = JSON.parse(e.data);
-            const {action,errCode} = message;
-            if (action === 'logged') {
-                resolve(ws);
-            }if (action === 'loginError') {
-                if(options.onLoginError){
-                    options.onLoginError(message,ws)
+            if(typeof e.data == 'string'){
+                const message = JSON.parse(e.data);
+                const {action,errCode} = message;
+                if (action === 'logged') {
+                    resolve(ws);
+                }if (action === 'loginError') {
+                    if(options.onLoginError){
+                        options.onLoginError(message,ws)
+                    }
+                    reject(new Error(errCode));
+                }else{
+                    options.onMessage(message, ws)
                 }
-                reject(new Error(errCode));
             }else{
-                options.onMessage(message, ws)
+                options.onBufferMessage && options.onBufferMessage(e.data, ws)
             }
+            
         };
         ws.onerror = error => {
             reject({

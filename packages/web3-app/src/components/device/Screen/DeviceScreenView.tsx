@@ -17,6 +17,7 @@ let mouseDown = false;
 let startX = 0;
 let startY = 0;
 let isRightClick = false;
+
 export default function DeviceScreenView({
     deviceId,
     ws,
@@ -188,6 +189,11 @@ export default function DeviceScreenView({
                     bgcolor: theme.backgroundContent
                 }}
             >
+                <video
+                    style={{ width: '100%', height: '100%', display: 'none' }}
+                    id="video"
+                    draggable="false"
+                ></video>
                 {Boolean(screenImageSrc) && (
                     <img
                         id={getMonitorImageId(deviceId)}
@@ -200,7 +206,7 @@ export default function DeviceScreenView({
                     contentEditable
                     absFull
                     sx={{
-                        cursor: enableInput ? 'move' : undefined
+                        cursor: enableInput ? 'default' : undefined
                     }}
                     {...propsMonitor}
                 ></View>

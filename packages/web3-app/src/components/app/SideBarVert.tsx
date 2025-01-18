@@ -105,7 +105,7 @@ export const SideBarVert = ({ isMiniSideBar, left }: { isMiniSideBar: boolean; l
                                     borderBox
                                     wh100p
                                 >
-                                    <ImageIcon icon={action.icon!} size={28} />
+                                    <ImageIcon icon={action.icon!} size={22} />
                                 </View>
                             </View>
                         );

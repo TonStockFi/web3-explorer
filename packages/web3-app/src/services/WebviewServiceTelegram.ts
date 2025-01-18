@@ -168,7 +168,7 @@ export default class WebviewServiceTelegram extends WebviewService {
                         username = usernames[0].username
                     }
                     const avatar = await ws.getAvatar(user_id,avatarPhotoId)
-
+                    
                     alert(JSON.stringify(avatar.length))
                     // const {byChatId} =  state.user
                     // const messages = Object.values(byChatId[chatId].byId)
