@@ -12,7 +12,6 @@ import { useIAppContext } from '../providers/IAppProvider';
 
 import { useEffect } from 'react';
 import { TitleBarControlView } from '../components/app/TitleBarControlView';
-import { WalletSide } from '../components/app/WalletSide';
 import { MainMessageDispatcher } from '../components/MainMessageDispatcher';
 import { ProHandler } from '../components/ProHandler';
 import { ControlsView } from '../components/webview/ControlsView';
@@ -108,7 +107,7 @@ export const Web3AppInner = () => {
             <AppRegionDrag />
             <SideBarVert isMiniSideBar={isMiniSideBar} left={left} />
             <TitleBarControlView main />
-            <View
+            {/* <View
                 borderBox
                 sx={{
                     transition: 'left 0.2s ease'
@@ -121,8 +120,7 @@ export const Web3AppInner = () => {
                 height={HomHeaderHeight}
                 w={topLeft + 180 - SiderBarWidth}
             >
-                <WalletSide></WalletSide>
-            </View>
+            </View> */}
             <View
                 borderBox
                 sx={{
@@ -133,7 +131,7 @@ export const Web3AppInner = () => {
                 top0
                 right0
                 height={HomHeaderHeight}
-                left={topLeft + 180 - SiderBarWidth + 60}
+                left={topLeft - SiderBarWidth + 60}
             >
                 <TopBar />
             </View>

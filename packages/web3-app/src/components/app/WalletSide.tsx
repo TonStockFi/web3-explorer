@@ -58,6 +58,7 @@ export const WalletSide = () => {
             <View
                 rowVCenter
                 pointer
+                bgColor={theme.blue}
                 hoverBgColor={theme.backgroundContentAttention}
                 onClick={() => onShowWalletList(true)}
                 px={12}

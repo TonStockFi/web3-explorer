@@ -4,11 +4,12 @@ import { View } from '@web3-explorer/uikit-view';
 import { createRef, useEffect } from 'react';
 import { useTheme } from 'styled-components';
 import { goToUrlFromInput } from '../../common/helpers';
-import { AsideWidth, WALLET_LIST_WIDTH } from '../../constant';
+import { WALLET_LIST_WIDTH } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
 import { MAIN_NAV_TYPE } from '../../types';
 import { TabBar } from './TabBar';
+import { WalletSide } from './WalletSide';
 
 export const TopBar = () => {
     const ref = createRef<HTMLDivElement>();
@@ -60,6 +61,74 @@ export const TopBar = () => {
     }
     return (
         <View borderBox relative h100p flx rowVCenter mt={4} borderRadius={8} mr={0}>
+            <View
+                rowVCenter
+                overflowXAuto
+                flx
+                ref={ref}
+                right={showWalletList ? WALLET_LIST_WIDTH : 12}
+                abs
+                left0
+            >
+                <View pl={0} pr={8} sx={{ minWidth: 120 }}>
+                    <WalletSide />
+                </View>
+                {[MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY].map(row => {
+                    return (
+                        <TabBar
+                            key={row}
+                            tabId={row}
+                            minTabBar={false}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
+                        />
+                    );
+                })}
+                {[...mainTabs].map(row => {
+                    return (
+                        <TabBar
+                            key={row}
+                            tabId={row}
+                            minTabBar={false}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
+                        />
+                    );
+                })}
+                {[...urlTabs].map(row => {
+                    return (
+                        <TabBar
+                            key={row}
+                            tabId={row}
+                            minTabBar={false}
+                            onClick={() => {
+                                openTab(row);
+                            }}
+                            onClose={() => {
+                                closeTab(row);
+                            }}
+                        />
+                    );
+                })}
+                <View
+                    hide
+                    tips={'添加网址'}
+                    iconButtonSmall
+                    icon={'Add'}
+                    onClick={() => {
+                        onChangeUrlSearch('');
+                    }}
+                ></View>
+                <View appRegionDrag={true} flex1 h={36} />
+            </View>
             <View
                 hide={urlSearch === undefined}
                 zIdx={10000}
@@ -121,72 +190,6 @@ export const TopBar = () => {
                         ></Input>
                     </View>
                 </View>
-            </View>
-            <View
-                absFull
-                zIdx={1111}
-                rowVCenter
-                overflowXAuto
-                ref={ref}
-                right={walletAside ? AsideWidth : 0}
-            >
-                {[MAIN_NAV_TYPE.GAME_FI, MAIN_NAV_TYPE.DISCOVERY].map(row => {
-                    return (
-                        <TabBar
-                            key={row}
-                            tabId={row}
-                            minTabBar={false}
-                            onClick={() => {
-                                openTab(row);
-                            }}
-                            onClose={() => {
-                                closeTab(row);
-                            }}
-                        />
-                    );
-                })}
-                {[...mainTabs].map(row => {
-                    return (
-                        <TabBar
-                            key={row}
-                            tabId={row}
-                            minTabBar={false}
-                            onClick={() => {
-                                openTab(row);
-                            }}
-                            onClose={() => {
-                                closeTab(row);
-                            }}
-                        />
-                    );
-                })}
-
-                {[...urlTabs].map(row => {
-                    return (
-                        <TabBar
-                            key={row}
-                            tabId={row}
-                            minTabBar={false}
-                            onClick={() => {
-                                openTab(row);
-                            }}
-                            onClose={() => {
-                                closeTab(row);
-                            }}
-                        />
-                    );
-                })}
-
-                <View
-                    tips={'添加网址'}
-                    iconButtonSmall
-                    icon={'Add'}
-                    onClick={() => {
-                        onChangeUrlSearch('');
-                    }}
-                ></View>
-
-                <View appRegionDrag={!walletAside} flex1 h={36} mr={mr} />
             </View>
         </View>
     );

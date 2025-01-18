@@ -129,7 +129,7 @@ const DevicesPage = () => {
             wh100p
             relative
         >
-            <View abs xx0 top0 borderBox w100p h={44} px={12} aCenter row jSpaceBetween>
+            <View hide abs xx0 top0 borderBox w100p h={44} px={12} aCenter row jSpaceBetween>
                 <View aCenter jStart flex1>
                     <WebviewTopBar
                         hideOpenInNew
@@ -148,7 +148,7 @@ const DevicesPage = () => {
                 right={8}
                 left={8}
                 bottom={8}
-                top={44}
+                top={6}
                 borderBox
             >
                 <WebViewBrowser
