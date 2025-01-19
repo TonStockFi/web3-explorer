@@ -63,7 +63,8 @@ export const TopBar = () => {
         <View borderBox relative h100p flx rowVCenter mt={4} borderRadius={8} mr={0}>
             <View
                 rowVCenter
-                overflowXAuto={showWalletList ? false : true}
+                overflowXAuto={!showWalletList}
+                sx={{ overflow: showWalletList ? 'hidden' : undefined }}
                 flx
                 ref={ref}
                 right={showWalletList ? 150 : 12}
