@@ -17,7 +17,18 @@ export function SideWebviewInner({ site, currentSite }: { site: string; currentS
         }
     }, [isSelected]);
     return (
-        <View flex1 h100p hide={firstLoad} displayNone={!isSelected} borderRadius={0} borderBox>
+        <View
+            flex1
+            h100p
+            hide={firstLoad}
+            displayNone={!isSelected}
+            overflowHidden
+            sx={{
+                borderBottomLeftRadius: 8,
+                borderBottomRightRadius: 8
+            }}
+            borderBox
+        >
             {site === 'ChatGpt' && (
                 <LLmChatGptWebview
                     currentTabId={current_tabId}

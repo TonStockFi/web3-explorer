@@ -4,7 +4,6 @@ import { View } from '@web3-explorer/uikit-view';
 import { useState } from 'react';
 
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
-import Divider from '@web3-explorer/uikit-mui/dist/mui/Divider';
 import FormControl from '@web3-explorer/uikit-mui/dist/mui/FormControl';
 import InputLabel from '@web3-explorer/uikit-mui/dist/mui/InputLabel';
 import MenuItem from '@web3-explorer/uikit-mui/dist/mui/MenuItem';
@@ -85,7 +84,7 @@ export default function DeviceAuth({
     return (
         <View center absFull>
             <View column sx={{ width: 360 }} borderBox pt={24} px12>
-                <View mb12>
+                <View mb12 pb12>
                     <TextField
                         fullWidth
                         slotProps={{
@@ -122,7 +121,7 @@ export default function DeviceAuth({
                         variant="outlined"
                     />
                 </View>
-                <View mt={6}>
+                <View mt={6} hide>
                     <TextField
                         fullWidth
                         slotProps={{
@@ -162,7 +161,7 @@ export default function DeviceAuth({
                         </FormControl>
                     </View>
                 </View>
-                <Divider />
+                {/* <Divider /> */}
                 <View mt={24} center>
                     <View
                         buttonProps={{

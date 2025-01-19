@@ -241,16 +241,7 @@ export function WebviewDiscoverApps({
                     />
                 </View>
             </View>
-            <View
-                abs
-                borderRadius={8}
-                overflowHidden
-                right={8}
-                left={8}
-                bottom={8}
-                top={8}
-                borderBox
-            >
+            <View absFull borderRadius={8} overflowHidden m={4} borderBox>
                 <WebViewBrowser
                     preload={'playground'}
                     hideBoxShadow

@@ -535,13 +535,18 @@ if (!window._observerInitialized) {
             ref={ref}
             relative
             wh100p
-            borderRadius={borderRadius || 8}
             overflowHidden
             sx={{
                 zIndex: 1
             }}
         >
-            <View hide={!ready} absFull bgColor="white" borderRadius={10} zIdx={1} />
+            {/* <View
+                hide={!ready}
+                absFull
+                bgColor="white"
+                borderRadius={borderRadius ? borderRadius : 10}
+                zIdx={1}
+            /> */}
             <View absFull zIdx={2}>
                 <webview
                     src={initUrl}

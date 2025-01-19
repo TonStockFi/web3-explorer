@@ -3,7 +3,6 @@ import { ImageIcon } from '@web3-explorer/uikit-view/dist/icons/ImageIcon';
 import { HomHeaderHeight, MainNavList } from '../../constant';
 import { useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
-import SideProIcon from './SideProIcon';
 import SideSettings from './SideSettings';
 
 export const SideBarVert = ({ isMiniSideBar, left }: { isMiniSideBar: boolean; left: number }) => {
@@ -113,12 +112,12 @@ export const SideBarVert = ({ isMiniSideBar, left }: { isMiniSideBar: boolean; l
             </View>
             <View pb={6} w100p>
                 <View w100p center column hide={!isMiniSideBar}>
-                    <SideProIcon />
+                    {/* <SideProIcon /> */}
                     <SideSettings />
                 </View>
 
                 <View w100p borderBox rowVCenter px12 jSpaceBetween hide={isMiniSideBar}>
-                    <SideProIcon />
+                    {/* <SideProIcon /> */}
                     <SideSettings />
                 </View>
             </View>

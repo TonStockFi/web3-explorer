@@ -148,7 +148,7 @@ export default class WebviewServiceTelegram extends WebviewService {
                             await sleep(100)
                             ws.reloadWebview()
                             await sleep(1000)
-                            alert(accountBindedMessage)
+                            // alert(accountBindedMessage)
                             return true;
                         }
                     }
@@ -169,7 +169,7 @@ export default class WebviewServiceTelegram extends WebviewService {
                     }
                     const avatar = await ws.getAvatar(user_id,avatarPhotoId)
                     
-                    alert(JSON.stringify(avatar.length))
+                    // alert(JSON.stringify(avatar.length))
                     // const {byChatId} =  state.user
                     // const messages = Object.values(byChatId[chatId].byId)
                     // const message = messages[messages.length - 1];

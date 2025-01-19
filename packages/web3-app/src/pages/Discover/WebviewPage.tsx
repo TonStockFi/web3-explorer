@@ -20,7 +20,7 @@ export function WebviewPage() {
         return null;
     }
     return (
-        <View wh100p userSelectNone flx row relative>
+        <View wh100p userSelectNone flx row relative overflowHidden>
             <View flex1>
                 {Array.from(browserTabs)
                     .map(row => row[0])
@@ -37,7 +37,7 @@ export function WebviewPage() {
                 <View
                     bgColor={theme.backgroundBrowserActive}
                     absFull
-                    bottom={8}
+                    bottom={0}
                     zIdx={currentTabId === MAIN_NAV_TYPE.DISCOVERY ? 1 : -1}
                     opacity={currentTabId === MAIN_NAV_TYPE.DISCOVERY ? 1 : 0}
                 >
@@ -46,7 +46,7 @@ export function WebviewPage() {
                 <View
                     bgColor={theme.backgroundBrowserActive}
                     absFull
-                    bottom={8}
+                    bottom={0}
                     zIdx={currentTabId == MAIN_NAV_TYPE.GAME_FI ? 1 : -1}
                     opacity={currentTabId == MAIN_NAV_TYPE.GAME_FI ? 1 : 0}
                 >
