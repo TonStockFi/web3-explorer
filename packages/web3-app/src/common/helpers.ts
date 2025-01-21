@@ -10,7 +10,7 @@ import {
 import { md5 } from '@web3-explorer/lib-crypto/dist/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { BrowserTab } from '../providers/BrowserProvider';
-import { RoiInfo, SUB_WIN_ID } from '../types';
+import { DeviceInfo, RoiInfo, SUB_WIN_ID } from '../types';
 import { isValidDomain } from './utils';
 
 export function genId() {
@@ -138,3 +138,17 @@ export const goToUrlFromInput = (
     });
     cb && cb();
 };
+
+
+export function deviceIsDesktopPlatform(device: Partial<DeviceInfo>) {
+    return device.platform === 'darwin'  || 'win32' === device.platform;
+}
+
+
+export function deviceMacOsPlatform(device: Partial<DeviceInfo>) {
+    return device.platform === 'darwin';
+}
+
+export function deviceWin32Platform(device: Partial<DeviceInfo>) {
+    return device.platform === 'win32';
+}

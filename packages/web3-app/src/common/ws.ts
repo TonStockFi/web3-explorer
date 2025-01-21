@@ -21,11 +21,25 @@ export const connectWebSocket = (
         const ws = new WebSocket(wsUrl);
         ws.binaryType = 'arraybuffer'
         ws.onopen = () => {
+            
             if(options.onLogged){
                 wsSendMessage(
                     options.onLogged,
                     ws
                 );
+
+                const t = setInterval(()=>{
+                    if(ws.readyState === WebSocket.OPEN){
+                        wsSendMessage(
+                            {ping:1},
+                            ws
+                        );
+                    }else{
+                        clearInterval(t)
+                    }
+                    
+                },5000)
+
             }else{
                 resolve(ws)
             }
@@ -35,6 +49,7 @@ export const connectWebSocket = (
                 const message = JSON.parse(e.data);
                 const {action,errCode} = message;
                 if (action === 'logged') {
+
                     resolve(ws);
                 }if (action === 'loginError') {
                     if(options.onLoginError){

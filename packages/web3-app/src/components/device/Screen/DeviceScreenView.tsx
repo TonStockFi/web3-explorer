@@ -30,25 +30,19 @@ export default function DeviceScreenView({
     const theme = useTheme();
     const { getDeviceInfo } = useDevice();
     const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
-
     const platform = getDeviceInfo(deviceId, 'platform', null);
     const width1 = window.innerWidth;
-    let monitorScale1 = 0.5;
-    if (platform === 'darwin' || platform === 'win32') {
-        monitorScale1 = width1 / screen.width;
-    }
+    let monitorScale1 = width1 / screen.width;
+
     // debugger;
     const [monitorScale, setMonitorScale] = useState(monitorScale1);
     useEffect(() => {
         const handleResize = () => {
             const newWidth = window.innerWidth;
             let newMonitorScale = 0.5;
-            if (platform === 'darwin' || platform === 'win32') {
-                newMonitorScale = newWidth / screen.width;
-            }
+            newMonitorScale = newWidth / screen.width;
             setMonitorScale(newMonitorScale);
         };
-
         window.addEventListener('resize', handleResize);
 
         // Cleanup function to remove the event listener
@@ -63,7 +57,8 @@ export default function DeviceScreenView({
 
     let propsMonitor = {};
     const enableInput = inputIsOpen;
-
+    const isDesktop = platform === 'darwin' || platform === 'win32';
+    // alert(enableInput);
     if (enableInput) {
         propsMonitor = {
             onKeyDown: (e: any) => {
@@ -77,7 +72,6 @@ export default function DeviceScreenView({
                     keyEvent: { code, ctrlKey, altKeymetaKey, shiftKey, which, key, keyCode, type }
                 };
                 wsSendClientEvent(payload, ws);
-
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -104,11 +98,17 @@ export default function DeviceScreenView({
                 if (Math.abs(startX - pageX) > 10 || Math.abs(startY - pageY) > 10) {
                     if (!onDragging) {
                         payload.eventType = 'dragStart';
-                        wsSendClientEvent(payload, ws);
+                        if (!isDesktop) {
+                            wsSendClientEvent(payload, ws);
+                        }
+
                         onDragging = true;
                     } else {
                         wsSendClientEvent(payload, ws);
                     }
+                } else {
+                    payload.eventType = 'mouseMove';
+                    //wsSendClientEvent(payload, ws);
                 }
             },
 
@@ -126,8 +126,6 @@ export default function DeviceScreenView({
                     x: x1,
                     y: y1
                 };
-                // wsSendClientEvent(payload, ws);
-
                 const payload1 = {
                     eventType: 'pyautogui',
                     pyAutoGuisScript: `pyautogui.rightClick(${x1},${y1})`
@@ -154,7 +152,10 @@ export default function DeviceScreenView({
                         x: x1,
                         y: y1
                     };
-                    wsSendClientEvent(payload, ws);
+
+                    if (!isDesktop) {
+                        wsSendClientEvent(payload, ws);
+                    }
                 } else {
                     console.log('click', { scrollTop, x, y, x1, y1, pageX, pageY });
                     wsSendClientClickEvent(x1, y1, ws);
@@ -163,12 +164,12 @@ export default function DeviceScreenView({
                 mouseDown = false;
             }
         };
-        if (!(platform === 'darwin' || platform === 'win32')) {
+        if (!isDesktop) {
             //@ts-ignore
             delete propsMonitor.onContextMenu;
         }
     }
-
+    let cursor = enableInput ? 'default' : undefined;
     return (
         <View
             row
@@ -182,12 +183,15 @@ export default function DeviceScreenView({
             }}
         >
             <View
+                userSelectNone
                 sx={{
+                    cursor,
                     position: 'relative',
                     width: `${width}px`,
                     height: `${height}px`,
                     bgcolor: theme.backgroundContent
                 }}
+                {...propsMonitor}
             >
                 <video
                     style={{ width: '100%', height: '100%', display: 'none' }}
@@ -202,14 +206,6 @@ export default function DeviceScreenView({
                         src={screenImageSrc}
                     />
                 )}
-                <View
-                    contentEditable
-                    absFull
-                    sx={{
-                        cursor: enableInput ? 'default' : undefined
-                    }}
-                    {...propsMonitor}
-                ></View>
             </View>
         </View>
     );

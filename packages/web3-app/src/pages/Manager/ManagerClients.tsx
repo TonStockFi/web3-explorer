@@ -19,15 +19,15 @@ import { getUrlQuery, isDesktop } from '../../common/utils';
 import { WsCloseCode } from '../../types';
 
 export default function ManagerClients({
-    serverIsReady,
     setServerIsReady
 }: {
     serverIsReady: boolean;
     setServerIsReady: (v: boolean) => void;
 }) {
+    const serverIsReady = true;
     const ip = getUrlQuery('ip');
     const port = 6788;
-    const WS_URL = `ws://${ip}:${port}/api`;
+    const WS_URL = `wss://push.web3r.site`;
 
     const [clients, setClients] = useState([]);
     const theme = useTheme();
@@ -172,8 +172,15 @@ export default function ManagerClients({
                                     key={session.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell align="right">
+                                    <TableCell>
                                         <View useSelectText>
+                                            {session.manager && (
+                                                <Chip
+                                                    label="1001"
+                                                    size={'small'}
+                                                    variant="filled"
+                                                />
+                                            )}
                                             {session.device && `${session.device.deviceId}`}
                                             {session.client && `${session.client.deviceId}`}
                                         </View>

@@ -23,8 +23,21 @@ export function getUrlQuery(key:string,defaultVal?:any){
     return uri.searchParams.get(key) || defaultVal
 }
 
-export function addQauery(key:string,defaultVal?:any){
+export function addQuery(key:string,val:any){
     const uri = new URL(location.href);
+    uri.searchParams.set(key, String(val));
+    return uri.toString()
+}
+
+
+export function urlAddQuery(url:string,key:string,val:any){
+    const uri = new URL(url);
+    uri.searchParams.set(key, String(val));
+    return uri.toString()
+}
+
+export function urlGetQuery(url:string,key:string,defaultVal?:any){
+    const uri = new URL(url);
     return uri.searchParams.get(key) || defaultVal
 }
 

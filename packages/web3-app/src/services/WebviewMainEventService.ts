@@ -20,8 +20,8 @@ import {
 import { BaseWindowConstructorOptions } from 'electron';
 import { onAction, openWindow } from '../common/electron';
 import { getDiscoverHost, showAlertMessage } from '../common/helpers';
-import { currentTs, getPartitionKey } from '../common/utils';
-import { DISCOVER_PID, HEIGHT_PLAYGROUND_WIN_GAP, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB, WIDTH_PLAYGROUND_WIN_GAP } from '../constant';
+import { currentTs, getPartitionKey, urlGetQuery } from '../common/utils';
+import { DISCOVER_PID, PLAYGROUND_WIN_HEIGHT, TELEGRAME_WEB } from '../constant';
 import { BrowserTab, SideWebProps } from '../providers/BrowserProvider';
 import { AppEnv } from '../providers/IAppProvider';
 import { ExtensionType, isDeviceMonitor, isTelegramTab } from '../providers/PlaygroundProvider';
@@ -303,7 +303,6 @@ export default class WebviewMainEventService {
     }) {
         const { tabId } = tab;
         const topColor = getTopColor(index);
-
         const winId = WebviewMainEventService.getPlaygroundWinId({ index, tabId });
         
         const playgroundUrl = `${getDiscoverHost(
@@ -317,43 +316,33 @@ export default class WebviewMainEventService {
         
         let width = isMinWindow ? 368 : 368 * 2;
         let height = PLAYGROUND_WIN_HEIGHT;
-        if(isDeviceMonitor(tab)){
-            height = 852
-        }
+       
         let minHeight = height
         let minWidth = 368
-        let resizable = !(isTelegramTab(tab) || isDeviceMonitor(tab))
-        if(isDeviceMonitor(tab)&& tab.url  && tab.url?.indexOf("w=") > -1 && tab.url?.indexOf("h=") > -1 ){
-            const uri = new URL(tab.url)
-            const w = Number(uri.searchParams.get("w"))
-            const h = Number(uri.searchParams.get("h"))
-            resizable = true;
-            width = 1024 + WIDTH_PLAYGROUND_WIN_GAP
-            height = width * h / w +HEIGHT_PLAYGROUND_WIN_GAP
-            minHeight = height /2
-            minWidth = width / 2
-            // //1154 775
-            // //1440 900
-            // //0.8
-            // //1146 720
-            // width = w *0.8 + 1154 - 1146
-            // height = h *0.8 + 775 - 723
-        }
+        let resizable = !(isTelegramTab(tab))
 
         let x = winWidth - width - 12;
         let y = 12; 
+        const tabPropString = urlGetQuery(tab!.url!!,"tabProps")
+        let tabProps = {
+            resizable,
+            width,
+            minWidth,
+            height,
+            minHeight,
+            x,
+            y,
+        }
         
+        if(tabPropString){
+            tabProps = JSON.parse(Buffer.from(tabPropString,"hex").toString())
+
+        }
+
         return {
             winId,
             playgroundUrl,
             options: {
-                resizable,
-                width,
-                minWidth,
-                height,
-                minHeight,
-                x,
-                y,
                 titleBarStyle: 'hiddenInset',
                 titleBarOverlay: false,
                 trafficLightPosition: { x: 18, y: 14 },
@@ -361,7 +350,10 @@ export default class WebviewMainEventService {
                 autoHideMenuBar: true,
                 webPreferences: {
                     partition: getPartitionKey(DISCOVER_PID)
-                }
+                },
+
+                ...tabProps
+                
             } as BaseWindowConstructorOptions
         };
     }

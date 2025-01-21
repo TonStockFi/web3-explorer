@@ -162,20 +162,6 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                 if (deviceInfo) {
                     peerConnection = new RTCPeerConnection();
                     peerConnection.ontrack = event => {
-                        // const [remoteStream] = event.streams;
-
-                        // // // 调整接收端清晰度
-                        // const videoTrack = remoteStream.getVideoTracks()[0];
-                        // const sender = peerConnection!
-                        //     .getSenders()
-                        //     .find(s => s.track === videoTrack);
-
-                        // const params = sender!.getParameters();
-                        // if (!params.encodings) params.encodings = [{}];
-
-                        // params.encodings[0].maxBitrate = 5_000_000; // 提高观看端质量
-                        // sender!.setParameters(params);
-
                         const videoElement = document.getElementById('video') as HTMLVideoElement;
                         if (videoElement) {
                             videoElement.srcObject = event.streams[0];
@@ -188,7 +174,6 @@ export default function DeviceMonitor({ deviceId }: { deviceId: string }) {
                             videoElement.playsInline = true; // 适配移动端
                         }
                     };
-                    console.log('onMessage deviceInfo', deviceInfo);
                     handleClientDeviceInfo(deviceId!, deviceInfo);
                 }
             }

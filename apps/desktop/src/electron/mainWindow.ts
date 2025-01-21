@@ -25,6 +25,7 @@ import './i18n';
 import { handleActionMessage } from './onAction';
 import { delay } from './utils';
 import { getLocalIPAddress, WebSocketServerWrapper } from './ws-server/server';
+
 const publicDir = path.resolve(__dirname, isDev ? '../../' : '../../../', 'public');
 
 export function t(key: string) {
