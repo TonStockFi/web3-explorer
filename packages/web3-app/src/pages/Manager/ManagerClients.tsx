@@ -15,7 +15,7 @@ import { connectWebSocket, wsSendClose, wsSendMessage } from '../../common/ws';
 
 import QRCode from 'react-qr-code';
 import { showAlertMessage, showGlobalLoading } from '../../common/helpers';
-import { getUrlQuery, isDesktop } from '../../common/utils';
+import { isDesktop } from '../../common/utils';
 import { WsCloseCode } from '../../types';
 
 export default function ManagerClients({
@@ -25,7 +25,6 @@ export default function ManagerClients({
     setServerIsReady: (v: boolean) => void;
 }) {
     const serverIsReady = true;
-    const ip = getUrlQuery('ip');
     const port = 6788;
     const WS_URL = `wss://push.web3r.site`;
 
@@ -161,7 +160,7 @@ export default function ManagerClients({
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>设备ID</TableCell>
+                                <TableCell>识别码</TableCell>
                                 <TableCell align="right">类型</TableCell>
                                 <TableCell align="right">平台</TableCell>
                             </TableRow>

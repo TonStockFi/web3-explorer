@@ -1,8 +1,11 @@
 import { View } from '@web3-explorer/uikit-view';
 import { useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
-import { wsSendClientClickEvent, wsSendClientEvent } from '../../../common/ws';
+
+import { deviceIsDesktopPlatform } from '../../../common/helpers';
+import { getUrlQuery } from '../../../common/utils';
 import { useDevice } from '../../../providers/DevicesProvider';
+import { WebRtcControl } from '../WebRtcControl';
 
 export function getMonitorImageId(deviceId: string): string | undefined {
     return `monitor_${deviceId}`;
@@ -30,10 +33,10 @@ export default function DeviceScreenView({
     const theme = useTheme();
     const { getDeviceInfo } = useDevice();
     const screen = getDeviceInfo(deviceId, 'screen', { height: 1600, width: 720 });
-    const platform = getDeviceInfo(deviceId, 'platform', null);
-    const width1 = window.innerWidth;
-    let monitorScale1 = width1 / screen.width;
-
+    const platform = getUrlQuery('platform');
+    const w1 = getUrlQuery('w1');
+    const w = getUrlQuery('w');
+    let monitorScale1 = w1 / w;
     // debugger;
     const [monitorScale, setMonitorScale] = useState(monitorScale1);
     useEffect(() => {
@@ -57,8 +60,8 @@ export default function DeviceScreenView({
 
     let propsMonitor = {};
     const enableInput = inputIsOpen;
-    const isDesktop = platform === 'darwin' || platform === 'win32';
-    // alert(enableInput);
+    const isDesktop = deviceIsDesktopPlatform({ platform });
+    // console.log('enableInput', { enableInput });
     if (enableInput) {
         propsMonitor = {
             onKeyDown: (e: any) => {
@@ -71,7 +74,7 @@ export default function DeviceScreenView({
                     eventType: 'keyDown',
                     keyEvent: { code, ctrlKey, altKeymetaKey, shiftKey, which, key, keyCode, type }
                 };
-                wsSendClientEvent(payload, ws);
+                WebRtcControl.getInstance().wsSendClientEvent(payload, ws);
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -99,12 +102,12 @@ export default function DeviceScreenView({
                     if (!onDragging) {
                         payload.eventType = 'dragStart';
                         if (!isDesktop) {
-                            wsSendClientEvent(payload, ws);
+                            WebRtcControl.getInstance().wsSendClientEvent(payload, ws);
                         }
 
                         onDragging = true;
                     } else {
-                        wsSendClientEvent(payload, ws);
+                        WebRtcControl.getInstance().wsSendClientEvent(payload, ws);
                     }
                 } else {
                     payload.eventType = 'mouseMove';
@@ -121,16 +124,12 @@ export default function DeviceScreenView({
                 const scrollTop = document.documentElement.scrollTop;
                 const x1 = (pageX - x) / monitorScale;
                 const y1 = (pageY - y - scrollTop) / monitorScale;
-                const payload = {
-                    eventType: 'rightClick',
-                    x: x1,
-                    y: y1
-                };
+
                 const payload1 = {
                     eventType: 'pyautogui',
                     pyAutoGuisScript: `pyautogui.rightClick(${x1},${y1})`
                 };
-                wsSendClientEvent(payload1, ws);
+                WebRtcControl.getInstance().wsSendClientEvent(payload1, ws);
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -154,11 +153,11 @@ export default function DeviceScreenView({
                     };
 
                     if (!isDesktop) {
-                        wsSendClientEvent(payload, ws);
+                        WebRtcControl.getInstance().wsSendClientEvent(payload, ws);
                     }
                 } else {
                     console.log('click', { scrollTop, x, y, x1, y1, pageX, pageY });
-                    wsSendClientClickEvent(x1, y1, ws);
+                    WebRtcControl.getInstance().wsSendClientClickEvent(x1, y1, ws);
                 }
                 onDragging = false;
                 mouseDown = false;
@@ -177,7 +176,7 @@ export default function DeviceScreenView({
                 height: `${height}px`,
                 borderRadius: '10px',
                 overflow: 'hidden',
-                border: '1px solid rgba(0,0,0,0.9)',
+                border: '1px solid rgba(0,0,0,0.1)',
                 display: 'flex',
                 alignItems: 'flex-start'
             }}
@@ -188,8 +187,7 @@ export default function DeviceScreenView({
                     cursor,
                     position: 'relative',
                     width: `${width}px`,
-                    height: `${height}px`,
-                    bgcolor: theme.backgroundContent
+                    height: `${height}px`
                 }}
                 {...propsMonitor}
             >
@@ -205,6 +203,11 @@ export default function DeviceScreenView({
                         style={{ width: '100%', height: '100%' }}
                         src={screenImageSrc}
                     />
+                )}
+                {!screenImageSrc && !isDesktop && (
+                    <View absFull center>
+                        <View loading></View>
+                    </View>
                 )}
             </View>
         </View>

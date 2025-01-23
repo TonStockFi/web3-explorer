@@ -74,6 +74,7 @@ export const DevicesProvider = (props: { children: ReactNode }) => {
         device.delaySendImageDataMs = delaySendImageDataMs;
         device.delayPullEventMs = delayPullEventMs;
         Devices.set(deviceId, device);
+        updateGlobalDevice();
     };
     const getDeviceInfo = (deviceId: string, key?: keyof DeviceInfo, defaultValue?: any) => {
         const device = Devices.get(deviceId);

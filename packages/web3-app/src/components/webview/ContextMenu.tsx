@@ -8,6 +8,7 @@ import { useTheme } from 'styled-components';
 import { currentTs } from '../../common/utils';
 import { isDiscoverTab, useBrowserContext } from '../../providers/BrowserProvider';
 import { useIAppContext } from '../../providers/IAppProvider';
+import { isDeviceMonitor } from '../../providers/PlaygroundProvider';
 import { useScreenshotContext } from '../../providers/ScreenshotProvider';
 import LLMGeminiService from '../../services/LLMGeminiService';
 import WebviewMainEventService from '../../services/WebviewMainEventService';
@@ -63,14 +64,18 @@ export default function ContextMenu({
         }
     };
     const isDiscover = tabId && isDiscoverTab(tabId);
-    const isDevice = false; //tabId && isDeviceMonitor({ url: getUrlByTabId(tabId) });
+    const isDevice = tabId && isDeviceMonitor({ url: getUrlByTabId(tabId) });
     // console.log('contextMenu >>', contextMenu, tabId, selectionText);
     if (!env.isDev) {
         if (!tabId) {
             return null;
         }
     }
-    if (tabId && getUrlByTabId(tabId).indexOf('w=') > -1) {
+    if (
+        tabId &&
+        (getUrlByTabId(tabId).indexOf('playform=darwin') > -1 ||
+            getUrlByTabId(tabId).indexOf('playform=win32') > -1)
+    ) {
         return null;
     }
     if (!tabId || isCutEnable) {

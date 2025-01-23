@@ -2,7 +2,7 @@ import { CHAIN, ChainListItem, MAIN_NAV_TYPE, MainNavListItem, ProPlan } from '.
 export const PRO_RECV_ADDRESS="UQDUawBs8JDdr3QR4dYDkJq2ic9_0yNRSp-6eq29MKZKUkT-"
 
 export const WIDTH_PLAYGROUND_WIN_GAP = 8
-export const HEIGHT_PLAYGROUND_WIN_GAP = 52
+export const HEIGHT_PLAYGROUND_WIN_GAP = 56
 export const W3C_JETTON_CONTRACT  = '0:3f145e2bd301b31329418ca3b8aea0d6c44f0ecfa85b5b412787d87c55284e76'
 export const PRO_WHITE_LIST_MONTH="TK1jewM0JbFdb1f7mWsTlk17,1|TK0zTffTeEGskMtwdYGAl8I2,0|TK1z-z7apmAbgW_o6toLWx1T,0"
 export const PRO_WHITE_LIST_YEAR="TK1jewM0JbFdb1f7mWsTlk17,2"
@@ -29,7 +29,8 @@ export const TELEGRAME_WEB_P2E = `${TELEGRAME_WEB}#${P2E_ChatId}`
 export const TWA_URL_PREFIX = "https://t.me/"
 export const SERVER_URL = 'https://desk.web3r.site/api';
 export const OPENCV_URL = 'http://192.168.43.244:3100/opencv.js?v=1';
-export const WS_URL = 'ws://192.168.43.244:6788/api';
+// export const WS_URL = 'ws://192.168.43.244:6788';
+export const WS_URL = 'wss://push.web3r.site';
 
 export const DISCOVER_API = "https://api-web3r.site/api"
 export const DISCOVER_HOST = 'https://web3r.site/';

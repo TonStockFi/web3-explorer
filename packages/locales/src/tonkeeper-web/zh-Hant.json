@@ -1,7 +1,7 @@
 {
   "back":"后退",
   "DeviceInfo": "设备信息",
-  "DeviceId": "设备ID",
+  "DeviceId": "识别码",
   "Server":"服务器",
   "AddServer":"添加服务器",
   "ServerAddress":"服务器地址",
@@ -11,7 +11,7 @@
   "ServerExists":"服务器已存在",
   "InputControlEnabled":"输入控制已开启",
   "InputControlDisabled":"输入控制已关闭",
-  "DeviceIdCannotBeNull":"设备ID不能为空",
+  "DeviceIdCannotBeNull":"识别码不能为空",
   "ServerCannotBeNull":"服务器不能为空",
   "DeviceExists":"设备已存在",
   "RemoteScreenSize":"远程屏幕尺寸",

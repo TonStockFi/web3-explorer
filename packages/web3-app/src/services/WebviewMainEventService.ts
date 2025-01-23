@@ -337,7 +337,8 @@ export default class WebviewMainEventService {
         if(tabPropString){
             tabProps = JSON.parse(Buffer.from(tabPropString,"hex").toString())
 
-        }
+        }   
+        debugger
 
         return {
             winId,

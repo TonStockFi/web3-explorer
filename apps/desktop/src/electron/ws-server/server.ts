@@ -256,7 +256,7 @@ export class WebSocketServerWrapper {
                         return;
                     }
                     if (data.action === 'registerDevice') {
-                        const { deviceId, platform, password } = data.payload;
+                        const { deviceId, platform, password,screen } = data.payload;
                         this.users.forEach((user_, userId_) => {
                             if (
                                 user_.device &&
